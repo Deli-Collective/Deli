@@ -40,8 +40,8 @@ namespace H3ModFramework
         /// <returns>A byte array of the raw data at the given path</returns>
         public byte[] GetResource(string path, bool cache = true)
         {
-            if (_loadedByteResources.ContainsKey(path))
-                return _loadedByteResources[path];
+            if (_loadedByteResources.TryGetValue(path, out var result))
+                return result;
             if (Archive.ContainsEntry(path))
             {
                 using (var memoryStream = new MemoryStream())
@@ -67,25 +67,27 @@ namespace H3ModFramework
         public T GetResource<T>(string path, bool cache = true)
         {
             // Check if it's already cached
-            if (_loadedObjectResources.ContainsKey(path))
-                return (T) _loadedObjectResources[path];
+            if (_loadedObjectResources.TryGetValue(path, out var cached))
+                return (T) cached;
             
             // Try and load the bytes for the resource.
             var bytes = GetResource(path, false);
             // If it doesn't exist, return the default value for T
             if (bytes.Length == 0) return default;
 
-            // Check if we have a type loader for this type
-            if (!TypeLoaders.RegisteredTypeLoaders.ContainsKey(typeof(T)))
+            // Check if we have a type loader for the type
+            if (TypeLoaders.RegisteredTypeLoaders.TryGetValue(typeof(T), out var method))
             {
-                H3ModFramework.PublicLogger.LogError($"Resource {path} in {Guid} was requested with type {nameof(T)} but no TypeLoader exists for this type!");
-                return default;
+                // Invoke the type loader with the bytes from before
+                var result = (T) method.Invoke(null, new object[] {bytes});
+                if (cache) _loadedObjectResources[path] = result;
+                return result;
             }
 
-            // Invoke the type loader with the bytes from before
-            var result = (T) TypeLoaders.RegisteredTypeLoaders[typeof(T)].Invoke(null, new object[] {bytes});
-            if (cache) _loadedObjectResources[path] = result;
-            return result;
+            H3ModFramework.PublicLogger.LogError($"Resource {path} in {Guid} was requested with type {nameof(T)} but no TypeLoader exists for this type!");
+            return default;
+
+
         }
 
         /// <summary>

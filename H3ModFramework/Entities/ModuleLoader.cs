@@ -32,7 +32,6 @@ namespace H3ModFramework
             {
                 if (!type.IsSubclassOf(typeof(H3VRMod))) continue;
                 var modClass = (H3VRMod) Activator.CreateInstance(type);
-                modClass.Awake();
                 _loadedModClasses.Add(modClass);
             }
         }
@@ -45,7 +44,7 @@ namespace H3ModFramework
     
     public class ModuleLoaderAttribute : Attribute
     {
-        public static Dictionary<string, ModuleLoader> Cache = new Dictionary<string, ModuleLoader>();
+        public static readonly Dictionary<string, ModuleLoader> Cache = new Dictionary<string, ModuleLoader>();
         
         public string Name; 
 
