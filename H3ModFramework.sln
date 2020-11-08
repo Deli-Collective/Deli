@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "H3ModLoader", "H3ModLoader\H3ModLoader.csproj", "{AFF79E47-8610-47D3-88E6-DB6BB3173BA3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject", "TestProject\TestProject.csproj", "{E0C905EB-D50F-4035-AEF1-E5BFDF29C712}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "H3ModFramework", "H3ModFramework\H3ModFramework.csproj", "{AFF79E47-8610-47D3-88E6-DB6BB3173BA3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,9 +12,5 @@ Global
 		{AFF79E47-8610-47D3-88E6-DB6BB3173BA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFF79E47-8610-47D3-88E6-DB6BB3173BA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFF79E47-8610-47D3-88E6-DB6BB3173BA3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E0C905EB-D50F-4035-AEF1-E5BFDF29C712}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E0C905EB-D50F-4035-AEF1-E5BFDF29C712}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E0C905EB-D50F-4035-AEF1-E5BFDF29C712}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E0C905EB-D50F-4035-AEF1-E5BFDF29C712}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

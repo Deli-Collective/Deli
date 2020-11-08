@@ -1,12 +1,12 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 
-namespace H3ModLoader
+namespace H3ModFramework
 {
     [BepInPlugin(Constants.Guid, Constants.Name, Constants.Version)]
-    public class H3ModLoader : BaseUnityPlugin
+    public class H3ModFramework : BaseUnityPlugin
     {
-        public static H3ModLoader Instance;
+        public static H3ModFramework Instance;
         public static ManualLogSource PublicLogger;
 
         private void Awake()
@@ -20,6 +20,12 @@ namespace H3ModLoader
             var logger = new ManualLogSource(name);
             BepInEx.Logging.Logger.Sources.Add(logger);
             return logger;
+        }
+
+        public static void LoadMods()
+        {
+            // Steps required to load mods:
+            // 1: Read all the mod metadata
         }
     }
 }

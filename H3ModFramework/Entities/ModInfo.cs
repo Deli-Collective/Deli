@@ -4,7 +4,7 @@ using System.IO;
 using Ionic.Zip;
 using Valve.Newtonsoft.Json;
 
-namespace H3ModLoader
+namespace H3ModFramework
 {
     [JsonObject(MemberSerialization.OptIn)]
     public class ModInfo
@@ -46,7 +46,7 @@ namespace H3ModLoader
                 }
             }
 
-            H3ModLoader.PublicLogger.LogWarning($"Resource {path} requested in mod {Guid} but it doesn't exist!");
+            H3ModFramework.PublicLogger.LogWarning($"Resource {path} requested in mod {Guid} but it doesn't exist!");
             return new byte[0];
         }
 
@@ -71,7 +71,7 @@ namespace H3ModLoader
             // Check if we have a type loader for this type
             if (!TypeLoaders.RegisteredTypeLoaders.ContainsKey(typeof(T)))
             {
-                H3ModLoader.PublicLogger.LogError($"Resource {path} in {Guid} was requested with type {nameof(T)} but no TypeLoader exists for this type!");
+                H3ModFramework.PublicLogger.LogError($"Resource {path} in {Guid} was requested with type {nameof(T)} but no TypeLoader exists for this type!");
                 return default;
             }
 
@@ -97,14 +97,14 @@ namespace H3ModLoader
             catch (Exception e)
             {
                 // This method should only be passed zip files, so we should provide a stack trace if this errors.
-                H3ModLoader.PublicLogger.LogError($"Could not load mod archive ({path})\n" + e.StackTrace);
+                H3ModFramework.PublicLogger.LogError($"Could not load mod archive ({path})\n" + e.StackTrace);
                 return null;
             }
 
             // Try to locate the metadata file
             if (!archive.ContainsEntry(Constants.ArchiveMetaFilePath))
             {
-                H3ModLoader.PublicLogger.LogError($"Could not load {path} as it is not a valid mod.");
+                H3ModFramework.PublicLogger.LogError($"Could not load {path} as it is not a valid mod.");
                 return null;
             }
 

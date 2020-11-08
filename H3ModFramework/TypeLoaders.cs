@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Xml;
 using UnityEngine;
 
-namespace H3ModLoader
+namespace H3ModFramework
 {
     public static class TypeLoaders
     {
@@ -35,7 +34,7 @@ namespace H3ModLoader
 
                 if (RegisteredTypeLoaders.ContainsKey(method.ReturnType))
                 {
-                    H3ModLoader.PublicLogger.LogWarning($"Duplicate TypeLoader for type {method.ReturnType}. Ignoring duplicate implementation.");
+                    H3ModFramework.PublicLogger.LogWarning($"Duplicate TypeLoader for type {method.ReturnType}. Ignoring duplicate implementation.");
                     continue;
                 }
                 
@@ -43,7 +42,7 @@ namespace H3ModLoader
                 var parameters = method.GetParameters();
                 if (parameters.Length != 1 || parameters[0].ParameterType != typeof(byte[]))
                 {
-                    H3ModLoader.PublicLogger.LogError($"Cannot register TypeLoader for method {method}, it is invalid.");
+                    H3ModFramework.PublicLogger.LogError($"Cannot register TypeLoader for method {method}, it is invalid.");
                     continue;
                 }
 

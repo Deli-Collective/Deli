@@ -1,4 +1,4 @@
-﻿namespace H3ModLoader
+﻿namespace H3ModFramework
 {
     public static class Constants
     {
@@ -9,6 +9,7 @@
         
         // Loader constants
         public const string ModExtension = "zip";
+        public const string ModDirectory = "mods";
         public const string ArchiveMetaFilePath = "metadata.json";
     }
 }
