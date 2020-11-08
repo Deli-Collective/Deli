@@ -106,7 +106,7 @@ namespace H3ModFramework
             catch (Exception e)
             {
                 // This method should only be passed zip files, so we should provide a stack trace if this errors.
-                H3ModFramework.PublicLogger.LogError($"Could not load mod archive ({path})\n" + e.StackTrace);
+                H3ModFramework.PublicLogger.LogError($"Could not load mod archive ({path})\n{e}");
                 return null;
             }
 

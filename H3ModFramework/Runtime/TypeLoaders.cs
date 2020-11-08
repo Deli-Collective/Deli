@@ -38,6 +38,7 @@ namespace H3ModFramework
 
                 // If it's valid, add it to the dictionary
                 RegisteredTypeLoaders[method.ReturnType] = method;
+                H3ModFramework.PublicLogger.LogInfo("Registered TypeLoader for " + method.ReturnType);
             }
         }
 

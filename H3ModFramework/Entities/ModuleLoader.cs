@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 
 namespace H3ModFramework
 {
@@ -30,7 +28,7 @@ namespace H3ModFramework
             foreach (var type in assembly.GetTypes())
             {
                 if (!type.IsSubclassOf(typeof(H3VRMod))) continue;
-                var modClass = (H3VRMod) Activator.CreateInstance(type, H3ModFramework.GetLogger(mod.Name));
+                var modClass = (H3VRMod) Activator.CreateInstance(type, mod, H3ModFramework.GetLogger(mod.Name));
                 _loadedModClasses.Add(modClass);
             }
         }

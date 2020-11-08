@@ -20,6 +20,7 @@ namespace H3ModFramework
         {
             Instance = this;
             PublicLogger = GetLogger("H3MF");
+            Initialize();
         }
 
         public static ManualLogSource GetLogger(string name)
@@ -33,15 +34,17 @@ namespace H3ModFramework
         /// Enumerates the mods in the mods folder
         /// </summary>
         /// <returns>An enumerable of the mods in the mods folder</returns>
-        private static IEnumerable<ModInfo> DiscoverMods() => Directory.GetFiles(Constants.ModDirectory, "*." + Constants.ModExtension, SearchOption.AllDirectories).Select(ModInfo.FromFile).ToArray();
+        private static IEnumerable<ModInfo> DiscoverMods(string dir) => Directory.GetFiles(dir, "*." + Constants.ModExtension, SearchOption.AllDirectories).Select(ModInfo.FromFile).ToArray();
 
         private static void Initialize()
         {
             // Scan this assembly for stuff
+            TypeLoaders.ScanAssembly(Assembly.GetExecutingAssembly());
             ModuleLoaderAttribute.ScanAssembly(Assembly.GetExecutingAssembly());
-            
+
+            var modsDir = Directory.GetCurrentDirectory() + "/" + Constants.ModDirectory;
             // Sort the mods in the order they depend on each other
-            var mods = DiscoverMods().ToArray();
+            var mods = DiscoverMods(modsDir).ToArray();
             try
             {
                 var sorted = mods.TSort(x => mods.Where(m => x.Dependencies.Contains(m.Guid)), true);

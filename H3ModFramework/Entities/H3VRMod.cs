@@ -3,16 +3,17 @@ using BepInEx.Logging;
 
 namespace H3ModFramework
 {
-    public abstract class H3VRMod
+    public class H3VRMod
     {
         protected ManualLogSource Logger { get; private set; }
+        protected ModInfo BaseMod { get; private set; }
         
-        public H3VRMod(ManualLogSource logSource)
+        public H3VRMod(ModInfo mod, ManualLogSource logSource)
         {
             Logger = logSource;
+            BaseMod = mod;
         }
-        
-        
+
         /// <summary>
         /// This is called by the default Mod Loader after all mods have been constructed
         /// </summary>
