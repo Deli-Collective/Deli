@@ -14,6 +14,8 @@ namespace H3ModFramework
         public static H3ModFramework Instance;
         public static ManualLogSource PublicLogger;
 
+        public static event Action PostInitialization;
+        
         private void Awake()
         {
             Instance = this;
@@ -44,6 +46,9 @@ namespace H3ModFramework
             {
                 var sorted = mods.TSort(x => mods.Where(m => x.Dependencies.Contains(m.Guid)), true);
                 foreach (var mod in sorted) LoadMod(mod);
+                
+                // Once the mods are all done loading we can fire the PostInitialization events
+                PostInitialization?.Invoke();
             }
             catch (Exception e)
             {

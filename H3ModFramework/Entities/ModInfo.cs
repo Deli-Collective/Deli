@@ -36,8 +36,8 @@ namespace H3ModFramework
 
         // Resources
         public ZipFile Archive;
-        private Dictionary<string, byte[]> _loadedByteResources = new Dictionary<string, byte[]>();
-        private Dictionary<string, object> _loadedObjectResources = new Dictionary<string, object>();
+        private readonly Dictionary<string, byte[]> _loadedByteResources = new Dictionary<string, byte[]>();
+        private readonly Dictionary<string, object> _loadedObjectResources = new Dictionary<string, object>();
 
         // State
         public ModState State;
