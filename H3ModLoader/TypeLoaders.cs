@@ -1,0 +1,74 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Xml;
+using UnityEngine;
+
+namespace H3ModLoader
+{
+    public static class TypeLoaders
+    {
+        public static Dictionary<Type, MethodInfo> RegisteredTypeLoaders = new Dictionary<Type, MethodInfo>();
+        
+        /// <summary>
+        /// Scans the loaded assemblies for valid type loader methods and adds them to the dictionary.
+        /// </summary>
+        public static void ScanAssemblies()
+        {
+            // Clear the current dict
+            RegisteredTypeLoaders.Clear();
+
+            // Create an enumerator for all static methods in all assemblies
+            var methods =
+                AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(a => a.GetTypes())
+                    .SelectMany(t => t.GetMethods())
+                    .Where(m => m.IsStatic);
+
+            foreach (var method in methods)
+            {
+                // Check if we have the type loader attribute on the method
+                var attributes = method.GetCustomAttributes(typeof(TypeLoaderAttribute), false);
+                if (attributes.Length <= 0) continue;
+
+                if (RegisteredTypeLoaders.ContainsKey(method.ReturnType))
+                {
+                    H3ModLoader.PublicLogger.LogWarning($"Duplicate TypeLoader for type {method.ReturnType}. Ignoring duplicate implementation.");
+                    continue;
+                }
+                
+                // Verify the type loader is valid
+                var parameters = method.GetParameters();
+                if (parameters.Length != 1 || parameters[0].ParameterType != typeof(byte[]))
+                {
+                    H3ModLoader.PublicLogger.LogError($"Cannot register TypeLoader for method {method}, it is invalid.");
+                    continue;
+                }
+
+                // If it's valid, add it to the dictionary
+                RegisteredTypeLoaders[method.ReturnType] = method;
+            }
+        }
+
+        #region Type Loader Methods
+
+        [TypeLoader]
+        public static string TypeLoaderString(byte[] raw) => Encoding.UTF8.GetString(raw, 0, raw.Length);
+
+        [TypeLoader]
+        public static AssetBundle TypeLoaderAssetBundle(byte[] raw) => AssetBundle.LoadFromMemory(raw);
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Attribute to assign to methods that are Type Loaders
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class TypeLoaderAttribute : Attribute
+    {
+
+    }
+}
