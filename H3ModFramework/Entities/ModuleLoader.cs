@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 
 namespace H3ModFramework
 {
-    
     public abstract class ModuleLoader
     {
         public abstract void LoadModule(ModInfo mod, ModInfo.ModuleInfo module);
@@ -31,7 +30,7 @@ namespace H3ModFramework
             foreach (var type in assembly.GetTypes())
             {
                 if (!type.IsSubclassOf(typeof(H3VRMod))) continue;
-                var modClass = (H3VRMod) Activator.CreateInstance(type);
+                var modClass = (H3VRMod) Activator.CreateInstance(type, H3ModFramework.GetLogger(mod.Name));
                 _loadedModClasses.Add(modClass);
             }
         }
