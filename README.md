@@ -6,3 +6,9 @@ H3ModFramework is a framework for modularizing mods into archives containing one
 
 ## Examples
 Lets say you've made a custom character for Take and Hold and to compliment it you've made some custom enemy templates as well. Normally you'd have to place the files individually inside their respective folders. With this mod framework you can package them all up into a single archive, and if you wanted, even include some custom weaponry!
+
+## Features
+- **Extreme modularity**: all module loaders are user-defined, giving external libraries control over how they want to load their own data.
+- **Resource management**: Built into the framework is modular resource management. You can fetch and cache content from your mod archives as raw byte arrays, or use the fancy included Type Loaders (which are also modular!) which provide an easy-to-use intermediate for fetching and caching the data as any type
+- **Built-in dependency and version management**: Let the framework handle the discovery of mods. All you have to do is tell the framework which mods you're expecting to be there and it will do the rest.
+- **Compatible with legacy formats**: (Provided someone writes a module loader for it!)
