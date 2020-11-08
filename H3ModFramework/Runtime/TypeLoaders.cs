@@ -10,23 +10,13 @@ namespace H3ModFramework
     public static class TypeLoaders
     {
         public static Dictionary<Type, MethodInfo> RegisteredTypeLoaders = new Dictionary<Type, MethodInfo>();
-        
+
         /// <summary>
-        /// Scans the loaded assemblies for valid type loader methods and adds them to the dictionary.
+        /// Scans the provided assembly for valid type loader methods and adds them to the dictionary.
         /// </summary>
-        public static void ScanAssemblies()
+        public static void ScanAssembly(Assembly assembly)
         {
-            // Clear the current dict
-            RegisteredTypeLoaders.Clear();
-
-            // Create an enumerator for all static methods in all assemblies
-            var methods =
-                AppDomain.CurrentDomain.GetAssemblies()
-                    .SelectMany(a => a.GetTypes())
-                    .SelectMany(t => t.GetMethods())
-                    .Where(m => m.IsStatic);
-
-            foreach (var method in methods)
+            foreach (var method in assembly.GetTypes().SelectMany(t => t.GetMethods()).Where(m => m.IsStatic))
             {
                 // Check if we have the type loader attribute on the method
                 var attributes = method.GetCustomAttributes(typeof(TypeLoaderAttribute), false);
@@ -37,7 +27,7 @@ namespace H3ModFramework
                     H3ModFramework.PublicLogger.LogWarning($"Duplicate TypeLoader for type {method.ReturnType}. Ignoring duplicate implementation.");
                     continue;
                 }
-                
+
                 // Verify the type loader is valid
                 var parameters = method.GetParameters();
                 if (parameters.Length != 1 || parameters[0].ParameterType != typeof(byte[]))
@@ -58,7 +48,7 @@ namespace H3ModFramework
 
         [TypeLoader]
         public static AssetBundle TypeLoaderAssetBundle(byte[] raw) => AssetBundle.LoadFromMemory(raw);
-        
+
         [TypeLoader]
         public static Assembly TypeLoaderAssembly(byte[] raw) => Assembly.Load(raw);
 
@@ -71,6 +61,5 @@ namespace H3ModFramework
     [AttributeUsage(AttributeTargets.Method)]
     public class TypeLoaderAttribute : Attribute
     {
-
     }
 }

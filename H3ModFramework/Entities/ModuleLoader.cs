@@ -26,6 +26,7 @@ namespace H3ModFramework
         {
             var assembly = mod.GetResource<Assembly>(module.FilePath);
             ModuleLoaderAttribute.ScanAssembly(assembly);
+            TypeLoaders.ScanAssembly(assembly);
             
             foreach (var type in assembly.GetTypes())
             {

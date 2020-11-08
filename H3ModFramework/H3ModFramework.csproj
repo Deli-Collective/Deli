@@ -32,6 +32,12 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+        <Reference Include="Assembly-CSharp, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>A:\Games\SteamLibrary\steamapps\common\H3VR\h3vr_Data\Managed\Assembly-CSharp.dll</HintPath>
+        </Reference>
+        <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>A:\Games\SteamLibrary\steamapps\common\H3VR\h3vr_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+        </Reference>
         <Reference Include="BepInEx, Version=5.3.0.0, Culture=neutral, PublicKeyToken=null">
           <HintPath>A:\Games\SteamLibrary\steamapps\common\H3VR\BepInEx\core\BepInEx.dll</HintPath>
         </Reference>
