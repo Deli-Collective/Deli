@@ -9,13 +9,6 @@ namespace H3ModFramework
     [JsonObject(MemberSerialization.OptIn)]
     public class ModInfo
     {
-        public enum ModState
-        {
-            Unloaded,
-            Loaded,
-            Invalid,
-            WaitingForDependency,
-        }
 
         [JsonObject(MemberSerialization.OptIn)]
         public struct ModuleInfo
@@ -39,9 +32,6 @@ namespace H3ModFramework
         private readonly Dictionary<string, byte[]> _loadedByteResources = new Dictionary<string, byte[]>();
         private readonly Dictionary<string, object> _loadedObjectResources = new Dictionary<string, object>();
 
-        // State
-        public ModState State;
-        
         /// <summary>
         /// Fetches data from the mod's archive at the specified path
         /// </summary>
@@ -132,7 +122,6 @@ namespace H3ModFramework
                 memoryStream.Position = 0;
                 var mod = JsonConvert.DeserializeObject<ModInfo>(new StreamReader(memoryStream).ReadToEnd());
                 mod.Archive = archive;
-                mod.State = ModState.Unloaded;
                 return mod;
             }
         }
