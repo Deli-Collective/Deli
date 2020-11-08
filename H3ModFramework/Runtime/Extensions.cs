@@ -35,5 +35,15 @@ namespace H3ModFramework
                     throw new Exception("Cyclic dependency found");
             }
         }
+
+        /// <summary>
+        /// Checks if the provided dependant version string is satisfied by the source version
+        /// </summary>
+        public static bool Satisfies(this Version source, string dependant)
+        {
+            // It is satisfied if the Major version is the same and the minor version is equal or higher.
+            var dep = new Version(dependant);
+            return source.Major == dep.Major && source.Minor >= dep.Minor;
+        }
     }
 }

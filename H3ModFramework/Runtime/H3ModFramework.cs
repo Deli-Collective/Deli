@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
+using UnityEngine;
 
 namespace H3ModFramework
 {
@@ -15,7 +16,7 @@ namespace H3ModFramework
         public static ManualLogSource PublicLogger;
 
         public static event Action PostInitialization;
-        
+
         private void Awake()
         {
             Instance = this;
@@ -42,21 +43,59 @@ namespace H3ModFramework
             TypeLoaders.ScanAssembly(Assembly.GetExecutingAssembly());
             ModuleLoaderAttribute.ScanAssembly(Assembly.GetExecutingAssembly());
 
+            // Discover all the mods
             var modsDir = Directory.GetCurrentDirectory() + "/" + Constants.ModDirectory;
-            // Sort the mods in the order they depend on each other
             var mods = DiscoverMods(modsDir).ToArray();
+
+            // Make sure all dependencies are satisfied
+            if (!CheckDependencies(mods))
+            {
+                PublicLogger.LogError("One or more dependencies are not satisfied. Aborting initialization.");
+                return;
+            }
+
+            // Load the mods
             try
             {
-                var sorted = mods.TSort(x => mods.Where(m => x.Dependencies.Contains(m.Guid)), true);
+                // Sort the mods in the order they depend on each other
+                var sorted = mods.TSort(x => mods.Where(m => x.Dependencies.Select(d => d.Split('@')[0]).Contains(m.Guid)), true);
                 foreach (var mod in sorted) LoadMod(mod);
-                
-                // Once the mods are all done loading we can fire the PostInitialization events
-                PostInitialization?.Invoke();
             }
             catch (Exception e)
             {
                 PublicLogger.LogError("Could not initialize mod framework.\n" + e);
             }
+
+            // Once the mods are all done loading we can fire the PostInitialization events
+            PostInitialization?.Invoke();
+        }
+
+        private static bool CheckDependencies(ModInfo[] mods)
+        {
+            var pass = true;
+
+            foreach (var mod in mods)
+            foreach (var dep in mod.Dependencies)
+            {
+                // Split the dependency by @ and extract the target version
+                var split = dep.Split('@');
+
+                // Try finding the installed dependency
+                var dependency = mods.FirstOrDefault(m => m.Guid == split[0]);
+                if (dependency == null)
+                {
+                    PublicLogger.LogError($"Mod {mod.Name} depends on {dep} but it is not installed!");
+                    pass = false;
+                }
+                // Check if the installed version satisfies the dependency request
+                else if (!dependency.Version.Satisfies(split[1]))
+                {
+                    PublicLogger.LogError($"Mod {mod.Name} depends on {dep} but version {dependency.VersionString} is installed!");
+                    pass = false;
+                }
+            }
+
+            return pass;
         }
 
         private static void LoadMod(ModInfo mod)

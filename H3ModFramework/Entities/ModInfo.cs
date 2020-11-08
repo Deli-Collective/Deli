@@ -22,6 +22,8 @@ namespace H3ModFramework
         [JsonProperty] public string Name;
         [JsonProperty] public string Author;
         [JsonProperty] public string[] Dependencies;
+        [JsonProperty("Version")] public string VersionString;
+        public Version Version;
 
         // Loader info
         [JsonProperty] public ModuleInfo[] Modules;
@@ -124,6 +126,7 @@ namespace H3ModFramework
                 memoryStream.Position = 0;
                 var mod = JsonConvert.DeserializeObject<ModInfo>(new StreamReader(memoryStream).ReadToEnd());
                 mod.Archive = archive;
+                mod.Version = new Version(mod.VersionString);
                 return mod;
             }
         }
