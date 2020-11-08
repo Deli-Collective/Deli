@@ -25,7 +25,7 @@ So lets say you're making a sci-fi pack for H3. You have a couple of custom weap
 ```
 
 #### Metadata.json
-This file describes to the framework what your mod is and how it should be loaded.
+This file describes to the framework what your mod is and how it should be loaded. Your metadata file contains your mod GUID, name, author and dependencies as well as a list of modules to be loaded. Each module consists of a resource in your archive and a loader to load it. All loaders except the Assembly loader are defined externally, so make sure you have your dependencies listed or else there's no guarantee they'll be loaded before your mod.
 (This is just an example. These dependencies and loaders don't exist. Yet.)
 ```JSON
 {
