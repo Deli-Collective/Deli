@@ -52,10 +52,13 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Constants.cs" />
+        <Compile Include="Entities\H3VRMod.cs" />
         <Compile Include="Entities\ModInfo.cs" />
-        <Compile Include="H3ModFramework.cs" />
+        <Compile Include="Entities\ModuleLoader.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="TypeLoaders.cs" />
+        <Compile Include="Runtime\Extensions.cs" />
+        <Compile Include="Runtime\H3ModFramework.cs" />
+        <Compile Include="Runtime\TypeLoaders.cs" />
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />

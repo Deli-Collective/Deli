@@ -9,6 +9,21 @@ namespace H3ModFramework
     [JsonObject(MemberSerialization.OptIn)]
     public class ModInfo
     {
+        public enum ModState
+        {
+            Unloaded,
+            Loaded,
+            Invalid,
+            WaitingForDependency,
+        }
+
+        [JsonObject(MemberSerialization.OptIn)]
+        public struct ModuleInfo
+        {
+            [JsonProperty] public string FilePath;
+            [JsonProperty] public string Loader;
+        }
+        
         // Mod info
         [JsonProperty] public string Guid;
         [JsonProperty] public string Name;
@@ -16,8 +31,7 @@ namespace H3ModFramework
         [JsonProperty] public string[] Dependencies;
 
         // Loader info
-        [JsonProperty] public string Loader;
-        [JsonProperty] public string LoaderVersion;
+        [JsonProperty] public ModuleInfo[] Modules;
         [JsonProperty] public string GameVersion;
 
         // Resources
@@ -25,6 +39,9 @@ namespace H3ModFramework
         private Dictionary<string, byte[]> _loadedByteResources = new Dictionary<string, byte[]>();
         private Dictionary<string, object> _loadedObjectResources = new Dictionary<string, object>();
 
+        // State
+        public ModState State;
+        
         /// <summary>
         /// Fetches data from the mod's archive at the specified path
         /// </summary>
@@ -115,6 +132,7 @@ namespace H3ModFramework
                 memoryStream.Position = 0;
                 var mod = JsonConvert.DeserializeObject<ModInfo>(new StreamReader(memoryStream).ReadToEnd());
                 mod.Archive = archive;
+                mod.State = ModState.Unloaded;
                 return mod;
             }
         }

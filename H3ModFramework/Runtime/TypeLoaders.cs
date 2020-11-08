@@ -58,6 +58,9 @@ namespace H3ModFramework
 
         [TypeLoader]
         public static AssetBundle TypeLoaderAssetBundle(byte[] raw) => AssetBundle.LoadFromMemory(raw);
+        
+        [TypeLoader]
+        public static Assembly TypeLoaderAssembly(byte[] raw) => Assembly.Load(raw);
 
         #endregion
     }
