@@ -14,6 +14,7 @@ namespace H3ModFramework
     {
         public static H3ModFramework Instance;
         public static ManualLogSource PublicLogger;
+        public static ModInfo[] InstalledMods;
 
         public static event Action PostInitialization;
 
@@ -45,10 +46,10 @@ namespace H3ModFramework
 
             // Discover all the mods
             var modsDir = Directory.GetCurrentDirectory() + "/" + Constants.ModDirectory;
-            var mods = DiscoverMods(modsDir).ToArray();
+            InstalledMods = DiscoverMods(modsDir).ToArray();
 
             // Make sure all dependencies are satisfied
-            if (!CheckDependencies(mods))
+            if (!CheckDependencies(InstalledMods))
             {
                 PublicLogger.LogError("One or more dependencies are not satisfied. Aborting initialization.");
                 return;
@@ -58,7 +59,7 @@ namespace H3ModFramework
             try
             {
                 // Sort the mods in the order they depend on each other
-                var sorted = mods.TSort(x => mods.Where(m => x.Dependencies.Select(d => d.Split('@')[0]).Contains(m.Guid)), true);
+                var sorted = InstalledMods.TSort(x => InstalledMods.Where(m => x.Dependencies.Select(d => d.Split('@')[0]).Contains(m.Guid)), true);
                 foreach (var mod in sorted) LoadMod(mod);
             }
             catch (Exception e)

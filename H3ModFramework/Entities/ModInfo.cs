@@ -131,5 +131,7 @@ namespace H3ModFramework
                 return mod;
             }
         }
+
+        public override string ToString() => $"{Guid}@{VersionString}";
     }
 }
