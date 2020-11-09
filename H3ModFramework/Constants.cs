@@ -10,6 +10,7 @@
         // Loader constants
         public const string ModExtension = "zip";
         public const string ModDirectory = "mods";
+        public const string ConfigDirectory = "config";
         public const string ArchiveMetaFilePath = "metadata.json";
     }
 }

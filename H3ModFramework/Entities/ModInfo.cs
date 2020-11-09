@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
+using BepInEx.Configuration;
 using Ionic.Zip;
 using Valve.Newtonsoft.Json;
 
@@ -24,13 +26,11 @@ namespace H3ModFramework
         [JsonProperty] public string[] Dependencies;
         [JsonProperty("Version")] public string VersionString;
         public Version Version;
-
-        // Loader info
         [JsonProperty] public ModuleInfo[] Modules;
-        [JsonProperty] public string GameVersion;
 
         // Resources
         public ZipFile Archive;
+        public ConfigFile Config;
         private readonly Dictionary<string, byte[]> _loadedByteResources = new Dictionary<string, byte[]>();
         private readonly Dictionary<string, object> _loadedObjectResources = new Dictionary<string, object>();
 
@@ -127,6 +127,7 @@ namespace H3ModFramework
                 var mod = JsonConvert.DeserializeObject<ModInfo>(new StreamReader(memoryStream).ReadToEnd());
                 mod.Archive = archive;
                 mod.Version = new Version(mod.VersionString);
+                mod.Config = new ConfigFile(Path.Combine(Constants.ConfigDirectory, $"{mod.Guid}.cfg"), true);
                 return mod;
             }
         }

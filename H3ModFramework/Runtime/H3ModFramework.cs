@@ -98,6 +98,12 @@ namespace H3ModFramework
             return pass;
         }
 
+        private static void EnsureDirectoriesExist()
+        {
+            Directory.CreateDirectory(Constants.ModDirectory);
+            Directory.CreateDirectory(Constants.ConfigDirectory);
+        }
+        
         private static void LoadMod(ModInfo mod)
         {
             // For each module inside the mod, load it
