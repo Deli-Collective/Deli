@@ -16,7 +16,7 @@ namespace H3ModFramework
         /// </summary>
         public static void ScanAssembly(Assembly assembly)
         {
-            foreach (var method in assembly.GetTypes().SelectMany(t => t.GetMethods()).Where(m => m.IsStatic))
+            foreach (var method in assembly.GetTypesSafe().SelectMany(t => t.GetMethods()).Where(m => m.IsStatic))
             {
                 // Check if we have the type loader attribute on the method
                 var attributes = method.GetCustomAttributes(typeof(TypeLoaderAttribute), false);

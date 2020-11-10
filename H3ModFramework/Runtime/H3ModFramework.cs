@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,12 +16,14 @@ namespace H3ModFramework
         public static H3ModFramework Instance;
         public static ManualLogSource PublicLogger;
         public static ModInfo[] InstalledMods;
+        public static GameObject ManagerObject;
 
         public static event Action PostInitialization;
 
         private void Awake()
         {
             Instance = this;
+            ManagerObject = new GameObject("H3ModFramework Manager");
             PublicLogger = GetLogger("H3MF");
             Initialize();
         }
@@ -40,6 +43,8 @@ namespace H3ModFramework
 
         private static void Initialize()
         {
+            EnsureDirectoriesExist();
+            
             // Scan this assembly for stuff
             TypeLoaders.ScanAssembly(Assembly.GetExecutingAssembly());
             ModuleLoaderAttribute.ScanAssembly(Assembly.GetExecutingAssembly());

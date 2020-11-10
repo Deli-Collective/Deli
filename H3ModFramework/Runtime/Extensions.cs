@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace H3ModFramework
 {
@@ -44,6 +46,18 @@ namespace H3ModFramework
             // It is satisfied if the Major version is the same and the minor version is equal or higher.
             var dep = new Version(dependant);
             return source.Major == dep.Major && source.Minor >= dep.Minor;
+        }
+
+        public static Type[] GetTypesSafe(this Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                return e.Types.Where(t => t != null).ToArray();
+            }
         }
     }
 }

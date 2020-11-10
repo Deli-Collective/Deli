@@ -1,24 +1,11 @@
-﻿using System;
-using BepInEx.Logging;
+﻿using BepInEx.Logging;
+using UnityEngine;
 
 namespace H3ModFramework
 {
-    public class H3VRMod
+    public abstract class H3VRMod : MonoBehaviour
     {
-        protected ManualLogSource Logger { get; private set; }
-        protected ModInfo BaseMod { get; private set; }
-        
-        public H3VRMod(ModInfo mod, ManualLogSource logSource)
-        {
-            Logger = logSource;
-            BaseMod = mod;
-        }
-
-        /// <summary>
-        /// This is called by the default Mod Loader after all mods have been constructed
-        /// </summary>
-        public virtual void Start()
-        {
-        }
+        public ManualLogSource Logger;
+        public ModInfo BaseMod;
     }
 }
