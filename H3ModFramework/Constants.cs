@@ -1,4 +1,6 @@
-﻿namespace H3ModFramework
+﻿using System.IO;
+
+namespace H3ModFramework
 {
     public static class Constants
     {
@@ -10,7 +12,7 @@
         // Loader constants
         public const string ModExtension = "zip";
         public const string ModDirectory = "mods";
-        public const string ConfigDirectory = "config";
+        public const string ConfigDirectory = "mods/configs";
         public const string ArchiveMetaFilePath = "metadata.json";
     }
 }

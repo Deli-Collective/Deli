@@ -21,6 +21,7 @@ namespace H3ModFramework
         {
             Instance = this;
             ManagerObject = new GameObject("H3ModFramework Manager");
+            DontDestroyOnLoad(ManagerObject);
             PublicLogger = GetLogger("H3MF");
             Initialize();
         }
