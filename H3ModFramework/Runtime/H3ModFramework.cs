@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,8 +17,6 @@ namespace H3ModFramework
         public static ModInfo[] InstalledMods;
         public static GameObject ManagerObject;
 
-        public static event Action PostInitialization;
-
         private void Awake()
         {
             Instance = this;
@@ -36,17 +33,20 @@ namespace H3ModFramework
         }
 
         /// <summary>
-        /// Enumerates the mods in the mods folder
+        ///     Enumerates the mods in the mods folder
         /// </summary>
         /// <returns>An enumerable of the mods in the mods folder</returns>
-        private static IEnumerable<ModInfo> DiscoverMods(string dir) => Directory.GetFiles(dir, "*." + Constants.ModExtension, SearchOption.AllDirectories).Select(ModInfo.FromFile).ToArray();
+        private static IEnumerable<ModInfo> DiscoverMods(string dir)
+        {
+            return Directory.GetFiles(dir, "*." + Constants.ModExtension, SearchOption.AllDirectories).Select(ModInfo.FromFile).ToArray();
+        }
 
         private static void Initialize()
         {
             EnsureDirectoriesExist();
-            
+
             // Scan this assembly for stuff
-            TypeLoaders.ScanAssembly(Assembly.GetExecutingAssembly());
+            ResourceTypeLoader.ScanAssembly(Assembly.GetExecutingAssembly());
             ModuleLoaderAttribute.ScanAssembly(Assembly.GetExecutingAssembly());
 
             // Discover all the mods
@@ -71,9 +71,6 @@ namespace H3ModFramework
             {
                 PublicLogger.LogError("Could not initialize mod framework.\n" + e);
             }
-
-            // Once the mods are all done loading we can fire the PostInitialization events
-            PostInitialization?.Invoke();
         }
 
         private static bool CheckDependencies(ModInfo[] mods)
@@ -109,7 +106,7 @@ namespace H3ModFramework
             Directory.CreateDirectory(Constants.ModDirectory);
             Directory.CreateDirectory(Constants.ConfigDirectory);
         }
-        
+
         private static void LoadMod(ModInfo mod)
         {
             // For each module inside the mod, load it

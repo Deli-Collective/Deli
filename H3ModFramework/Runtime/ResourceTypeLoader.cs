@@ -7,19 +7,19 @@ using UnityEngine;
 
 namespace H3ModFramework
 {
-    public static class TypeLoaders
+    public static class ResourceTypeLoader
     {
         public static Dictionary<Type, MethodInfo> RegisteredTypeLoaders = new Dictionary<Type, MethodInfo>();
 
         /// <summary>
-        /// Scans the provided assembly for valid type loader methods and adds them to the dictionary.
+        ///     Scans the provided assembly for valid type loader methods and adds them to the dictionary.
         /// </summary>
         public static void ScanAssembly(Assembly assembly)
         {
             foreach (var method in assembly.GetTypesSafe().SelectMany(t => t.GetMethods()).Where(m => m.IsStatic))
             {
                 // Check if we have the type loader attribute on the method
-                var attributes = method.GetCustomAttributes(typeof(TypeLoaderAttribute), false);
+                var attributes = method.GetCustomAttributes(typeof(ResourceTypeLoaderAttribute), false);
                 if (attributes.Length <= 0) continue;
 
                 if (RegisteredTypeLoaders.ContainsKey(method.ReturnType))
@@ -44,23 +44,32 @@ namespace H3ModFramework
 
         #region Type Loader Methods
 
-        [TypeLoader]
-        public static string TypeLoaderString(byte[] raw) => Encoding.UTF8.GetString(raw, 0, raw.Length);
+        [ResourceTypeLoader]
+        public static string TypeLoaderString(byte[] raw)
+        {
+            return Encoding.UTF8.GetString(raw, 0, raw.Length);
+        }
 
-        [TypeLoader]
-        public static AssetBundle TypeLoaderAssetBundle(byte[] raw) => AssetBundle.LoadFromMemory(raw);
+        [ResourceTypeLoader]
+        public static AssetBundle TypeLoaderAssetBundle(byte[] raw)
+        {
+            return AssetBundle.LoadFromMemory(raw);
+        }
 
-        [TypeLoader]
-        public static Assembly TypeLoaderAssembly(byte[] raw) => Assembly.Load(raw);
+        [ResourceTypeLoader]
+        public static Assembly TypeLoaderAssembly(byte[] raw)
+        {
+            return Assembly.Load(raw);
+        }
 
         #endregion
     }
 
     /// <summary>
-    /// Attribute to assign to methods that are Type Loaders
+    ///     Attribute to assign to methods that are Type Loaders
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class TypeLoaderAttribute : Attribute
+    public class ResourceTypeLoaderAttribute : Attribute
     {
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using BepInEx.Configuration;
 using Ionic.Zip;
@@ -11,31 +10,21 @@ namespace H3ModFramework
     [JsonObject(MemberSerialization.OptIn)]
     public class ModInfo
     {
-
-        [JsonObject(MemberSerialization.OptIn)]
-        public struct ModuleInfo
-        {
-            [JsonProperty] public string FilePath;
-            [JsonProperty] public string Loader;
-        }
-        
-        // Mod info
-        [JsonProperty] public string Guid;
-        [JsonProperty] public string Name;
-        [JsonProperty] public string Author;
-        [JsonProperty] public string[] Dependencies;
-        [JsonProperty("Version")] public string VersionString;
-        public Version Version;
-        [JsonProperty] public ModuleInfo[] Modules;
-
-        // Resources
-        public ZipFile Archive;
-        public ConfigFile Config;
         private readonly Dictionary<string, byte[]> _loadedByteResources = new Dictionary<string, byte[]>();
         private readonly Dictionary<string, object> _loadedObjectResources = new Dictionary<string, object>();
+        
+        public ZipFile Archive;
+        [JsonProperty] public string Author;
+        public ConfigFile Config;
+        [JsonProperty] public string[] Dependencies;
+        [JsonProperty] public string Guid;
+        [JsonProperty] public ModuleInfo[] Modules;
+        [JsonProperty] public string Name;
+        public Version Version;
+        [JsonProperty("Version")] public string VersionString;
 
         /// <summary>
-        /// Fetches data from the mod's archive at the specified path
+        ///     Fetches data from the mod's archive at the specified path
         /// </summary>
         /// <param name="path">Path to the data</param>
         /// <param name="cache">Optionally cache the result for future fetches</param>
@@ -45,7 +34,6 @@ namespace H3ModFramework
             if (_loadedByteResources.TryGetValue(path, out var result))
                 return result;
             if (Archive.ContainsEntry(path))
-            {
                 using (var memoryStream = new MemoryStream())
                 {
                     Archive[path].Extract(memoryStream);
@@ -53,14 +41,13 @@ namespace H3ModFramework
                     if (cache) _loadedByteResources[path] = bytes;
                     return bytes;
                 }
-            }
 
             H3ModFramework.PublicLogger.LogWarning($"Resource {path} requested in mod {Guid} but it doesn't exist!");
             return new byte[0];
         }
 
         /// <summary>
-        /// Fetches data from the specified path and automatically converts it to the given type
+        ///     Fetches data from the specified path and automatically converts it to the given type
         /// </summary>
         /// <param name="path">Path to the data</param>
         /// <param name="cache">Optionally cache the result for future fetches</param>
@@ -71,14 +58,14 @@ namespace H3ModFramework
             // Check if it's already cached
             if (_loadedObjectResources.TryGetValue(path, out var cached))
                 return (T) cached;
-            
+
             // Try and load the bytes for the resource.
             var bytes = GetResource(path, false);
             // If it doesn't exist, return the default value for T
             if (bytes.Length == 0) return default;
 
             // Check if we have a type loader for the type
-            if (TypeLoaders.RegisteredTypeLoaders.TryGetValue(typeof(T), out var method))
+            if (ResourceTypeLoader.RegisteredTypeLoaders.TryGetValue(typeof(T), out var method))
             {
                 // Invoke the type loader with the bytes from before
                 var result = (T) method.Invoke(null, new object[] {bytes});
@@ -88,12 +75,10 @@ namespace H3ModFramework
 
             H3ModFramework.PublicLogger.LogError($"Resource {path} in {Guid} was requested with type {nameof(T)} but no TypeLoader exists for this type!");
             return default;
-
-
         }
 
         /// <summary>
-        /// Constructs a ModInfo class from the archive at a given path
+        ///     Constructs a ModInfo class from the archive at a given path
         /// </summary>
         /// <param name="path">Path to the archive</param>
         /// <returns>Instantiated ModInfo class</returns>
@@ -132,6 +117,16 @@ namespace H3ModFramework
             }
         }
 
-        public override string ToString() => $"{Guid}@{VersionString}";
+        public override string ToString()
+        {
+            return $"{Guid}@{VersionString}";
+        }
+
+        [JsonObject(MemberSerialization.OptIn)]
+        public struct ModuleInfo
+        {
+            [JsonProperty] public string FilePath;
+            [JsonProperty] public string Loader;
+        }
     }
 }

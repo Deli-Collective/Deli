@@ -39,7 +39,7 @@ namespace H3ModFramework
         }
 
         /// <summary>
-        /// Checks if the provided dependant version string is satisfied by the source version
+        ///     Checks if the provided dependant version string is satisfied by the source version
         /// </summary>
         public static bool Satisfies(this Version source, string dependant)
         {
@@ -48,6 +48,12 @@ namespace H3ModFramework
             return source.Major == dep.Major && source.Minor >= dep.Minor;
         }
 
+        /// <summary>
+        /// Extension for Assembly.GetTypes() that won't throw an exception.
+        /// This is needed to avoid a slew of ReflectionTypeLoadExceptions
+        /// </summary>
+        /// <param name="assembly">Assembly to get types of</param>
+        /// <returns>Array of not-null types in the assembly</returns>
         public static Type[] GetTypesSafe(this Assembly assembly)
         {
             try
