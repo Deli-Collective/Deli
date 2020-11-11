@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Atlas;
 
 namespace H3ModFramework
 {
@@ -86,6 +87,22 @@ namespace H3ModFramework
             }
 
             dest.Write(buffer, 0, read);
+        }
+
+        public static bool IsQuickBindable(this Type @this)
+        {
+            if (@this.GetCustomAttributes(typeof(QuickBindAttribute), false).Length == 0)
+            {
+                return false;
+            }
+
+            if (@this.GetConstructor(new Type[0]) is null)
+            {
+                H3ModFramework.PublicLogger.LogError($"Type {@this} is annotated with {typeof(QuickBindAttribute)}, but does not contain a public, parameterless constructor.");
+                return false;
+            }
+
+            return true;
         }
     }
 }
