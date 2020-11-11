@@ -30,7 +30,8 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
-[Ll]ibs/
+[Ll]ibs/**
+![Ll]ibs/README.md
 uTinyExport/
 
 # Visual Studio 2015/2017 cache/options directory
