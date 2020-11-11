@@ -39,7 +39,7 @@ namespace H3ModFramework
         /// <returns>An enumerable of the mods in the mods folder</returns>
         private static IEnumerable<ModInfo> DiscoverMods(string dir)
         {
-            return Directory.GetFiles(dir, "*." + Constants.ModExtension, SearchOption.AllDirectories).Select(ModInfo.FromFile).ToArray();
+            return Directory.GetFiles(dir, "*." + Constants.ModExtension, SearchOption.AllDirectories).Select(ModInfo.FromArchive).ToArray();
         }
 
         private static void Initialize()

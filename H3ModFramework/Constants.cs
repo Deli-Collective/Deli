@@ -13,6 +13,6 @@ namespace H3ModFramework
         public const string ModExtension = "zip";
         public const string ModDirectory = "mods";
         public const string ConfigDirectory = "mods/configs";
-        public const string ArchiveMetaFilePath = "metadata.json";
+        public const string ManifestFileName = "manifest.json";
     }
 }

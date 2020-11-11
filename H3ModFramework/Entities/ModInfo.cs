@@ -12,8 +12,9 @@ namespace H3ModFramework
     {
         private readonly Dictionary<string, byte[]> _loadedByteResources = new Dictionary<string, byte[]>();
         private readonly Dictionary<string, object> _loadedObjectResources = new Dictionary<string, object>();
-        
+
         public ZipFile Archive;
+        public string Location;
         [JsonProperty] public string Author;
         public ConfigFile Config;
         [JsonProperty] public string[] Dependencies;
@@ -22,6 +23,7 @@ namespace H3ModFramework
         [JsonProperty] public string Name;
         public Version Version;
         [JsonProperty("Version")] public string VersionString;
+        public bool IsArchive;
 
         /// <summary>
         ///     Fetches data from the mod's archive at the specified path
@@ -31,9 +33,12 @@ namespace H3ModFramework
         /// <returns>A byte array of the raw data at the given path</returns>
         public byte[] GetResource(string path, bool cache = true)
         {
+            // If we already have it cached, return it
             if (_loadedByteResources.TryGetValue(path, out var result))
                 return result;
-            if (Archive.ContainsEntry(path))
+
+            // If this mod is an archive and the file exists fetch it like that
+            if (IsArchive && Archive.ContainsEntry(path))
                 using (var memoryStream = new MemoryStream())
                 {
                     Archive[path].Extract(memoryStream);
@@ -42,6 +47,15 @@ namespace H3ModFramework
                     return bytes;
                 }
 
+            // If this mod is an uncompressed folder fetch it like this
+            if (!IsArchive && File.Exists(Path.Combine(Location, path)))
+            {
+                var bytes = File.ReadAllBytes(Path.Combine(Location, path));
+                if (cache) _loadedByteResources[path] = bytes;
+                return bytes;
+            }
+
+            // If it's not found
             H3ModFramework.PublicLogger.LogWarning($"Resource {path} requested in mod {Guid} but it doesn't exist!");
             return new byte[0];
         }
@@ -82,7 +96,7 @@ namespace H3ModFramework
         /// </summary>
         /// <param name="path">Path to the archive</param>
         /// <returns>Instantiated ModInfo class</returns>
-        public static ModInfo FromFile(string path)
+        public static ModInfo FromArchive(string path)
         {
             // Try and load the archive
             ZipFile archive;
@@ -97,8 +111,8 @@ namespace H3ModFramework
                 return null;
             }
 
-            // Try to locate the metadata file
-            if (!archive.ContainsEntry(Constants.ArchiveMetaFilePath))
+            // Try to locate the manifest file
+            if (!archive.ContainsEntry(Constants.ManifestFileName))
             {
                 H3ModFramework.PublicLogger.LogError($"Could not load {path} as it is not a valid mod.");
                 return null;
@@ -107,14 +121,38 @@ namespace H3ModFramework
             // If we have a metadata file then we can go ahead and read the metadata
             using (var memoryStream = new MemoryStream())
             {
-                archive[Constants.ArchiveMetaFilePath].Extract(memoryStream);
+                archive[Constants.ManifestFileName].Extract(memoryStream);
                 memoryStream.Position = 0;
                 var mod = JsonConvert.DeserializeObject<ModInfo>(new StreamReader(memoryStream).ReadToEnd());
+                mod.IsArchive = true;
                 mod.Archive = archive;
                 mod.Version = new Version(mod.VersionString);
                 mod.Config = new ConfigFile(Path.Combine(Constants.ConfigDirectory, $"{mod.Guid}.cfg"), true);
+                mod.Location = path;
                 return mod;
             }
+        }
+
+        /// <summary>
+        ///     Constructs a ModInfo class from a folder
+        /// </summary>
+        /// <param name="path">Path to the folder</param>
+        /// <returns>Constructed ModInfo class</returns>
+        public static ModInfo FromFolder(string path)
+        {
+            var manifest = Path.Combine(path, Constants.ManifestFileName);
+            if (!File.Exists(manifest))
+            {
+                H3ModFramework.PublicLogger.LogError($"Could not load {path} as a mod, it is missing a manifest.");
+                return null;
+            }
+
+            var mod = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(manifest));
+            mod.IsArchive = false;
+            mod.Version = new Version(mod.VersionString);
+            mod.Config = new ConfigFile(Path.Combine(Constants.ConfigDirectory, $"{mod.Guid}.cfg"), true);
+            mod.Location = path;
+            return mod;
         }
 
         public override string ToString()
