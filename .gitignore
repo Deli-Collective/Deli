@@ -363,3 +363,6 @@ MigrationBackup/
 
 # Un-Ignore dependencies we can include in the repo
 ![Ll]ibs/Valve.Newtonsoft.Json.dll
+# Temporary workaround until Atlas is on Nuget
+![Ll]ibs/Atlas.dll
+![Ll]ibs/Atlas.xml
