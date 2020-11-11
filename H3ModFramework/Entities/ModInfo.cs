@@ -78,11 +78,11 @@ namespace H3ModFramework
             // If it doesn't exist, return the default value for T
             if (bytes.Length == 0) return default;
 
-            // Check if we have a type loader for the type
-            if (ResourceTypeLoader.RegisteredTypeLoaders.TryGetValue(typeof(T), out var method))
+            // Check if we have a type reader for the type
+            if (H3ModFramework.Services.Get<IReader<T>>().MatchSome(out var reader))
             {
-                // Invoke the type loader with the bytes from before
-                var result = (T) method.Invoke(null, new object[] {bytes});
+                // Invoke the type reader with the bytes from before
+                var result = reader.Read(bytes);
                 if (cache) _loadedObjectResources[path] = result;
                 return result;
             }

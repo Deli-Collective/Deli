@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Atlas;
+using Atlas.Fluent;
+using Atlas.Impl;
 using BepInEx;
 using BepInEx.Logging;
 using UnityEngine;
@@ -13,13 +16,36 @@ namespace H3ModFramework
     public class H3ModFramework : BaseUnityPlugin
     {
         public static H3ModFramework Instance;
+
+
+        private static readonly StandardServiceKernel _kernel;
+
+        public static readonly Dictionary<string, IModuleLoader> ModuleLoaders;
+
         public static ManualLogSource PublicLogger;
         public static ModInfo[] InstalledMods;
         public static GameObject ManagerObject;
 
+        public static IServiceResolver Services => _kernel;
+
+        static H3ModFramework()
+        {
+            _kernel = new StandardServiceKernel();
+
+            _kernel.Bind<IReader<Assembly>>()
+                .ToConstant(new AssemblyReader());
+
+            ModuleLoaders = new Dictionary<string, IModuleLoader>
+            {
+                ["Assembly"] = new AssemblyModuleLoader()
+            };
+        }
+
         private void Awake()
         {
             Instance = this;
+            _kernel.Bind<H3ModFramework>().ToConstant(this);
+
             ManagerObject = new GameObject("H3ModFramework Manager");
             DontDestroyOnLoad(ManagerObject);
             PublicLogger = GetLogger("H3MF");
@@ -44,13 +70,9 @@ namespace H3ModFramework
             return archives.Concat(directories);
         }
 
-        private static void Initialize()
+        private void Initialize()
         {
             EnsureDirectoriesExist();
-
-            // Scan this assembly for stuff
-            ResourceTypeLoader.ScanAssembly(Assembly.GetExecutingAssembly());
-            ModuleLoaderAttribute.ScanAssembly(Assembly.GetExecutingAssembly());
 
             // Discover all the mods
             var modsDir = Directory.GetCurrentDirectory() + "/" + Constants.ModDirectory;
@@ -114,7 +136,7 @@ namespace H3ModFramework
         private static void LoadMod(ModInfo mod)
         {
             // For each module inside the mod, load it
-            foreach (var module in mod.Modules) ModuleLoaderAttribute.Cache[module.Loader].LoadModule(mod, module);
+            foreach (var module in mod.Modules) ModuleLoaders[module.Loader].LoadModule(_kernel, mod, module);
         }
     }
 }

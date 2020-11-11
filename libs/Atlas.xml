@@ -208,7 +208,7 @@
             <param name="services">The services available to the getter.</param>
             <typeparam name="TService">The type of the service to get.</typeparam>
         </member>
-        <member name="T:Atlas.Fluent.Impl.FunctionalResolverServiceBinding`1">
+        <member name="T:Atlas.Fluent.Impl.FlResolverServiceBinding`1">
             <summary>
             	A service binding which outputs a value determined by a function that is given access to existing services.
             </summary>
@@ -588,14 +588,6 @@
             <param name="name">The name of the parameter.</param>
             <typeparam name="T">The type of the items in the parameter.</typeparam>
         </member>
-        <member name="M:Atlas.Guard.NullIndex``1(System.Collections.Generic.IReadOnlyList{``0},System.String)">
-            <summary>
-            	Throws an indexed exception if an element of the parameter is <see langword="null" />.
-            </summary>
-            <param name="value">The value of the parameter.</param>
-            <param name="name">The name of the parameter.</param>
-            <typeparam name="T">The type of the items in the parameter.</typeparam>
-        </member>
         <member name="M:Atlas.Guard.Null``1(``0,System.String)">
             <summary>
             	Throws an exception if the parameter is <see langword="null" />.
@@ -639,14 +631,6 @@
             <param name="value">The value of the index parameter.</param>
             <param name="name">The name of the index parameter.</param>
             <param name="list">The list the index is intended for.</param>
-        </member>
-        <member name="M:Atlas.Guard.Index``1(System.Int32,System.String,System.Collections.Generic.IReadOnlyList{``0})">
-            <summary>
-            	Throws an exception if the index is out of bounds of the read-only list.
-            </summary>
-            <param name="value">The value of the index parameter.</param>
-            <param name="name">The name of the index parameter.</param>
-            <param name="list">The array the index is intended for.</param>
         </member>
         <member name="T:Atlas.Nullability`1">
             <summary>
@@ -903,15 +887,6 @@
             <param name="mapper">The function to mutate <code>v</code> if <code>Some(v)</code>.</param>
             <typeparam name="TMapped">The type to map the inner value to.</typeparam>
         </member>
-        <member name="M:Atlas.Option`1.Map``2(``0,Atlas.Mapper{`0,``0,``1})">
-            <summary>
-            	Returns <code>Some(<paramref name="mapper"/>(v, <paramref name="state"/>))</code> if <code>Some(v)</code>, otherwise returns <code>None</code>.
-            </summary>
-            <param name="state">The state to pass to <paramref name="mapper"/>, if it is invoked.</param>
-            <param name="mapper">The function to mutate <code>v</code> if <code>Some(v)</code>.</param>
-            <typeparam name="TState">The type to of the object to pass to the mapper.</typeparam>
-            <typeparam name="TMapped">The type to map the inner value to.</typeparam>
-        </member>
         <member name="M:Atlas.Option`1.MapOr``1(``0,Atlas.Mapper{`0,``0})">
             <summary>
             	Returns <code>Some(<paramref name="mapper"/>(v))</code> if <code>Some(v)</code>, otherwise returns <code>Some(<paramref name="default"/>)</code>.
@@ -929,6 +904,22 @@
             <param name="default">The getter to invoke if <code>None</code>.</param>
             <param name="mapper">The function to mutate <code>v</code> if <code>Some(v)</code>.</param>
             <typeparam name="TMapped">The type to map the inner value to.</typeparam>
+        </member>
+        <member name="M:Atlas.Option`1.ToString">
+            <summary>
+            	Returns "Some(<code>value</code>)" if <code>Some</code>, otherwise (<code>None</code>) returns "None".
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.AllowNullAttribute">
+            <summary>Specifies that null is allowed as an input even if the corresponding type disallows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DisallowNullAttribute">
+            <summary>Specifies that null is disallowed as an input even if the corresponding type allows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullAttribute">
+            <summary>Specifies that an output may be null even if the corresponding type disallows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullAttrito map the inner value to.</typeparam>
         </member>
         <member name="M:Atlas.Option`1.ToString">
             <summary>
