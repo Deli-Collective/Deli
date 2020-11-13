@@ -136,7 +136,7 @@
         </member>
         <member name="M:Atlas.ServiceResolverExtensions.Get``1(Atlas.IServiceResolver)">
             <summary>
-            	Resolves a service using no context (<see cref="T:At"/>).
+            	Resolves a service using no context (<see cref="T:Atlas.Unit"/>).
             </summary>
             <typeparam name="TService">The type of service to produce.</typeparam>
         </member>
@@ -205,7 +205,6 @@
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
-      >
         <member name="M:Atlas.Fluent.PendingBindingExtensions.ToPureMethod``2(Atlas.Fluent.IPendingBinding{``0,``1},Atlas.PureBindingImpl{``0})">
             <summary>
             	Binds a pure callback method to the service.
@@ -343,7 +342,7 @@
             	A service binding which calculates a value when first called, and outputs that value for every call.
             </summary>
             <typeparam name="TService">The type of service to produce.</typeparam>
-            <typeparam name="TContext">The type ot to consume.</typeparam>
+            <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
         <member name="M:Atlas.Fluent.Impl.SingletonNopServiceBinding`2.#ctor(Atlas.IServiceBinding{`0,`1})">
             <summary>
@@ -418,7 +417,7 @@
             <summary>
             	The maximum amount of times to recursively get a service. If a service is gotten more than this many times within the same call, an exception is thrown.
             </summary>
-            <exception cref="T:System.ArgumentOutOfRangeException">The in">The inner value of <paramref name="value" /> was less than 0.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">The inner value of <paramref name="value" /> was less than 0.</exception>
         </member>
         <member name="M:Atlas.Impl.StandardServiceKernel.#ctor">
             <summary>
@@ -579,7 +578,17 @@
         </member>
         <member name="M:Atlas.Guard.NonPositive(System.Int32,System.String)">
             <summary>
-            	Throws an exception if the parameter is neganame of the index parameter.</param>
+            	Throws an exception if the parameter is negative or zero.
+            </summary>
+            <param name="value">The value of the parameter.</param>
+            <param name="name">The name of the parameter.</param>
+        </member>
+        <member name="M:Atlas.Guard.Index``1(System.Int32,System.String,``0[])">
+            <summary>
+            	Throws an exception if the index is out of bounds of the array.
+            </summary>
+            <param name="value">The value of the index parameter.</param>
+            <param name="name">The name of the index parameter.</param>
             <param name="array">The array the index is intended for.</param>
         </member>
         <member name="M:Atlas.Guard.Index``1(System.Int32,System.String,System.Collections.Generic.IList{``0})">
@@ -589,6 +598,14 @@
             <param name="value">The value of the index parameter.</param>
             <param name="name">The name of the index parameter.</param>
             <param name="list">The list the index is intended for.</param>
+        </member>
+        <member name="M:Atlas.Guard.Index``1(System.Int32,System.String,System.Collections.Generic.IReadOnlyList{``0})">
+            <summary>
+            	Throws an exception if the index is out of bounds of the read-only list.
+            </summary>
+            <param name="value">The value of the index parameter.</param>
+            <param name="name">The name of the index parameter.</param>
+            <param name="list">The array the index is intended for.</param>
         </member>
         <member name="T:Atlas.Nullability`1">
             <summary>
@@ -715,22 +732,6 @@
             <param name="this"></param>
             <param name="value">The new inner value.</param>
             <typeparam name="T">The type of the inner value.</typeparam>
-        </member>
-        <member name="M:Atlas.OptionExtensions.GetOrInsert``1(Atlas.Option{``0}@,``0)">
-            <summary>
-            	Sets self to Some(<paramref name="value"/>) if it was not Some already, and returns the inner value.
-            </summary>
-            <param name="this"></param>
-            <param name="value">The inner value if one is not present.</param>
-            <typeparam name="T">The type of the inner value.</typeparam>
-        </member>
-        <member name="M:Atlas.OptionExtensions.GetOrInsertWith``1(Atlas.Option{``0}@,System.Func{``0})">
-            <summary>
-            	Sets self to Some(<paramref name="value"/>()) if it was not Some already, and returns the inner value.
-            	<p>This is the lazily-evaluated variant of <seealso cref="M:Atlas.OptionExtensions.GetOrInsert``1(Atlas.Option{``0}@,``0)"/>.</p>
-            </summary>
-            <param name="this"></param>
-            <param name="T">The type of the inner value.</typeparam>
         </member>
         <member name="M:Atlas.OptionExtensions.GetOrInsert``1(Atlas.Option{``0}@,``0)">
             <summary>
