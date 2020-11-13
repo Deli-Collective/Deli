@@ -62,6 +62,14 @@ namespace H3ModFramework
             return Assembly.Load(raw);
         }
 
+        [ResourceTypeLoader]
+        public static Texture2D TypeLoaderTexture(byte[] raw)
+        {
+            var tex = new Texture2D(0, 0);
+            tex.LoadImage(raw);
+            return tex;
+        }
+
         #endregion
     }
 

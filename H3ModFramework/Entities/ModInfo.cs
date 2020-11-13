@@ -138,20 +138,19 @@ namespace H3ModFramework
         /// </summary>
         /// <param name="path">Path to the folder</param>
         /// <returns>Constructed ModInfo class</returns>
-        public static ModInfo FromFolder(string path)
+        public static ModInfo FromManifest(string path)
         {
-            var manifest = Path.Combine(path, Constants.ManifestFileName);
-            if (!File.Exists(manifest))
+            if (!File.Exists(path))
             {
                 H3ModFramework.PublicLogger.LogError($"Could not load {path} as a mod, it is missing a manifest.");
                 return null;
             }
 
-            var mod = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(manifest));
+            var mod = JsonConvert.DeserializeObject<ModInfo>(File.ReadAllText(path));
             mod.IsArchive = false;
             mod.Version = new Version(mod.VersionString);
             mod.Config = new ConfigFile(Path.Combine(Constants.ConfigDirectory, $"{mod.Guid}.cfg"), true);
-            mod.Location = path;
+            mod.Location = Path.GetDirectoryName(path);
             return mod;
         }
 
@@ -165,6 +164,8 @@ namespace H3ModFramework
         {
             [JsonProperty] public string FilePath;
             [JsonProperty] public string Loader;
+
+            public override string ToString() => $"{Loader}:{FilePath}";
         }
     }
 }

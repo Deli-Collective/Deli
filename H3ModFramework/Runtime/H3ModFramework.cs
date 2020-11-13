@@ -39,7 +39,9 @@ namespace H3ModFramework
         /// <returns>An enumerable of the mods in the mods folder</returns>
         private static IEnumerable<ModInfo> DiscoverMods(string dir)
         {
-            return Directory.GetFiles(dir, "*." + Constants.ModExtension, SearchOption.AllDirectories).Select(ModInfo.FromArchive).ToArray();
+            var archives = Directory.GetFiles(dir, "*." + Constants.ModExtension, SearchOption.AllDirectories).Select(ModInfo.FromArchive);
+            var directories = Directory.GetFiles(dir, Constants.ManifestFileName, SearchOption.AllDirectories).Select(ModInfo.FromManifest);
+            return archives.Concat(directories);
         }
 
         private static void Initialize()
@@ -53,6 +55,7 @@ namespace H3ModFramework
             // Discover all the mods
             var modsDir = Directory.GetCurrentDirectory() + "/" + Constants.ModDirectory;
             InstalledMods = DiscoverMods(modsDir).ToArray();
+            PublicLogger.LogInfo($"Discovered {InstalledMods.Length} mods");
 
             // Make sure all dependencies are satisfied
             if (!CheckDependencies(InstalledMods))
