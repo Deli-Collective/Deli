@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Atlas;
 using BepInEx.Configuration;
 using Ionic.Zip;
 using Valve.Newtonsoft.Json;
@@ -56,7 +57,7 @@ namespace H3ModFramework
             }
 
             // If it's not found
-            H3ModFramework.PublicLogger.LogWarning($"Resource {path} requested in mod {Guid} but it doesn't exist!");
+            H3ModFramework.Logger.LogWarning($"Resource {path} requested in mod {Guid} but it doesn't exist!");
             return new byte[0];
         }
 
@@ -79,15 +80,15 @@ namespace H3ModFramework
             if (bytes.Length == 0) return default;
 
             // Check if we have a type reader for the type
-            if (H3ModFramework.Services.Get<IReader<T>>().MatchSome(out var reader))
+            if (H3ModFramework.Services.Get<IAssetReader<T>>().MatchSome(out var reader))
             {
                 // Invoke the type reader with the bytes from before
-                var result = reader.Read(bytes);
+                var result = reader.ReadAsset(bytes);
                 if (cache) _loadedObjectResources[path] = result;
                 return result;
             }
 
-            H3ModFramework.PublicLogger.LogError($"Resource {path} in {Guid} was requested with type {nameof(T)} but no TypeLoader exists for this type!");
+            H3ModFramework.Logger.LogError($"Resource {path} in {Guid} was requested with type {nameof(T)} but no TypeLoader exists for this type!");
             return default;
         }
 
@@ -107,14 +108,14 @@ namespace H3ModFramework
             catch (Exception e)
             {
                 // This method should only be passed zip files, so we should provide a stack trace if this errors.
-                H3ModFramework.PublicLogger.LogError($"Could not load mod archive ({path})\n{e}");
+                H3ModFramework.Logger.LogError($"Could not load mod archive ({path})\n{e}");
                 return null;
             }
 
             // Try to locate the manifest file
             if (!archive.ContainsEntry(Constants.ManifestFileName))
             {
-                H3ModFramework.PublicLogger.LogError($"Could not load {path} as it is not a valid mod.");
+                H3ModFramework.Logger.LogError($"Could not load {path} as it is not a valid mod.");
                 return null;
             }
 
@@ -142,7 +143,7 @@ namespace H3ModFramework
         {
             if (!File.Exists(path))
             {
-                H3ModFramework.PublicLogger.LogError($"Could not load {path} as a mod, it is missing a manifest.");
+                H3ModFramework.Logger.LogError($"Could not load {path} as a mod, it is missing a manifest.");
                 return null;
             }
 

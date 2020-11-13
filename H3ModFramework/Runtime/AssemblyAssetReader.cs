@@ -2,9 +2,9 @@ using System.Reflection;
 
 namespace H3ModFramework
 {
-    public class AssemblyReader : IReader<Assembly>
+    public class AssemblyAssetReader : IAssetReader<Assembly>
     {
-        public Assembly Read(byte[] raw)
+        public Assembly ReadAsset(byte[] raw)
         {
             return Assembly.Load(raw);
         }

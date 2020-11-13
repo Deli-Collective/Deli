@@ -89,20 +89,20 @@ namespace H3ModFramework
             dest.Write(buffer, 0, read);
         }
 
-        public static bool IsQuickBindable(this Type @this)
+        public static Option<ConstructorInfo> QuickBindableCtor(this Type @this)
         {
             if (@this.GetCustomAttributes(typeof(QuickBindAttribute), false).Length == 0)
             {
-                return false;
+                return Option.None<ConstructorInfo>();
             }
 
-            if (@this.GetConstructor(new Type[0]) is null)
+            if (@this.GetConstructor(new Type[0]) is ConstructorInfo ctor)
             {
-                H3ModFramework.PublicLogger.LogError($"Type {@this} is annotated with {typeof(QuickBindAttribute)}, but does not contain a public, parameterless constructor.");
-                return false;
+                return Option.Some(ctor);   
             }
 
-            return true;
+            H3ModFramework.Logger.LogError($"Type {@this} is annotated with {typeof(QuickBindAttribute)}, but does not contain a public, parameterless constructor.");
+            return Option.None<ConstructorInfo>();
         }
     }
 }

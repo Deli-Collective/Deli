@@ -1,7 +1,7 @@
 namespace H3ModFramework
 {
-    public interface IReader<out T>
+    public interface IAssetReader<out T>
     {
-        T Read(byte[] raw);
+        T ReadAsset(byte[] raw);
     }
 }

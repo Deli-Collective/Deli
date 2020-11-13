@@ -2,6 +2,7 @@
 using System.Reflection;
 using Atlas;
 using Atlas.Fluent.Impl;
+using BepInEx.Logging;
 
 namespace H3ModFramework
 {
@@ -23,12 +24,13 @@ namespace H3ModFramework
                     continue;
                 }
 
-                if (type.IsQuickBindable())
+                if (type.QuickBindableCtor().MatchSome(out var ctor))
                 {
-                    var bindingType = typeof(ConstantServiceBinding<>).MakeGenericType(type);
-                    var bindMethod = typeof(IServiceBinder).GetMethod(nameof(IServiceBinder.Bind)).MakeGenericMethod(type);
+                    var genericArguments = new[] { type, typeof(Unit) };
+                    var bindingType = typeof(ConstantServiceBinding<,>).MakeGenericType(genericArguments);
+                    var bindMethod = typeof(IServiceBinder).GetMethod(nameof(IServiceBinder.Bind)).MakeGenericMethod(genericArguments);
 
-                    var impl = Activator.CreateInstance(type);
+                    var impl = ctor.Invoke(new object[0]);
                     var binding = Activator.CreateInstance(bindingType, impl);
                     bindMethod.Invoke(kernel, new[] { binding });
 
@@ -40,7 +42,7 @@ namespace H3ModFramework
                 H3ModFramework.ManagerObject.SetActive(false);
                 var modClass = (H3VRMod) H3ModFramework.ManagerObject.AddComponent(type);
                 modClass.BaseMod = mod;
-                modClass.Logger = H3ModFramework.GetLogger(mod.Name);
+                modClass.Logger = kernel.Get<ManualLogSource, string>(mod.Name).Unwrap();
                 H3ModFramework.ManagerObject.SetActive(true);
             }
         }
