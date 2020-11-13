@@ -11,7 +11,7 @@ namespace H3ModFramework
         public void LoadModule(ModInfo mod, ModInfo.ModuleInfo module)
         {
             // Load the assembly and scan it for new module loaders and resource type loaders
-            var assembly = mod.GetResource<Assembly>(module.FilePath);
+            var assembly = mod.GetResource<Assembly>(module.Path);
             ModuleLoaderAttribute.ScanAssembly(assembly);
             ResourceTypeLoader.ScanAssembly(assembly);
 

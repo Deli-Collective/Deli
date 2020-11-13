@@ -162,10 +162,10 @@ namespace H3ModFramework
         [JsonObject(MemberSerialization.OptIn)]
         public struct ModuleInfo
         {
-            [JsonProperty] public string FilePath;
             [JsonProperty] public string Loader;
+            [JsonProperty] public string Path;
 
-            public override string ToString() => $"{Loader}:{FilePath}";
+            public override string ToString() => $"{Loader}:{Path}";
         }
     }
 }
