@@ -170,7 +170,7 @@ namespace H3ModFramework
             }
 
             // Add the ModInfo to the kernel.
-            Services.Get<IDictionary<string, ModInfo>>().Unwrap()[mod.Name] = mod;
+            Services.Get<IDictionary<string, ModInfo>>().Unwrap().Add(mod.Name, mod);
         }
     }
 }
