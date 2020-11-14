@@ -1,4 +1,4 @@
-﻿namespace H3ModFramework
+﻿namespace Deli
 {
     internal static class Constants
     {

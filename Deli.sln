@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "H3ModFramework", "H3ModFramework\H3ModFramework.csproj", "{AFF79E47-8610-47D3-88E6-DB6BB3173BA3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deli", "Deli\Deli.csproj", "{AFF79E47-8610-47D3-88E6-DB6BB3173BA3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

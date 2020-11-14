@@ -10,71 +10,71 @@ using BepInEx;
 using BepInEx.Logging;
 using UnityEngine;
 
-namespace H3ModFramework
+namespace Deli
 {
     [BepInPlugin(Constants.Guid, Constants.Name, Constants.Version)]
     public class H3ModFramework : BaseUnityPlugin
     {
-        private static readonly StandardServiceKernel _kernel;
+        private static readonly StandardServiceKernel Kernel;
 
-        public static IServiceResolver Services => _kernel;
+        public static IServiceResolver Services => Kernel;
 
-        public static new ManualLogSource Logger => Services.Get<ManualLogSource>().Unwrap();
+        public new static ManualLogSource Logger => Services.Get<ManualLogSource>().Unwrap();
 
         static H3ModFramework()
         {
-            _kernel = new StandardServiceKernel();
+            Kernel = new StandardServiceKernel();
 
             // Basic impls
-            _kernel.Bind<IAssetReader<Assembly>>()
+            Kernel.Bind<IAssetReader<Assembly>>()
                 .ToConstant(new AssemblyAssetReader());
 
             // Named dictionaries
-            _kernel.Bind<IDictionary<string, IModuleLoader>>()
+            Kernel.Bind<IDictionary<string, IModuleLoader>>()
                 .ToConstant(new Dictionary<string, IModuleLoader>
             {
                 ["Assembly"] = new AssemblyModuleLoader()
             });
-            _kernel.Bind<IDictionary<string, ModInfo>>()
+            Kernel.Bind<IDictionary<string, ModInfo>>()
                 .ToConstant(new Dictionary<string, ModInfo>());
 
             // Enumerables
-            _kernel.Bind<IEnumerable<IModuleLoader>>()
+            Kernel.Bind<IEnumerable<IModuleLoader>>()
                 .ToRecursiveMethod(x => x.Get<IDictionary<string, IModuleLoader>>().Map(v => (IEnumerable<IModuleLoader>) v.Values))
                 .InTransientScope();
-            _kernel.Bind<IEnumerable<ModInfo>>()
+            Kernel.Bind<IEnumerable<ModInfo>>()
                 .ToRecursiveMethod(x => x.Get<IDictionary<string, ModInfo>>().Map(v => (IEnumerable<ModInfo>) v.Values))
                 .InTransientScope();
 
             // Contextual to dictionaries
-            _kernel.Bind<IModuleLoader, string>()
+            Kernel.Bind<IModuleLoader, string>()
                 .ToWholeMethod((services, context) => services.Get<IDictionary<string, IModuleLoader>>()
                     .Map(x => x.OptionGetValue(context))
                     .Flatten())
                 .InTransientScope();
-            _kernel.Bind<ModInfo, string>()
+            Kernel.Bind<ModInfo, string>()
                 .ToWholeMethod((services, context) => services.Get<IDictionary<string, ModInfo>>()
                     .Map(x => x.OptionGetValue(context))
                     .Flatten())
                 .InTransientScope();
 
             // Custom impls
-            _kernel.Bind<ManualLogSource, string>()
+            Kernel.Bind<ManualLogSource, string>()
                 .ToContextualNopMethod(x => BepInEx.Logging.Logger.CreateLogSource(x))
                 .InSingletonScope();
         }
 
         private void Awake()
         {
-            _kernel.Bind<H3ModFramework>()
+            Kernel.Bind<H3ModFramework>()
                 .ToConstant(this);
-            _kernel.Bind<ManualLogSource>()
+            Kernel.Bind<ManualLogSource>()
                 .ToConstant(base.Logger);
             {
-                var manager = new GameObject("H3ModFramework Manager");
+                var manager = new GameObject("Deli Manager");
                 DontDestroyOnLoad(manager);
                 
-                _kernel.Bind<GameObject>()
+                Kernel.Bind<GameObject>()
                     .ToConstant(manager);
             }
             
@@ -166,7 +166,7 @@ namespace H3ModFramework
                     continue;
                 }
 
-                loader.LoadModule(_kernel, mod, module);
+                loader.LoadModule(Kernel, mod, module);
             }
 
             // Add the ModInfo to the kernel.

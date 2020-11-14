@@ -1,6 +1,6 @@
 ﻿using Atlas;
 
-namespace H3ModFramework
+namespace Deli
 {
     /// <summary>
     /// Interface for module loaders

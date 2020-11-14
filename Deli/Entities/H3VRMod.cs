@@ -1,7 +1,7 @@
 ﻿using BepInEx.Logging;
 using UnityEngine;
 
-namespace H3ModFramework
+namespace Deli
 {
     /// <summary>
     /// Base class for plugin mods

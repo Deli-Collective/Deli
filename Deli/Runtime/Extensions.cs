@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Atlas;
 
-namespace H3ModFramework
+namespace Deli
 {
     // https://stackoverflow.com/a/11027096/8809017
     public static class Extensions

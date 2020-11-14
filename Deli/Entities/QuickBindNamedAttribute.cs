@@ -1,6 +1,6 @@
 using System;
 
-namespace H3ModFramework
+namespace Deli
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public class QuickNamedBindAttribute : Attribute

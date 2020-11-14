@@ -6,7 +6,7 @@ using Atlas.Fluent.Impl;
 using BepInEx.Logging;
 using UnityEngine;
 
-namespace H3ModFramework
+namespace Deli
 {
     /// <summary>
     /// Module Loader for assemblies.

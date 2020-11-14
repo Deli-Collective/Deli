@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace H3ModFramework
+namespace Deli
 {
     public class AssemblyAssetReader : IAssetReader<Assembly>
     {

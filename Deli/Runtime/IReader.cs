@@ -1,4 +1,4 @@
-namespace H3ModFramework
+namespace Deli
 {
     public interface IAssetReader<out T>
     {

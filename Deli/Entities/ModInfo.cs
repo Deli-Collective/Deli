@@ -6,7 +6,7 @@ using BepInEx.Configuration;
 using Ionic.Zip;
 using Valve.Newtonsoft.Json;
 
-namespace H3ModFramework
+namespace Deli
 {
     [JsonObject(MemberSerialization.OptIn)]
     public class ModInfo
