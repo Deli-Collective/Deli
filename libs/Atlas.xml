@@ -164,6 +164,30 @@
             	A function that is a pure (no parameters taken) implementation of <see cref="M:Atlas.IServiceBinding`2.Get(Atlas.IServiceResolver,`1)"/>.
             </summary>
         </member>
+        <member name="T:Atlas.WholeNopBindingImpl`2">
+            <summary>
+            	A function that is a full (no parameters dropped), always Some, implementation of <see cref="M:Atlas.IServiceBinding`2.Get(Atlas.IServiceResolver,`1)"/>.
+            </summary>
+            <param name="services">The services available in this service request.</param>
+            <param name="context">Information about the service request.</param>
+        </member>
+        <member name="T:Atlas.RecursiveNopBindingImpl`1">
+            <summary>
+            	A function that is a recursive (resolver only), always Some, implementation of <see cref="M:Atlas.IServiceBinding`2.Get(Atlas.IServiceResolver,`1)"/>.
+            </summary>
+            <param name="services">The services available in this service request.</param>
+        </member>
+        <member name="T:Atlas.ContextualNopBindingImpl`2">
+            <summary>
+            	A function that is a contextual (context only), always some, implementation of <see cref="M:Atlas.IServiceBinding`2.Get(Atlas.IServiceResolver,`1)"/>.
+            </summary>
+            <param name="context">Information about the service request.</param>
+        </member>
+        <member name="T:Atlas.PureNopBindingImpl`1">
+            <summary>
+            	A function that is a pure (no parameters taken), always Some, implementation of <see cref="M:Atlas.IServiceBinding`2.Get(Atlas.IServiceResolver,`1)"/>.
+            </summary>
+        </member>
         <member name="T:Atlas.Fluent.PendingBindingExtensions">
             <summary>
             	A collection of extension methods for <see cref="T:Atlas.Fluent.IPendingBinding`2"/>.
@@ -214,14 +238,57 @@
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
+        <member name="M:Atlas.Fluent.PendingBindingExtensions.ToWholeNopMethod``2(Atlas.Fluent.IPendingBinding{``0,``1},Atlas.WholeNopBindingImpl{``0,``1})">
+            <summary>
+            	Binds a full, always Some, callback method to the service.
+            </summary>
+            <param name="this"></param>
+            <param name="method">The full binding implementation to use when this binding is called.</param>
+            <typeparam name="TService">The type of service to produce.</typeparam>
+            <typeparam name="TContext">The type of context to consume.</typeparam>
+        </member>
+        <member name="M:Atlas.Fluent.PendingBindingExtensions.ToRecursiveNopMethod``2(Atlas.Fluent.IPendingBinding{``0,``1},Atlas.RecursiveNopBindingImpl{``0})">
+            <summary>
+            	Binds a recursive, always Some, callback method to the service.
+            </summary>
+            <param name="this"></param>
+            <param name="method">The recursive binding implementation to use when this binding is called.</param>
+            <typeparam name="TService">The type of service to produce.</typeparam>
+            <typeparam name="TContext">The type of context to consume.</typeparam>		
+        </member>
+        <member name="M:Atlas.Fluent.PendingBindingExtensions.ToContextualNopMethod``2(Atlas.Fluent.IPendingBinding{``0,``1},Atlas.ContextualNopBindingImpl{``0,``1})">
+            <summary>
+            	Binds a contextual, always Some, callback method to the service.
+            </summary>
+            <param name="this"></param>
+            <param name="method">The contextual binding implementation to use when this binding is called.</param>
+            <typeparam name="TService">The type of service to produce.</typeparam>
+            <typeparam name="TContext">The type of context to consume.</typeparam>
+        </member>
+        <member name="M:Atlas.Fluent.PendingBindingExtensions.ToPureNopMethod``2(Atlas.Fluent.IPendingBinding{``0,``1},Atlas.PureNopBindingImpl{``0})">
+            <summary>
+            	Binds a pure, always Some, callback method to the service.
+            </summary>
+            <param name="this"></param>
+            <param name="method">The pure binding implementation to use when this binding is called.</param>
+            <typeparam name="TService">The type of service to produce.</typeparam>
+            <typeparam name="TContext">The type of context to consume.</typeparam>
+        </member>
         <member name="T:Atlas.Fluent.PendingScopedBindingExtensions">
             <summary>
             	A collection of extension methods for <see cref="T:Atlas.Fluent.IPendingScopedBinding`2"/>.
             </summary>
         </member>
+        <member name="M:Atlas.Fluent.PendingScopedBindingExtensions.InSingletonScope``2(Atlas.Fluent.IPendingScopedBinding{``0,``1})">
+            <summary>
+            	Binds this binding as a singleton, contextful service; only one instance will be per context and it will persist for each call to the binding.
+            </summary>
+            <typeparam name="TService">The type of service to produce.</typeparam>
+            <typeparam name="TContext">The type of context to consume.</typeparam>
+        </member>
         <member name="M:Atlas.Fluent.PendingScopedBindingExtensions.InSingletonNopScope``2(Atlas.Fluent.IPendingScopedBinding{``0,``1})">
             <summary>
-            	Binds this binding as a singleton service; only one instance will be retrieved and it will persist for each call to the binding.
+            	Binds this binding as a singleton, contextless service; only one instance will be retrieved irregardless of context and it will persist for each call to the binding.
             </summary>
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
@@ -297,6 +364,30 @@
             	Constructs an instance of <see cref="T:Atlas.Fluent.Impl.FunctionServiceBinding`2"/>.
             </summary>
             <param name="impl">The pure binding implementation to use when this binding is called.</param>
+        </member>
+        <member name="M:Atlas.Fluent.Impl.FunctionServiceBinding`2.#ctor(Atlas.WholeNopBindingImpl{`0,`1})">
+            <summary>
+            	Constructs an instance of <see cref="T:Atlas.Fluent.Impl.FunctionServiceBinding`2"/>.
+            </summary>
+            <param name="impl">The full, always Some, binding implementation to use when this binding is called.</param>
+        </member>
+        <member name="M:Atlas.Fluent.Impl.FunctionServiceBinding`2.#ctor(Atlas.RecursiveNopBindingImpl{`0})">
+            <summary>
+            	Constructs an instance of <see cref="T:Atlas.Fluent.Impl.FunctionServiceBinding`2"/>.
+            </summary>
+            <param name="impl">The recursive, always Some, binding implementation to use when this binding is called.</param>
+        </member>
+        <member name="M:Atlas.Fluent.Impl.FunctionServiceBinding`2.#ctor(Atlas.ContextualNopBindingImpl{`0,`1})">
+            <summary>
+            	Constructs an instance of <see cref="T:Atlas.Fluent.Impl.FunctionServiceBinding`2"/>.
+            </summary>
+            <param name="impl">The contextual, always Some, binding implementation to use when this binding is called.</param>
+        </member>
+        <member name="M:Atlas.Fluent.Impl.FunctionServiceBinding`2.#ctor(Atlas.PureNopBindingImpl{`0})">
+            <summary>
+            	Constructs an instance of <see cref="T:Atlas.Fluent.Impl.FunctionServiceBinding`2"/>.
+            </summary>
+            <param name="impl">The pure, always Some, binding implementation to use when this binding is called.</param>
         </member>
         <member name="M:Atlas.Fluent.Impl.FunctionServiceBinding`2.Get(Atlas.IServiceResolver,`1)">
             <inheritdoc cref="M:Atlas.IServiceBinding`2.Get(Atlas.IServiceResolver,`1)"/>
@@ -904,20 +995,9 @@
                 A type that has no information.
             </summary>
         </member>
-        <member name="T:System.Diagnostics.CodeAnalysis.AllowNullAttribute">
-            <summary>Specifies that null is allowed as an input even if the corresponding type disallows it.</summary>
-        </member>
-        <member name="T:System.Diagnostics.CodeAnalysis.DisallowNullAttribute">
-            <summary>Specifies that null is disallowed as an input even if the corresponding type allows it.</summary>
-        </member>
-        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullAttribute">
-            <summary>Specifies that an output may be null even if the corresponding type disallows it.</summary>
-        </member>
-        <member name="T:System.Diagnostics.CodeAnalysis.NotNullAttribute">
-            <summary>Specifies that an output will not be null even if the corresponding type allows it.</summary>
-        </member>
-        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute">
-            <summary>Specifies that when a method returns <see cref="P:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue" />, the parameter may be null even if the corresponding type disallows it.</summary>
+    </members>
+</doc>
+cs.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue" />, the parameter may be null even if the corresponding type disallows it.</summary>
         </member>
         <member name="M:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.#ctor(System.Boolean)">
             <summary>Initializes the attribute with the specified return value condition.</summary>
@@ -954,6 +1034,23 @@
         </member>
         <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute">
             <summary>Applied to a method that will never return under any circumstance.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute">
+            <summary>Specifies that the method will not return if the associated Boolean parameter is passed the specified value.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute.#ctor(System.Boolean)">
+            <summary>Initializes the attribute with the specified parameter value.</summary>
+            <param name="parameterValue">
+            	The condition parameter value. Code after the method will be considered unreachable by diagnostics if the argument to
+            	the associated parameter matches this value.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute.ParameterValue">
+            <summary>Gets the condition parameter value.</summary>
+        </member>
+    </members>
+</doc>
+hod that will never return under any circumstance.</summary>
         </member>
         <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute">
             <summary>Specifies that the method will not return if the associated Boolean parameter is passed the specified value.</summary>
