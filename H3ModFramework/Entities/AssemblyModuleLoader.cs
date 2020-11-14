@@ -43,10 +43,16 @@ namespace H3ModFramework
                     var manager = kernel.Get<GameObject>().Unwrap();
 
                     manager.SetActive(false);
-                    var modClass = (H3VRMod) manager.AddComponent(type);
-                    modClass.BaseMod = mod;
-                    modClass.Logger = kernel.Get<ManualLogSource, string>(mod.Name).Unwrap();
-                    manager.SetActive(true);
+                    try
+                    {
+                        var modClass = (H3VRMod) manager.AddComponent(type);
+                        modClass.BaseMod = mod;
+                        modClass.Logger = kernel.Get<ManualLogSource, string>(mod.Name).Unwrap();
+                    }
+                    finally
+                    {
+                        manager.SetActive(true);
+                    }
                 }
             }
         }
