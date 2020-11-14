@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Atlas;
 using Atlas.Fluent.Impl;
@@ -25,15 +26,76 @@ namespace H3ModFramework
                     continue;
                 }
 
-                if (type.QuickBindableCtor().MatchSome(out var ctor))
+                if (type.GetCustomAttribute<QuickUnnamedBindAttribute>().MatchSome(out var unnamedAttr) &&
+                    type.GetParameterlessCtor<QuickUnnamedBindAttribute>().MatchSome(out var ctor))
                 {
-                    var genericArguments = new[] { type, typeof(Unit) };
-                    var bindingType = typeof(ConstantServiceBinding<,>).MakeGenericType(genericArguments);
-                    var bindMethod = typeof(IServiceBinder).GetMethod(nameof(IServiceBinder.Bind)).MakeGenericMethod(genericArguments);
+                    var services = unnamedAttr.AsServices;
 
-                    var impl = ctor.Invoke(new object[0]);
-                    var binding = Activator.CreateInstance(bindingType, impl);
-                    bindMethod.Invoke(kernel, new[] { binding });
+                    if (services.Length == 0)
+                    {
+                        services = type.GetInterfaces();
+                    }
+
+                    var inst = ctor.Invoke(new object[0]);
+                    foreach (var service in unnamedAttr.AsServices)
+                    {
+                        var binderGenericArguments = new[] { type, typeof(Unit) };
+                        var bindingType = typeof(ConstantServiceBinding<,>).MakeGenericType(binderGenericArguments);
+                        var binderBindMethod = typeof(IServiceBinder).GetMethod(nameof(IServiceBinder.Bind)).MakeGenericMethod(binderGenericArguments);
+
+                        var bindingInst = Activator.CreateInstance(bindingType, inst);
+                        binderBindMethod.Invoke(kernel, new[] { bindingInst });
+                    }
+
+                    continue;
+                }
+
+                if (type.GetCustomAttribute<QuickNamedBindAttribute>().MatchSome(out var namedAttr) &&
+                    type.GetParameterlessCtor<QuickNamedBindAttribute>().MatchSome(out ctor))
+                {
+                    var services = namedAttr.AsServices;
+
+                    if (services.Length == 0)
+                    {
+                        services = type.GetInterfaces();
+                    }
+
+                    var inst = ctor.Invoke(new object[0]);
+                    var dictAddParameters = new[] { namedAttr.Name, inst };
+                    foreach (var service in namedAttr.AsServices)
+                    {
+                        var genericDictArguments = new[] { typeof(string), service };
+                        var dict = typeof(IDictionary<,>).MakeGenericType(genericDictArguments);
+                        var dictAddMethod = dict.GetMethod(nameof(IDictionary<object, object>.Add));
+
+                        var genericKernelArguments = new[] { dict, typeof(Unit) };
+                        var resolverGetMethod = typeof(IServiceResolver).GetMethod(nameof(IServiceResolver.Get)).MakeGenericMethod(genericKernelArguments);
+
+                        var dictOptInst = resolverGetMethod.Invoke(kernel, new object[] { default(Unit) });
+
+                        var option = typeof(Option<>).MakeGenericType(dict);
+                        var optionMatchSomeMethod = option.GetMethod(nameof(Option<object>.MatchSome));
+
+                        var matched = new object[] { null };
+                        object dictInst;
+                        if ((bool) optionMatchSomeMethod.Invoke(dictOptInst, matched))
+                        {
+                            dictInst = matched[0];
+                        }
+                        else
+                        {
+                            var bindingType = typeof(ConstantServiceBinding<,>).MakeGenericType(genericKernelArguments);
+                            var bindMethod = typeof(IServiceBinder).GetMethod(nameof(IServiceBinder.Bind)).MakeGenericMethod(genericKernelArguments);
+
+                            var genericDictImpl = typeof(Dictionary<,>).MakeGenericType(genericDictArguments);
+                            dictInst = Activator.CreateInstance(genericDictImpl);
+
+                            var binding = Activator.CreateInstance(bindingType, dictInst);
+                            bindMethod.Invoke(kernel, new[] { binding });
+                        }
+
+                        dictAddMethod.Invoke(dictInst, dictAddParameters);
+                    }
 
                     continue;
                 }

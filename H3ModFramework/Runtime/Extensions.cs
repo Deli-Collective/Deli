@@ -89,19 +89,23 @@ namespace H3ModFramework
             dest.Write(buffer, 0, read);
         }
 
-        public static Option<ConstructorInfo> QuickBindableCtor(this Type @this)
+        public static Option<TAttribute> GetCustomAttribute<TAttribute>(this Type @this) where TAttribute : Attribute
         {
-            if (@this.GetCustomAttributes(typeof(QuickBindAttribute), false).Length == 0)
-            {
-                return Option.None<ConstructorInfo>();
-            }
+            var attrs = @this.GetCustomAttributes(typeof(TAttribute), false);
 
+            return attrs.Length > 0
+                ? Option.Some((TAttribute) attrs[0])
+                : Option.None<TAttribute>();
+        }
+
+        public static Option<ConstructorInfo> GetParameterlessCtor<TAttribute>(this Type @this) where TAttribute : Attribute
+        {
             if (@this.GetConstructor(new Type[0]) is ConstructorInfo ctor)
             {
                 return Option.Some(ctor);   
             }
 
-            H3ModFramework.Logger.LogError($"Type {@this} is annotated with {typeof(QuickBindAttribute)}, but does not contain a public, parameterless constructor.");
+            H3ModFramework.Logger.LogError($"Type {@this} is annotated with {typeof(TAttribute)}, but does not contain a public, parameterless constructor.");
             return Option.None<ConstructorInfo>();
         }
     }
