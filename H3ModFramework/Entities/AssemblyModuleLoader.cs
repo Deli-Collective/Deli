@@ -3,6 +3,7 @@ using System.Reflection;
 using Atlas;
 using Atlas.Fluent.Impl;
 using BepInEx.Logging;
+using UnityEngine;
 
 namespace H3ModFramework
 {
@@ -37,13 +38,16 @@ namespace H3ModFramework
                     continue;
                 }
 
-                if (!type.IsSubclassOf(typeof(H3VRMod))) continue;
+                if (type.IsSubclassOf(typeof(H3VRMod)))
+                {
+                    var manager = kernel.Get<GameObject>().Unwrap();
 
-                H3ModFramework.ManagerObject.SetActive(false);
-                var modClass = (H3VRMod) H3ModFramework.ManagerObject.AddComponent(type);
-                modClass.BaseMod = mod;
-                modClass.Logger = kernel.Get<ManualLogSource, string>(mod.Name).Unwrap();
-                H3ModFramework.ManagerObject.SetActive(true);
+                    manager.SetActive(false);
+                    var modClass = (H3VRMod) manager.AddComponent(type);
+                    modClass.BaseMod = mod;
+                    modClass.Logger = kernel.Get<ManualLogSource, string>(mod.Name).Unwrap();
+                    manager.SetActive(true);
+                }
             }
         }
     }

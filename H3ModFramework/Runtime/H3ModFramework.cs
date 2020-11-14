@@ -17,8 +17,6 @@ namespace H3ModFramework
     {
         private static readonly StandardServiceKernel _kernel;
 
-        public static GameObject ManagerObject;
-
         public static IServiceResolver Services => _kernel;
 
         public static new ManualLogSource Logger => Services.Get<ManualLogSource>().Unwrap();
