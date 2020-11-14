@@ -1,8 +1,6 @@
-﻿using System.IO;
-
-namespace H3ModFramework
+﻿namespace H3ModFramework
 {
-    public static class Constants
+    internal static class Constants
     {
         // GUID and Version
         public const string Name = "H3VR Mod Framework";
