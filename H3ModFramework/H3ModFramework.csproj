@@ -9,12 +9,6 @@
     <Reference Include="Atlas">
       <HintPath>..\libs\Atlas.dll</HintPath>
     </Reference>
-    <Reference Include="BepInEx">
-      <HintPath>..\libs\BepInEx.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\libs\UnityEngine.dll</HintPath>
-    </Reference>
     <Reference Include="Valve.Newtonsoft.Json">
       <HintPath>..\libs\Valve.Newtonsoft.Json.dll</HintPath>
     </Reference>
