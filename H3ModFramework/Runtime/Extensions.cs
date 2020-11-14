@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using Atlas;
 
 namespace H3ModFramework
 {
@@ -64,6 +66,47 @@ namespace H3ModFramework
             {
                 return e.Types.Where(t => t != null).ToArray();
             }
+        }
+
+        // This is added in .NET Framework 4, but isn't present in .NET Framework 3.5. For now, we can make our own.
+        /// <summary>
+        ///     Copies data from this stream to the other.
+        /// </summary>
+        /// <param name="source">The stream to copy from.</param>
+        /// <param name="dest">The stream to copy to.</param>
+        public static void CopyTo(this Stream source, Stream dest)
+        {
+            const int bufferLength = 64 * 1024;
+            var buffer = new byte[bufferLength];
+
+            var read = source.Read(buffer, 0, bufferLength);
+            while (read == bufferLength)
+            {
+                dest.Write(buffer, 0, bufferLength);
+                read = source.Read(buffer, 0, bufferLength);
+            }
+
+            dest.Write(buffer, 0, read);
+        }
+
+        public static Option<TAttribute> GetCustomAttribute<TAttribute>(this Type @this) where TAttribute : Attribute
+        {
+            var attrs = @this.GetCustomAttributes(typeof(TAttribute), false);
+
+            return attrs.Length > 0
+                ? Option.Some((TAttribute) attrs[0])
+                : Option.None<TAttribute>();
+        }
+
+        public static Option<ConstructorInfo> GetParameterlessCtor<TAttribute>(this Type @this) where TAttribute : Attribute
+        {
+            if (@this.GetConstructor(new Type[0]) is ConstructorInfo ctor)
+            {
+                return Option.Some(ctor);   
+            }
+
+            H3ModFramework.Logger.LogError($"Type {@this} is annotated with {typeof(TAttribute)}, but does not contain a public, parameterless constructor.");
+            return Option.None<ConstructorInfo>();
         }
     }
 }
