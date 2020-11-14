@@ -65,12 +65,12 @@
             <param name="message">The error message that explains the reason for the exception.</param>
             <param name="index">The index within the parameter that caused the exception.</param>
         </member>
-        <member name="T:Atlas.DictionaryExtensions">
+        <member name="T:Atlas.ExtIDictionary">
             <summary>
             	A collection of extension methods for <see cref="T:System.Collections.Generic.IDictionary`2"/>.
             </summary>
         </member>
-        <member name="M:Atlas.DictionaryExtensions.GetOrInsert``2(System.Collections.Generic.IDictionary{``0,``1},``0,``1)">
+        <member name="M:Atlas.ExtIDictionary.GetOrInsert``2(System.Collections.Generic.IDictionary{``0,``1},``0,``1)">
             <summary>
             	If <paramref name="key"/> is not present in the dictionary, it is inserted with a value of <paramref name="default"/>.
             	The value of the dictionary element is then returned.
@@ -81,11 +81,11 @@
             <typeparam name="TKey">The type of the key of the dictionary.</typeparam>
             <typeparam name="TValue">The type of the value of the dictionary.</typeparam>
         </member>
-        <member name="M:Atlas.DictionaryExtensions.GetOrInsertWith``2(System.Collections.Generic.IDictionary{``0,``1},``0,System.Func{``1})">
+        <member name="M:Atlas.ExtIDictionary.GetOrInsertWith``2(System.Collections.Generic.IDictionary{``0,``1},``0,System.Func{``1})">
             <summary>
             	If <paramref name="key"/> is not present in the dictionary, it is inserted with the result of <paramref name="default"/>.
             	The value of the dictionary element is then returned.
-            	<p>This is the lazily-evaluated variant of <seealso cref="M:Atlas.DictionaryExtensions.GetOrInsert``2(System.Collections.Generic.IDictionary{``0,``1},``0,``1)"/>.</p>
+            	<p>This is the lazily-evaluated variant of <seealso cref="M:Atlas.ExtIDictionary.GetOrInsert``2(System.Collections.Generic.IDictionary{``0,``1},``0,``1)"/>.</p>
             </summary>
             <param name="this"></param>
             <param name="key">The key of the dictionary entry to get.</param>
@@ -93,7 +93,7 @@
             <typeparam name="TKey">The type of the key of the dictionary.</typeparam>
             <typeparam name="TValue">The type of the value of the dictionary.</typeparam>
         </member>
-        <member name="M:Atlas.DictionaryExtensions.OptionGetValue``2(System.Collections.Generic.IReadOnlyDictionary{``0,``1},``0)">
+        <member name="M:Atlas.ExtIDictionary.OptionGetValue``2(System.Collections.Generic.IReadOnlyDictionary{``0,``1},``0)">
             <summary>
             	Gets a dictionary value. If it does exist, returns Some, otherwise None.
             	<p>This is the <see cref="T:Atlas.Option`1"/> compliant version of <see cref="M:System.Collections.Generic.Dictionary`2.TryGetValue(`0,`1@)"/>.</p>
@@ -103,42 +103,42 @@
             <typeparam name="TKey">The type of the key of the dictionary.</typeparam>
             <typeparam name="TValue">The type of the value of the dictionary.</typeparam>
         </member>
-        <member name="T:Atlas.ServiceKernelExtensions">
+        <member name="T:Atlas.ExtIServiceKernel">
             <summary>
             	A collection of extension methods for <see cref="T:Atlas.IServiceKernel"/>.
             </summary>
         </member>
-        <member name="M:Atlas.ServiceKernelExtensions.LoadEntryType``1(Atlas.IServiceKernel)">
+        <member name="M:Atlas.ExtIServiceKernel.LoadEntryType``1(Atlas.IServiceKernel)">
             <summary>
             	Loads an entry module type into the service kernel.
             </summary>
             <param name="this"></param>
             <typeparam name="TModule">The type of the module.</typeparam>
         </member>
-        <member name="M:Atlas.ServiceKernelExtensions.LoadEntryType(Atlas.IServiceKernel,System.Type)">
+        <member name="M:Atlas.ExtIServiceKernel.LoadEntryType(Atlas.IServiceKernel,System.Type)">
             <summary>
             	Loads an entry module type into the service kernel.
             </summary>
             <param name="this"></param>
             <param name="type">The type of the module.</param>
         </member>
-        <member name="M:Atlas.ServiceKernelExtensions.LoadEntryTypes(Atlas.IServiceKernel,System.Collections.Generic.IEnumerable{System.Type})">
+        <member name="M:Atlas.ExtIServiceKernel.LoadEntryTypes(Atlas.IServiceKernel,System.Collections.Generic.IEnumerable{System.Type})">
             <summary>
             	Loads any entry module types from an enumerable into the service kernel.
             </summary>
             <param name="this"></param>
             <param name="types">The possible module types to load. May contain zero modules.</param>
         </member>
-        <member name="T:Atlas.ServiceResolverExtensions">
+        <member name="T:Atlas.ExtIServiceResolver">
             <summary>
-                A collection of extension methods for <see cref="T:Atlas.IServiceResolver"/>.
+             A collection of extension methods for <see cref="T:Atlas.IServiceResolver"/>.
             </summary>
         </member>
-        <member name="M:Atlas.ServiceResolverExtensions.Get``1(Atlas.IServiceResolver)">
+        <member name="M:Atlas.ExtIServiceResolver.Get``1(Atlas.IServiceResolver)">
             <summary>
             	Resolves a service using no context (<see cref="T:Atlas.Unit"/>).
             </summary>
-            <typeparam name="TService">The type of service to produce.</typeparam>
+            <typeparam name="TSThe type of service to produce.</typeparam>
         </member>
         <member name="T:Atlas.WholeBindingImpl`2">
             <summary>
@@ -188,12 +188,12 @@
             	A function that is a pure (no parameters taken), always Some, implementation of <see cref="M:Atlas.IServiceBinding`2.Get(Atlas.IServiceResolver,`1)"/>.
             </summary>
         </member>
-        <member name="T:Atlas.Fluent.PendingBindingExtensions">
+        <member name="T:Atlas.Fluent.ExtIBindingStub">
             <summary>
-            	A collection of extension methods for <see cref="T:Atlas.Fluent.IPendingBinding`2"/>.
+            	A collection of extension methods for <see cref="T:Atlas.Fluent.IBindingStub`2"/>.
             </summary>
         </member>
-        <member name="M:Atlas.Fluent.PendingBindingExtensions.ToConstant``2(Atlas.Fluent.IPendingBinding{``0,``1},``0)">
+        <member name="M:Atlas.Fluent.ExtIBindingStub.ToConstant``2(Atlas.Fluent.IBindingStub{``0,``1},``0)">
             <summary>
             	Binds a constant value to the service.
             </summary>
@@ -202,16 +202,16 @@
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
-        <member name="M:Atlas.Fluent.PendingBindingExtensions.ToWholeMethod``2(Atlas.Fluent.IPendingBinding{``0,``1},Atlas.WholeBindingImpl{``0,``1})">
+        <member name="M:Atlas.Fluent.ExtIBindingStub.ToWholeMethod``2(Atlas.Fluent.IBindingStub{``0,``1},Atlas.WholeBindingImpl{``0,``1})">
             <summary>
             	Binds a full callback method to the service.
             </summary>
             <param name="this"></param>
             <param name="method">The full binding implementation to use when this binding is called.</param>
-            <typeparam name="TService">The type of service to produce.</typeparam>
+            <typeparam nameram name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
-        <member name="M:Atlas.Fluent.PendingBindingExtensions.ToRecursiveMethod``2(Atlas.Fluent.IPendingBinding{``0,``1},Atlas.RecursiveBindingImpl{``0})">
+        <member name="M:Atlas.Fluent.ExtIBindingStub.ToRecursiveMethod``2(Atlas.Fluent.IBindingStub{``0,``1},Atlas.RecursiveBindingImpl{``0})">
             <summary>
             	Binds a contextual callback method to the service.
             </summary>
@@ -220,7 +220,7 @@
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
-        <member name="M:Atlas.Fluent.PendingBindingExtensions.ToContextualMethod``2(Atlas.Fluent.IPendingBinding{``0,``1},Atlas.ContextualBindingImpl{``0,``1})">
+        <member name="M:Atlas.Fluent.ExtIBindingStub.ToContextualMethod``2(Atlas.Fluent.IBindingStub{``0,``1},Atlas.ContextualBindingImpl{``0,``1})">
             <summary>
             	Binds a recursive callback method to the service.
             </summary>
@@ -229,7 +229,7 @@
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
-        <member name="M:Atlas.Fluent.PendingBindingExtensions.ToPureMethod``2(Atlas.Fluent.IPendingBinding{``0,``1},Atlas.PureBindingImpl{``0})">
+        <member name="M:Atlas.Fluent.ExtIBindingStub.ToPureMethod``2(Atlas.Fluent.IBindingStub{``0,``1},Atlas.PureBindingImpl{``0})">
             <summary>
             	Binds a pure callback method to the service.
             </summary>
@@ -238,7 +238,7 @@
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
-        <member name="M:Atlas.Fluent.PendingBindingExtensions.ToWholeNopMethod``2(Atlas.Fluent.IPendingBinding{``0,``1},Atlas.WholeNopBindingImpl{``0,``1})">
+        <member name="M:Atlas.Fluent.ExtIBindingStub.ToWholeNopMethod``2(Atlas.Fluent.IBindingStub{``0,``1},Atlas.WholeNopBindingImpl{``0,``1})">
             <summary>
             	Binds a full, always Some, callback method to the service.
             </summary>
@@ -247,7 +247,7 @@
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
-        <member name="M:Atlas.Fluent.PendingBindingExtensions.ToRecursiveNopMethod``2(Atlas.Fluent.IPendingBinding{``0,``1},Atlas.RecursiveNopBindingImpl{``0})">
+        <member name="M:Atlas.Fluent.ExtIBindingStub.ToRecursiveNopMethod``2(Atlas.Fluent.IBindingStub{``0,``1},Atlas.RecursiveNopBindingImpl{``0})">
             <summary>
             	Binds a recursive, always Some, callback method to the service.
             </summary>
@@ -256,7 +256,7 @@
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>		
         </member>
-        <member name="M:Atlas.Fluent.PendingBindingExtensions.ToContextualNopMethod``2(Atlas.Fluent.IPendingBinding{``0,``1},Atlas.ContextualNopBindingImpl{``0,``1})">
+        <member name="M:Atlas.Fluent.ExtIBindingStub.ToContextualNopMethod``2(Atlas.Fluent.IBindingStub{``0,``1},Atlas.ContextualNopBindingImpl{``0,``1})">
             <summary>
             	Binds a contextual, always Some, callback method to the service.
             </summary>
@@ -265,7 +265,7 @@
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
-        <member name="M:Atlas.Fluent.PendingBindingExtensions.ToPureNopMethod``2(Atlas.Fluent.IPendingBinding{``0,``1},Atlas.PureNopBindingImpl{``0})">
+        <member name="M:Atlas.Fluent.ExtIBindingStub.ToPureNopMethod``2(Atlas.Fluent.IBindingStub{``0,``1},Atlas.PureNopBindingImpl{``0})">
             <summary>
             	Binds a pure, always Some, callback method to the service.
             </summary>
@@ -274,49 +274,65 @@
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
-        <member name="T:Atlas.Fluent.PendingScopedBindingExtensions">
+        <member name="T:Atlas.Fluent.ExtIScopedBindingStub">
             <summary>
-            	A collection of extension methods for <see cref="T:Atlas.Fluent.IPendingScopedBinding`2"/>.
+            	A collection of extension methods for <see cref="T:Atlas.Fluent.IScopedBindingStub`2"/>.
             </summary>
         </member>
-        <member name="M:Atlas.Fluent.PendingScopedBindingExtensions.InSingletonScope``2(Atlas.Fluent.IPendingScopedBinding{``0,``1})">
+        <member name="M:Atlas.Fluent.ExtIScopedBindingStub.InSingletonScope``2(Atlas.Fluent.IScopedBindingStub{``0,``1})">
             <summary>
             	Binds this binding as a singleton, contextful service; only one instance will be per context and it will persist for each call to the binding.
             </summary>
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
-        <member name="M:Atlas.Fluent.PendingScopedBindingExtensions.InSingletonNopScope``2(Atlas.Fluent.IPendingScopedBinding{``0,``1})">
+        <member name="M:Atlas.Fluent.ExtIScopedBindingStub.InSingletonNopScope``2(Atlas.Fluent.IScopedBindingStub{``0,``1})">
             <summary>
             	Binds this binding as a singleton, contextless service; only one instance will be retrieved irregardless of context and it will persist for each call to the binding.
             </summary>
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
-        <member name="M:Atlas.Fluent.PendingScopedBindingExtensions.InTransientScope``2(Atlas.Fluent.IPendingScopedBinding{``0,``1})">
+        <member name="M:Atlas.Fluent.ExtIScopedBindingStub.InTransientScope``2(Atlas.Fluent.IScopedBindingStub{``0,``1})">
             <summary>
             	Binds this binding as a transient service; a new instance will be retrieved for each call to the binding.
             </summary>
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
-        <member name="T:Atlas.Fluent.ServiceBinderExtensions">
+        <member name="T:Atlas.Fluent.ExtIServiceBinder">
             <summary>
             	A collection of extension methods for <see cref="T:Atlas.IServiceBinder" />.
             </summary>
         </member>
-        <member name="M:Atlas.Fluent.ServiceBinderExtensions.Bind``2(Atlas.IServiceBinder)">
+        <member name="M:Atlas.Fluent.ExtIServiceBinder.Bind``2(Atlas.IServiceBinder)">
             <summary>
             	Creates a pending binding for a service.
             </summary>
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
-        <member name="M:Atlas.Fluent.ServiceBinderExtensions.Bind``1(Atlas.IServiceBinder)">
+        <member name="M:Atlas.Fluent.ExtIServiceBinder.Bind``1(Atlas.IServiceBinder)">
             <summary>
             	Creates a pending binding for a service that expects no context (<see cref="T:Atlas.Unit"/>).
             </summary>
             <typeparam name="TService">The type of service to produce.</typeparam>
+        </member>
+        <member name="T:Atlas.Fluent.Impl.BindingStub`2">
+            <summary>
+            	An implementation of <see cref="T:Atlas.Fluent.IBindingStub`2"/>.
+            </summary>
+            <typeparam name="TService">The type of service to produce.</typeparam>
+            <typeparam name="TContext">The type of context to consume.</typeparam>
+        </member>
+        <member name="P:Atlas.Fluent.Impl.BindingStub`2.Applicator">
+            <inheritdoc cref="P:Atlas.Fluent.IBindingStub`2.Applicator"/>
+        </member>
+        <member name="M:Atlas.Fluent.Impl.BindingStub`2.#ctor(Atlas.Fluent.StubApplicator{`0,`1})">
+            <summary>
+            	Constructs an instance of <see cref="T:Atlas.Fluent.Impl.BindingStub`2"/>.
+            </summary>
+            <param name="applicator">The function to set the binding.</param>
         </member>
         <member name="T:Atlas.Fluent.Impl.ConstantServiceBinding`2">
             <summary>
@@ -392,38 +408,22 @@
         <member name="M:Atlas.Fluent.Impl.FunctionServiceBinding`2.Get(Atlas.IServiceResolver,`1)">
             <inheritdoc cref="M:Atlas.IServiceBinding`2.Get(Atlas.IServiceResolver,`1)"/>
         </member>
-        <member name="T:Atlas.Fluent.Impl.PendingBinding`2">
+        <member name="T:Atlas.Fluent.Impl.ScopedBindingStub`2">
             <summary>
-            	An implementation of <see cref="T:Atlas.Fluent.IPendingBinding`2"/>.
+            	An implementation of <see cref="T:Atlas.Fluent.IScopedBindingStub`2"/>.
             </summary>
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
-        <member name="P:Atlas.Fluent.Impl.PendingBinding`2.Applicator">
-            <inheritdoc cref="P:Atlas.Fluent.IPendingBinding`2.Applicator"/>
+        <member name="P:Atlas.Fluent.Impl.ScopedBindingStub`2.Applicator">
+            <inheritdoc cref="P:Atlas.Fluent.IScopedBindingStub`2.Applicator"/>
         </member>
-        <member name="M:Atlas.Fluent.Impl.PendingBinding`2.#ctor(Atlas.Fluent.PendingApplicator{`0,`1})">
+        <member name="P:Atlas.Fluent.Impl.ScopedBindingStub`2.Binding">
+            <inheritdoc cref="P:Atlas.Fluent.IScopedBindingStub`2.Binding"/>
+        </member>
+        <member name="M:Atlas.Fluent.Impl.ScopedBindingStub`2.#ctor(Atlas.Fluent.StubApplicator{`0,`1},Atlas.IServiceBinding{`0,`1})">
             <summary>
-            	Constructs an instance of <see cref="T:Atlas.Fluent.Impl.PendingBinding`2"/>.
-            </summary>
-            <param name="applicator">The function to set the binding.</param>
-        </member>
-        <member name="T:Atlas.Fluent.Impl.PendingScopedBinding`2">
-            <summary>
-            	An implementation of <see cref="T:Atlas.Fluent.IPendingScopedBinding`2"/>.
-            </summary>
-            <typeparam name="TService">The type of service to produce.</typeparam>
-            <typeparam name="TContext">The type of context to consume.</typeparam>
-        </member>
-        <member name="P:Atlas.Fluent.Impl.PendingScopedBinding`2.Applicator">
-            <inheritdoc cref="P:Atlas.Fluent.IPendingScopedBinding`2.Applicator"/>
-        </member>
-        <member name="P:Atlas.Fluent.Impl.PendingScopedBinding`2.Binding">
-            <inheritdoc cref="P:Atlas.Fluent.IPendingScopedBinding`2.Binding"/>
-        </member>
-        <member name="M:Atlas.Fluent.Impl.PendingScopedBinding`2.#ctor(Atlas.Fluent.PendingApplicator{`0,`1},Atlas.IServiceBinding{`0,`1})">
-            <summary>
-            	Constructs an instance of <see cref="T:Atlas.Fluent.Impl.PendingScopedBinding`2"/>.
+            	Constructs an instance of <see cref="T:Atlas.Fluent.Impl.ScopedBindingStub`2"/>.
             </summary>
             <param name="applicator">The function to set the binding.</param>
             <param name="binding">The binding, without scope.</param>
@@ -460,7 +460,7 @@
         <member name="M:Atlas.Fluent.Impl.SingletonServiceBinding`2.Get(Atlas.IServiceResolver,`1)">
             <inheritdoc cref="M:Atlas.IServiceBinding`2.Get(Atlas.IServiceResolver,`1)"/>
         </member>
-        <member name="T:Atlas.Fluent.PendingApplicator`2">
+        <member name="T:Atlas.Fluent.StubApplicator`2">
             <summary>
             	A function that applies a binding to a binder.
             </summary>
@@ -469,32 +469,32 @@
             <typeparam name="TContext">The context the binding consumes.</typeparam>
             <returns></returns>
         </member>
-        <member name="T:Atlas.Fluent.IPendingBinding`2">
+        <member name="T:Atlas.Fluent.IBindingStub`2">
             <summary>
             	Represent a binding not yet scoped and bound to a <see cref="T:Atlas.IServiceBinder" />.
             </summary>
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
-        <member name="P:Atlas.Fluent.IPendingBinding`2.Applicator">
+        <member name="P:Atlas.Fluent.IBindingStub`2.Applicator">
             <summary>
             	The function to set the binding.
             </summary>
         </member>
-        <member name="T:Atlas.Fluent.IPendingScopedBinding`2">
+        <member name="T:Atlas.Fluent.IScopedBindingStub`2">
             <summary>
             	Represents a binding that has been created and scoped but not yet bound to a <see cref="T:Atlas.IServiceBinder" />.
-            	<p>This interface composites <see cref="P:Atlas.Fluent.IPendingScopedBinding`2.Applicator"/> to improve ease of extension method usage.</p>
+            	<p>This interface composites <see cref="P:Atlas.Fluent.IScopedBindingStub`2.Applicator"/> to improve ease of extension method usage.</p>
             </summary>
             <typeparam name="TService">The type of service to produce.</typeparam>
             <typeparam name="TContext">The type of context to consume.</typeparam>
         </member>
-        <member name="P:Atlas.Fluent.IPendingScopedBinding`2.Applicator">
+        <member name="P:Atlas.Fluent.IScopedBindingStub`2.Applicator">
             <summary>
             	The function to set the binding.
             </summary>
         </member>
-        <member name="P:Atlas.Fluent.IPendingScopedBinding`2.Binding">
+        <member name="P:Atlas.Fluent.IScopedBindingStub`2.Binding">
             <summary>
             	The binding awaiting to be bound.
             </summary>
@@ -508,7 +508,6 @@
             <summary>
             	The maximum amount of times to recursively get a service. If a service is gotten more than this many times within the same call, an exception is thrown.
             </summary>
-            <exception cref="T:System.ArgumentOutOfRangeException">The inner value of <paramref name="value" /> was less than 0.</exception>
         </member>
         <member name="M:Atlas.Impl.StandardServiceKernel.#ctor">
             <summary>
@@ -585,7 +584,6 @@
         <member name="T:Atlas.Mapper`2">
             <summary>
             	Maps one value to another.
-            	Comparable to <see cref="T:System.Converter`2"/>, but with covariance and invariance
             </summary>
             <typeparam name="TSource">The type of the value.</typeparam>
             <typeparam name="TMapped">The type to map the value to.</typeparam>
@@ -593,7 +591,6 @@
         <member name="T:Atlas.Mapper`3">
             <summary>
             	Maps one value to another, using a passed state.
-            	Comparable to <see cref="T:System.Converter`2"/>, but with covariance and invariance, and nullable attributes.
             </summary>
             <param name="value">The value to map.</param>
             <param name="state">The state to pass into the function.</param>
@@ -992,12 +989,23 @@
         </member>
         <member name="T:Atlas.Unit">
             <summary>
-                A type that has no information.
+             A type that has no information.
             </summary>
         </member>
-    </members>
-</doc>
-cs.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue" />, the parameter may be null even if the corresponding type disallows it.</summary>
+        <member name="T:System.Diagnostics.CodeAnalysis.AllowNullAttribute">
+            <summary>Specifies that null is allowed as an input even if the corresponding type disallows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DisallowNullAttribute">
+            <summary>Specifies that null is disallowed as an input even if the corresponding type allows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullAttribute">
+            <summary>Specifies that an output may be null even if the corresponding type disallows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullAttribute">
+            <summary>Specifies that an output will not be null even if the corresponding type allows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute">
+            <summary>Specifies that when a method returns <see cref="P:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue" />, the parameter may be null even if the corresponding type disallows it.</summary>
         </member>
         <member name="M:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.#ctor(System.Boolean)">
             <summary>Initializes the attribute with the specified return value condition.</summary>
@@ -1034,23 +1042,6 @@ cs.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue" />, the parameter may be nul
         </member>
         <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute">
             <summary>Applied to a method that will never return under any circumstance.</summary>
-        </member>
-        <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute">
-            <summary>Specifies that the method will not return if the associated Boolean parameter is passed the specified value.</summary>
-        </member>
-        <member name="M:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute.#ctor(System.Boolean)">
-            <summary>Initializes the attribute with the specified parameter value.</summary>
-            <param name="parameterValue">
-            	The condition parameter value. Code after the method will be considered unreachable by diagnostics if the argument to
-            	the associated parameter matches this value.
-            </param>
-        </member>
-        <member name="P:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute.ParameterValue">
-            <summary>Gets the condition parameter value.</summary>
-        </member>
-    </members>
-</doc>
-hod that will never return under any circumstance.</summary>
         </member>
         <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute">
             <summary>Specifies that the method will not return if the associated Boolean parameter is passed the specified value.</summary>
