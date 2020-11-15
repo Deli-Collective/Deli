@@ -88,7 +88,7 @@ namespace Deli
                 return result;
             }
 
-            Deli.Logger.LogError($"Resource {path} in {Guid} was requested with type {nameof(T)} but no TypeLoader exists for this type!");
+            Deli.Logger.LogError($"Resource {path} in {Guid} was requested with type {typeof(T)} but no TypeLoader exists for this type!");
             return default;
         }
 
