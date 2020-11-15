@@ -1,7 +1,16 @@
-﻿Set-Location bin\Debug\net35\
+﻿# Unpack the arguments
+$dir = $args[0]
+$targetName = $args[1]
+
+# Set our directory to the build directory
+Set-Location $dir
+
+# Setup the compression arguments
 $compress = @{
-    Path = "manifest.json", "Deli.Core.dll"
+    Path = "manifest.json", "$($targetName).dll"
     CompressionLevel = "Optimal"
-    DestinationPath = "Deli.Core.zip"
+    DestinationPath = "$($targetName).zip"
 }
-Compress-Archive @compress
+
+# Compress and overwrite the previous build
+Compress-Archive -Force @compress
