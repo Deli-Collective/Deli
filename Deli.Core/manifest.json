@@ -1,0 +1,13 @@
+﻿{
+  "Guid": "deli",
+  "Name": "Deli Core",
+  "Author": "Nathan Gill & Contributors",
+  "Dependencies": [],
+  "Version": "0.0.0.0",
+  "Modules": [
+    {
+      "Loader": "Assembly",
+      "Path": "Deli.Core.dll"
+    }
+  ]
+}
