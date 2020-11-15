@@ -39,7 +39,7 @@ namespace Deli
                     var inst = ctor.Invoke(new object[0]);
                     foreach (var service in services)
                     {
-                        var binderGenericArguments = new[] { type, typeof(Unit) };
+                        var binderGenericArguments = new[] { service, typeof(Unit) };
                         var bindingType = typeof(ConstantServiceBinding<,>).MakeGenericType(binderGenericArguments);
                         var binderBindMethod = typeof(IServiceBinder).GetMethod(nameof(IServiceBinder.Bind)).MakeGenericMethod(binderGenericArguments);
 
