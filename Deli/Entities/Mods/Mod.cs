@@ -44,7 +44,7 @@ namespace Deli
             public Dictionary<string, string> Assets { get; }
 
             [JsonConstructor]
-            public Manifest(string guid, Version version, Option<string> name, Option<string[]> authors, Dictionary<string, Version> dependencies, Dictionary<string, string> modules)
+            public Manifest(string guid, Version version, Option<string> name, Option<string[]> authors, Dictionary<string, Version> dependencies, Dictionary<string, string> assets)
             {
                 Guid = guid;
                 Version = version;
@@ -53,7 +53,7 @@ namespace Deli
                 Name = name;
                 Authors = authors;
                 
-                Assets = modules;
+                Assets = assets;
             }
 
             /// <summary>
