@@ -15,15 +15,17 @@ namespace Deli
     {
         private static Option<ConstructorInfo> GetParameterlessCtor<TAttribute>(Type type, IServiceResolver services)
         {
-            return type.GetParameterlessCtor().Map(v =>
+            if (type.GetParameterlessCtor().MatchSome(out var ctor))
             {
-                if (services.Get<ManualLogSource>().MatchSome(out var log))
-                {
-                    log.LogError($"Type {type} is annotated with {typeof(TAttribute)}, but does not contain a public, parameterless constructor.");
-                }
+                return Option.Some(ctor);
+            }
 
-                return v;
-            });
+            if (services.Get<ManualLogSource>().MatchSome(out var log))
+            {
+                log.LogError($"Type {type} is annotated with {typeof(TAttribute)}, but does not contain a public, parameterless constructor.");
+            }
+
+            return Option.None<ConstructorInfo>();
         }
 
         public void LoadAsset(IServiceKernel kernel, Mod mod, string path)
