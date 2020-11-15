@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Atlas;
+using Atlas.Fluent;
+using BepInEx.Logging;
 
 namespace Deli
 {
@@ -43,11 +46,10 @@ namespace Deli
         /// <summary>
         ///     Checks if the provided dependant version string is satisfied by the source version
         /// </summary>
-        public static bool Satisfies(this Version source, string dependant)
+        public static bool Satisfies(this Version source, Version dependant)
         {
             // It is satisfied if the Major version is the same and the minor version is equal or higher.
-            var dep = new Version(dependant);
-            return source.Major == dep.Major && source.Minor >= dep.Minor;
+            return source.Major == dependant.Major && source.Minor >= dependant.Minor;
         }
 
         /// <summary>
@@ -98,15 +100,18 @@ namespace Deli
                 : Option.None<TAttribute>();
         }
 
-        public static Option<ConstructorInfo> GetParameterlessCtor<TAttribute>(this Type @this) where TAttribute : Attribute
+        public static Option<ConstructorInfo> GetParameterlessCtor(this Type @this)
         {
-            if (@this.GetConstructor(new Type[0]) is ConstructorInfo ctor)
-            {
-                return Option.Some(ctor);   
-            }
+            return @this.GetConstructor(new Type[0]) is ConstructorInfo ctor
+                ? Option.Some(ctor)
+                : Option.None<ConstructorInfo>();
+        }
 
-            Deli.Logger.LogError($"Type {@this} is annotated with {typeof(TAttribute)}, but does not contain a public, parameterless constructor.");
-            return Option.None<ConstructorInfo>();
+        public static void BindJson<T>(this IServiceKernel @this)
+        {
+            @this.Bind<IAssetReader<Option<T>>>()
+                .ToRecursiveNopMethod(x => new JsonAssetReader<T>(x))
+                .InSingletonNopScope();
         }
     }
 }

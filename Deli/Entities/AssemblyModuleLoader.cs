@@ -11,12 +11,27 @@ namespace Deli
     /// <summary>
     /// Module Loader for assemblies.
     /// </summary>
-    public class AssemblyModuleLoader : IModuleLoader
+    public class AssemblyModuleLoader : IAssetLoader
     {
-        public void LoadModule(IServiceKernel kernel, ModInfo mod, ModInfo.ModuleInfo module)
+        private static Option<ConstructorInfo> GetParameterlessCtor<TAttribute>(Type type, IServiceResolver services)
+        {
+            if (type.GetParameterlessCtor().MatchSome(out var ctor))
+            {
+                return Option.Some(ctor);
+            }
+
+            if (services.Get<ManualLogSource>().MatchSome(out var log))
+            {
+                log.LogError($"Type {type} is annotated with {typeof(TAttribute)}, but does not contain a public, parameterless constructor.");
+            }
+
+            return Option.None<ConstructorInfo>();
+        }
+
+        public void LoadAsset(IServiceKernel kernel, Mod mod, string path)
         {
             // Load the assembly and scan it for new module loaders and resource type loaders
-            var assembly = mod.GetResource<Assembly>(module.Path);
+            var assembly = mod.Resources.Get<Assembly>(path).Expect("Assembly not found at path: " + path);
 
             // Try to discover any mod plugins in the assembly
             foreach (var type in assembly.GetTypesSafe())
@@ -27,7 +42,7 @@ namespace Deli
                 }
 
                 if (type.GetCustomAttribute<QuickUnnamedBindAttribute>().MatchSome(out var unnamedAttr) &&
-                    type.GetParameterlessCtor<QuickUnnamedBindAttribute>().MatchSome(out var ctor))
+                    GetParameterlessCtor<QuickUnnamedBindAttribute>(type, kernel).MatchSome(out var ctor))
                 {
                     var services = unnamedAttr.AsServices;
 
@@ -51,7 +66,7 @@ namespace Deli
                 }
 
                 if (type.GetCustomAttribute<QuickNamedBindAttribute>().MatchSome(out var namedAttr) &&
-                    type.GetParameterlessCtor<QuickNamedBindAttribute>().MatchSome(out ctor))
+                    GetParameterlessCtor<QuickNamedBindAttribute>(type, kernel).MatchSome(out ctor))
                 {
                     var services = namedAttr.AsServices;
 
@@ -102,14 +117,13 @@ namespace Deli
 
                 if (type.IsSubclassOf(typeof(DeliMod)))
                 {
-                    var manager = kernel.Get<GameObject>().Unwrap();
+                    var manager = kernel.Get<GameObject>().Expect("Could not find manager object.");
 
                     manager.SetActive(false);
                     try
                     {
                         var modClass = (DeliMod) manager.AddComponent(type);
                         modClass.BaseMod = mod;
-                        modClass.Logger = kernel.Get<ManualLogSource, string>(mod.Name).Unwrap();
                     }
                     finally
                     {

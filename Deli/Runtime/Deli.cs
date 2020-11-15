@@ -7,89 +7,241 @@ using Atlas;
 using Atlas.Fluent;
 using Atlas.Impl;
 using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Logging;
+using Ionic.Zip;
 using UnityEngine;
+using Valve.Newtonsoft.Json;
+using Valve.Newtonsoft.Json.Linq;
+using Valve.Newtonsoft.Json.Serialization;
 
 namespace Deli
 {
     [BepInPlugin(Constants.Guid, Constants.Name, Constants.Version)]
     public class Deli : BaseUnityPlugin
     {
-        private static readonly StandardServiceKernel Kernel;
+        private StandardServiceKernel _kernel;
 
-        public static IServiceResolver Services => Kernel;
+        public IServiceResolver Services => _kernel;
 
-        public new static ManualLogSource Logger => Services.Get<ManualLogSource>().Unwrap();
-
-        static Deli()
+        private void Bind()
         {
-            Kernel = new StandardServiceKernel();
+            // Cleanup
+            _kernel.Bind<IList<IDisposable>>()
+                .ToConstant(new List<IDisposable>());
 
-            // Basic impls
-            Kernel.Bind<IAssetReader<Assembly>>()
-                .ToConstant(new AssemblyAssetReader());
-
-            // Named dictionaries
-            Kernel.Bind<IDictionary<string, IModuleLoader>>()
-                .ToConstant(new Dictionary<string, IModuleLoader>
-            {
-                ["Assembly"] = new AssemblyModuleLoader()
-            });
-            Kernel.Bind<IDictionary<string, ModInfo>>()
-                .ToConstant(new Dictionary<string, ModInfo>());
-
-            // Enumerables
-            Kernel.Bind<IEnumerable<IModuleLoader>>()
-                .ToRecursiveMethod(x => x.Get<IDictionary<string, IModuleLoader>>().Map(v => (IEnumerable<IModuleLoader>) v.Values))
-                .InTransientScope();
-            Kernel.Bind<IEnumerable<ModInfo>>()
-                .ToRecursiveMethod(x => x.Get<IDictionary<string, ModInfo>>().Map(v => (IEnumerable<ModInfo>) v.Values))
-                .InTransientScope();
-
-            // Contextual to dictionaries
-            Kernel.Bind<IModuleLoader, string>()
-                .ToWholeMethod((services, context) => services.Get<IDictionary<string, IModuleLoader>>()
-                    .Map(x => x.OptionGetValue(context))
-                    .Flatten())
-                .InTransientScope();
-            Kernel.Bind<ModInfo, string>()
-                .ToWholeMethod((services, context) => services.Get<IDictionary<string, ModInfo>>()
-                    .Map(x => x.OptionGetValue(context))
-                    .Flatten())
-                .InTransientScope();
-
-            // Custom impls
-            Kernel.Bind<ManualLogSource, string>()
-                .ToContextualNopMethod(x => BepInEx.Logging.Logger.CreateLogSource(x))
-                .InSingletonScope();
-        }
-
-        private void Awake()
-        {
-            Kernel.Bind<Deli>()
+            // Simple constants
+            _kernel.Bind<Deli>()
                 .ToConstant(this);
-            Kernel.Bind<ManualLogSource>()
+            _kernel.Bind<ManualLogSource>()
                 .ToConstant(base.Logger);
             {
                 var manager = new GameObject("Deli Manager");
                 DontDestroyOnLoad(manager);
                 
-                Kernel.Bind<GameObject>()
+                _kernel.Bind<GameObject>()
                     .ToConstant(manager);
             }
+
+            // JSON
+            _kernel.Bind<NamingStrategy>()
+                .ToConstant(new CamelCaseNamingStrategy());
+            _kernel.Bind<IContractResolver>()
+                .ToRecursiveNopMethod(x => new DefaultContractResolver
+                {
+                    NamingStrategy = x.Get<NamingStrategy>().Expect("JSON naming strategy not found")
+                })
+                .InSingletonNopScope();
+            _kernel.Bind<IList<JsonConverter>>()
+                .ToConstant(new List<JsonConverter>
+                {
+                    new OptionJsonConverter()
+                });
+            _kernel.Bind<JsonSerializerSettings>()
+                .ToRecursiveNopMethod(x => new JsonSerializerSettings
+                {
+                    ContractResolver = x.Get<IContractResolver>().Expect("JSON contract resolver not found"),
+                    Converters = x.Get<IList<JsonConverter>>().Expect("JSON converters not found")
+                })
+                .InSingletonNopScope();
+            _kernel.Bind<JsonSerializer>()
+                .ToRecursiveNopMethod(x =>
+                {
+                    var settings = x.Get<JsonSerializerSettings>().Expect("JSON settings not found.");
+
+                    return JsonSerializer.Create(settings);
+                })
+                .InSingletonNopScope();
+            _kernel.BindJson<Mod.Manifest>();
+
+            // Basic impls
+            _kernel.Bind<IAssetReader<Assembly>>()
+                .ToConstant(new AssemblyAssetReader());
+            _kernel.Bind<IAssetReader<Option<JObject>>>()
+                .ToRecursiveNopMethod(x => new JObjectAssetReader(x))
+                .InSingletonNopScope();
+
+            // Associative services dictionaries
+            _kernel.Bind<IDictionary<string, IAssetLoader>>()
+                .ToConstant(new Dictionary<string, IAssetLoader>
+            {
+                ["assembly"] = new AssemblyModuleLoader()
+            });
+            _kernel.Bind<IDictionary<string, Mod>>()
+                .ToConstant(new Dictionary<string, Mod>());
+
+            // Enumerables
+            _kernel.Bind<IEnumerable<IAssetLoader>>()
+                .ToRecursiveMethod(x => x.Get<IDictionary<string, IAssetLoader>>().Map(v => (IEnumerable<IAssetLoader>) v.Values))
+                .InTransientScope();
+            _kernel.Bind<IEnumerable<Mod>>()
+                .ToRecursiveMethod(x => x.Get<IDictionary<string, Mod>>().Map(v => (IEnumerable<Mod>) v.Values))
+                .InTransientScope();
+
+            // Contextual to dictionaries
+            _kernel.Bind<IAssetLoader, string>()
+                .ToWholeMethod((services, context) => services.Get<IDictionary<string, IAssetLoader>>()
+                    .Map(x => x.OptionGetValue(context))
+                    .Flatten())
+                .InTransientScope();
+            _kernel.Bind<Mod, string>()
+                .ToWholeMethod((services, context) => services.Get<IDictionary<string, Mod>>()
+                    .Map(x => x.OptionGetValue(context))
+                    .Flatten())
+                .InTransientScope();
+
+            // Custom impls
+            _kernel.Bind<ManualLogSource, string>()
+                .ToContextualNopMethod(x => BepInEx.Logging.Logger.CreateLogSource(x))
+                .InSingletonScope();
+            _kernel.Bind<ConfigFile, string>()
+                .ToContextualNopMethod(x => new ConfigFile(Path.Combine(Constants.ConfigDirectory, $"{x}.cfg"), true))
+                .InSingletonScope();
+        }
+
+        private void Awake()
+        {
+            _kernel = new StandardServiceKernel();
+            Bind();
             
             Initialize();
+        }
+
+        private void OnDestroy()
+        {
+            var disposables = Services.Get<IList<IDisposable>>().Expect("Could not find disposables.");
+
+            foreach (var disposable in disposables)
+            {
+                disposable.Dispose();
+            }
+        }
+
+        private Option<Mod> CreateMod(IRawIO raw)
+        {
+            const string prefix = "Failed to acquire the ";
+            IResourceIO resources = new CachedResourceIO(new ResolverResourceIO(raw, Services));
+
+            if (!resources.Get<Option<Mod.Manifest>>(Constants.ManifestFileName).Flatten().MatchSome(out var info))
+            {
+                Logger.LogWarning(prefix + "manifest file");
+            }
+            else if (!Services.Get<ConfigFile, string>(info.Guid).MatchSome(out var config))
+            {
+                Logger.LogWarning(prefix + "config file for " + info);
+            }
+            else if (!Services.Get<ManualLogSource, string>(info.Name.UnwrapOr(info.Guid)).MatchSome(out var log))
+            {
+                Logger.LogWarning(prefix + "log source for " + info);
+            }
+            else
+            {
+                resources = new LoggedModIO(log, resources);
+                var mod = new Mod(info, resources, config, log);
+
+                return Option.Some(mod);
+            }
+
+            return Option.None<Mod>();
         }
 
         /// <summary>
         ///     Enumerates the mods in the mods folder
         /// </summary>
         /// <returns>An enumerable of the mods in the mods folder</returns>
-        private static IEnumerable<ModInfo> DiscoverMods(string dir)
+        private IEnumerable<Mod> DiscoverMods(DirectoryInfo dir)
         {
-            var archives = Directory.GetFiles(dir, "*." + Constants.ModExtension, SearchOption.AllDirectories).Select(ModInfo.FromArchive);
-            var directories = Directory.GetFiles(dir, Constants.ManifestFileName, SearchOption.AllDirectories).Select(ModInfo.FromManifest);
-            return archives.Concat(directories);
+            void LogFailure(string type, object path)
+            {
+                Logger.LogWarning("Failed to create mod from " + type + ": " + path);
+            }
+
+            void LogSuccess(string type, object path)
+            {
+                Logger.LogDebug("Created mod from " + type + ": " + path);
+            }
+
+            var manifestPath = Path.Combine(dir.Name, Constants.ManifestFileName);
+            if (File.Exists(manifestPath)) // Directory mod
+            {
+                const string type = "directory";
+
+                var io = new DirectoryRawIO(dir);
+
+                if (CreateMod(io).MatchSome(out var mod))
+                {
+                    LogFailure(type, dir);
+                    yield return mod;
+                }
+                else
+                {
+                    LogSuccess(type, dir);
+                }
+
+                // Halt discovery in this directory
+                // Used because non-Deli *.zip and manifest.json files would be misinterpretted.
+                yield break;
+            }
+
+            foreach (var archiveFile in dir.GetFiles("*." + Constants.ModExtension))
+            {
+                const string type = "archive";
+
+                var raw = archiveFile.OpenRead();
+                var zip = ZipFile.Read(raw);
+
+                if (zip.Entries.Any(x => x.FileName.Contains('\\')))
+                {
+                    Logger.LogError($"Found a bad zip path in {archiveFile}. To fix it, try rezipping the archive or use a different zip utility.");
+
+                    zip.Dispose();
+                    raw.Dispose();
+                    continue;
+                }
+
+                var io = new ArchiveRawIO(zip);
+                
+                if (!CreateMod(io).MatchSome(out var mod))
+                {
+                    LogFailure(type, archiveFile);
+
+                    zip.Dispose();
+                    raw.Dispose();
+                    continue;
+                }
+
+                var disposables = _kernel.Get<IList<IDisposable>>().Unwrap();
+                disposables.Add(zip);
+                disposables.Add(raw);
+
+                LogSuccess(type, archiveFile);
+                yield return mod;
+            }
+
+            foreach (var mod in dir.GetDirectories().SelectMany(DiscoverMods))
+            {
+                yield return mod;
+            }
         }
 
         private void Initialize()
@@ -97,10 +249,9 @@ namespace Deli
             EnsureDirectoriesExist();
 
             // Discover all the mods
-            var modsDir = Directory.GetCurrentDirectory() + "/" + Constants.ModDirectory;
-            var mods = DiscoverMods(modsDir).ToArray();
-            Logger.LogInfo($"Discovered {mods.Length} mods ({mods.Count(x => x == null)} invalid)");
-            mods = mods.Where(x => x != null).ToArray();
+            var modsDir = new DirectoryInfo(Constants.ModDirectory);
+            var mods = DiscoverMods(modsDir).ToDictionary(x => x.Info.Guid, x => x);
+            Logger.LogInfo($"{mods.Count} mods to load");
 
             // Make sure all dependencies are satisfied
             if (!CheckDependencies(mods))
@@ -109,45 +260,52 @@ namespace Deli
                 return;
             }
 
+            // Sort the mods in the order they depend on each other
+            var sorted = mods.Values.TSort(x => x.Info.Dependencies.Keys.Select(dep => mods[dep]), true);
+
             // Load the mods
-            try
+            foreach (var mod in sorted)
             {
-                // Sort the mods in the order they depend on each other
-                var sorted = mods.TSort(x => mods.Where(m => x.Dependencies.Select(d => d.Split('@')[0]).Contains(m.Guid)), true);
-                foreach (var mod in sorted) LoadMod(mod);
+                try
+                {
+                    LoadMod(mod);
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError($"Failed to load mod {mod}. No additional mods will be loaded.\nException: " + e);
+                    break;
+                }
             }
-            catch (Exception e)
-            {
-                Logger.LogError("Could not initialize mod framework.\n" + e);
-            }
+
+            Logger.LogInfo("Mod loading complete");
         }
 
-        private bool CheckDependencies(ModInfo[] mods)
+        private bool CheckDependencies(Dictionary<string, Mod> mods)
         {
-            var pass = true;
-
-            foreach (var mod in mods)
-            foreach (var dep in mod.Dependencies)
+            foreach (var mod in mods.Values)
+            foreach (var dep in mod.Info.Dependencies)
             {
-                // Split the dependency by @ and extract the target version
-                var split = dep.Split('@');
+                string DepToString()
+                {
+                    return $"{dep.Key} @ {dep.Value}";
+                }
 
                 // Try finding the installed dependency
-                var dependency = mods.FirstOrDefault(m => m.Guid == split[0]);
-                if (dependency == null)
+                if (!mods.TryGetValue(dep.Key, out var resolved))
                 {
-                    Logger.LogError($"Mod {mod.Name} depends on {dep} but it is not installed!");
-                    pass = false;
+                    Logger.LogError($"Mod {mod} depends on {DepToString()}, but it is not installed!");
+                    return false;
                 }
+
                 // Check if the installed version satisfies the dependency request
-                else if (!dependency.Version.Satisfies(split[1]))
+                if (!resolved.Info.Version.Satisfies(dep.Value))
                 {
-                    Logger.LogError($"Mod {mod.Name} depends on {dep} but version {dependency.VersionString} is installed!");
-                    pass = false;
+                    Logger.LogError($"Mod {mod} depends on {DepToString()}, but version {resolved.Info.Version} is installed!");
+                    return false;
                 }
             }
 
-            return pass;
+            return true;
         }
 
         private static void EnsureDirectoriesExist()
@@ -156,22 +314,28 @@ namespace Deli
             Directory.CreateDirectory(Constants.ConfigDirectory);
         }
 
-        private void LoadMod(ModInfo mod)
+        private void LoadMod(Mod mod)
         {
-            // For each module inside the mod, load it
-            foreach (var module in mod.Modules)
+            Logger.LogInfo("Loading " + mod);
+
+            // For each asset inside the mod, load it
+            foreach (var asset in mod.Info.Assets)
             {
-                if (!Services.Get<IModuleLoader, string>(module.Loader).MatchSome(out var loader))
+                var assetPath = asset.Key;
+                var assetLoader = asset.Value;
+
+                if (!Services.Get<IAssetLoader, string>(assetLoader).MatchSome(out var loader))
                 {
-                    Logger.LogError($"Module not found for {mod}: {module.Loader}");
-                    continue;
+                    // Throw instead of skip, because this might be a critical part of the mod
+                    throw new InvalidOperationException($"Asset loader not found: " + assetLoader);
                 }
 
-                loader.LoadModule(Kernel, mod, module);
+                Logger.LogDebug($"Loading asset [{assetLoader}: {assetPath}]");
+                loader.LoadAsset(_kernel, mod, assetPath);
             }
 
-            // Add the ModInfo to the kernel.
-            Services.Get<IDictionary<string, ModInfo>>().Unwrap().Add(mod.Name, mod);
+            // Add the Mod to the kernel.
+            Services.Get<IDictionary<string, Mod>>().Unwrap().Add(mod.Info.Guid, mod);
         }
     }
 }
