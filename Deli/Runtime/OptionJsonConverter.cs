@@ -14,15 +14,15 @@ namespace Deli
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var generics = objectType.GetGenericArguments();
-            var value = reader.Value;
 
-            if (value is null)
+            if (reader.TokenType == JsonToken.Null)
             {
                 var optionNone = typeof(Option).GetMethod(nameof(Option.None)).MakeGenericMethod(generics);
 
                 return optionNone.Invoke(null, new object[0]);
             }
 
+            var value = serializer.Deserialize(reader, generics[0]);
             var optionSome = typeof(Option).GetMethod(nameof(Option.Some)).MakeGenericMethod(generics);
 
             return optionSome.Invoke(null, new[] { value });
@@ -35,7 +35,7 @@ namespace Deli
             var match = new object[] { null };
             if ((bool) matchSomeMethod.Invoke(value, match))
             {
-                writer.WriteValue(match[0]);
+                serializer.Serialize(writer, match[0]);
             }
             else
             {
