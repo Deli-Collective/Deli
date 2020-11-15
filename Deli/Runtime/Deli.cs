@@ -166,18 +166,31 @@ namespace Deli
         /// <returns>An enumerable of the mods in the mods folder</returns>
         private IEnumerable<Mod> DiscoverMods(DirectoryInfo dir)
         {
+            void LogFailure(string type, object path)
+            {
+                Logger.LogWarning("Failed to create mod from " + type + ": " + path);
+            }
+
+            void LogSuccess(string type, object path)
+            {
+                Logger.LogDebug("Created mod from " + type + ": " + path);
+            }
+
             var manifestPath = Path.Combine(dir.Name, Constants.ManifestFileName);
             if (File.Exists(manifestPath)) // Directory mod
             {
+                const string type = "directory";
+
                 var io = new DirectoryRawIO(dir);
 
                 if (CreateMod(io).MatchSome(out var mod))
                 {
+                    LogFailure(type, dir);
                     yield return mod;
                 }
                 else
                 {
-                    Logger.LogWarning("Failed to create mod from directory: " + dir);
+                    LogSuccess(type, dir);
                 }
 
                 // Halt discovery in this directory
@@ -187,7 +200,7 @@ namespace Deli
 
             foreach (var archiveFile in dir.GetFiles("*." + Constants.ModExtension))
             {
-                // Zip mod
+                const string type = "archive";
 
                 var raw = archiveFile.OpenRead();
                 _kernel.Get<IList<IDisposable>>().Unwrap().Add(raw);
@@ -197,10 +210,11 @@ namespace Deli
                 
                 if (!CreateMod(io).MatchSome(out var mod))
                 {
-                    Logger.LogWarning("Failed to create mod from archive: " + archiveFile);
+                    LogFailure(type, dir);
                     continue;
                 }
 
+                LogSuccess(type, dir);
                 yield return mod;
             }
 
