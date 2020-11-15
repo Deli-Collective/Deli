@@ -148,7 +148,7 @@ namespace Deli
             /// </summary>
             public override string ToString()
             {
-                return $"[{Guid} {Version}]";
+                return $"[{Name.UnwrapOr(Guid)} {Version}]";
             }
         }
     }
