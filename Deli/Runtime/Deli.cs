@@ -240,16 +240,21 @@ namespace Deli
                 return;
             }
 
+            // Sort the mods in the order they depend on each other
+            var sorted = mods.Values.TSort(x => x.Info.Dependencies.Keys.Select(dep => mods[dep]), true);
+
             // Load the mods
-            try
+            foreach (var mod in sorted)
             {
-                // Sort the mods in the order they depend on each other
-                var sorted = mods.Values.TSort(x => x.Info.Dependencies.Keys.Select(dep => mods[dep]), true);
-                foreach (var mod in sorted) LoadMod(mod);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError("Could not initialize mod framework.\n" + e);
+                try
+                {
+                    LoadMod(mod);
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError($"Failed to load mod {mod}. No additional mods will be loaded.\nException: " + e);
+                    break;
+                }
             }
         }
 
