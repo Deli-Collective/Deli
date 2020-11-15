@@ -208,6 +208,11 @@ namespace Deli
                 _kernel.Get<IList<IDisposable>>().Unwrap().Add(raw);
 
                 var zip = ZipFile.Read(raw);
+                if (zip.Entries.Any(x => x.FileName.Contains('\\')))
+                {
+                    Logger.LogWarning($"Found at least one bad zip path in {archiveFile}. Resources affected will be inaccessible until this is fixed. To fix it, try rezipping the archive or use a different zip utility.");
+                }
+
                 var io = new ArchiveRawIO(zip);
                 
                 if (!CreateMod(io).MatchSome(out var mod))
