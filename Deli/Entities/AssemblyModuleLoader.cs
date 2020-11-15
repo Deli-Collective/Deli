@@ -37,7 +37,7 @@ namespace Deli
                     }
 
                     var inst = ctor.Invoke(new object[0]);
-                    foreach (var service in unnamedAttr.AsServices)
+                    foreach (var service in services)
                     {
                         var binderGenericArguments = new[] { type, typeof(Unit) };
                         var bindingType = typeof(ConstantServiceBinding<,>).MakeGenericType(binderGenericArguments);
@@ -62,7 +62,7 @@ namespace Deli
 
                     var inst = ctor.Invoke(new object[0]);
                     var dictAddParameters = new[] { namedAttr.Name, inst };
-                    foreach (var service in namedAttr.AsServices)
+                    foreach (var service in services)
                     {
                         var genericDictArguments = new[] { typeof(string), service };
                         var dict = typeof(IDictionary<,>).MakeGenericType(genericDictArguments);
