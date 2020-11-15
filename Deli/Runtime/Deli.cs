@@ -75,7 +75,7 @@ namespace Deli
             // Basic impls
             _kernel.Bind<IAssetReader<Assembly>>()
                 .ToConstant(new AssemblyAssetReader());
-            _kernel.Bind<IAssetReader<Option<Mod.Manifest>>>()
+            _kernel.Bind<IAssetReader<Mod.Manifest>>()
                 .ToRecursiveNopMethod(x => new JsonAssetReader<Mod.Manifest>(x))
                 .InSingletonNopScope();
 
@@ -138,13 +138,9 @@ namespace Deli
         private Option<Mod> CreateMod(IRawIO raw)
         {
             var resources = new CachedResourceIO(new ResolverResourceIO(raw, Services));
-            var infoParsed = resources.Get<Option<Mod.Manifest>>(Constants.ManifestFileName).Unwrap();
+            var info = resources.Get<Mod.Manifest>(Constants.ManifestFileName).Unwrap();
 
-            if (!infoParsed.MatchSome(out var info))
-            {
-                Logger.LogWarning("Failed to parse manifest file");
-            }
-            else if (!Services.Get<ConfigFile, string>(info.Guid).MatchSome(out var config))
+            if (!Services.Get<ConfigFile, string>(info.Guid).MatchSome(out var config))
             {
                 Logger.LogWarning("Failed to acquire config file for " + info);
             }
