@@ -99,7 +99,8 @@ namespace Deli
             // Discover all the mods
             var modsDir = Directory.GetCurrentDirectory() + "/" + Constants.ModDirectory;
             var mods = DiscoverMods(modsDir).ToArray();
-            Logger.LogInfo($"Discovered {mods.Length} mods");
+            Logger.LogInfo($"Discovered {mods.Length} mods ({mods.Count(x => x == null)} invalid)");
+            mods = mods.Where(x => x != null).ToArray();
 
             // Make sure all dependencies are satisfied
             if (!CheckDependencies(mods))
