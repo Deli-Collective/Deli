@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Atlas;
+using Atlas.Fluent;
 using BepInEx.Logging;
 
 namespace Deli
@@ -104,6 +105,13 @@ namespace Deli
             return @this.GetConstructor(new Type[0]) is ConstructorInfo ctor
                 ? Option.Some(ctor)
                 : Option.None<ConstructorInfo>();
+        }
+
+        public static void BindJson<T>(this IServiceKernel @this)
+        {
+            @this.Bind<IAssetReader<Option<T>>>()
+                .ToRecursiveNopMethod(x => new JsonAssetReader<T>(x))
+                .InSingletonNopScope();
         }
     }
 }

@@ -72,15 +72,13 @@ namespace Deli
                     return JsonSerializer.Create(settings);
                 })
                 .InSingletonNopScope();
+            _kernel.BindJson<Mod.Manifest>();
 
             // Basic impls
             _kernel.Bind<IAssetReader<Assembly>>()
                 .ToConstant(new AssemblyAssetReader());
             _kernel.Bind<IAssetReader<Option<JObject>>>()
                 .ToRecursiveNopMethod(x => new JObjectAssetReader(x))
-                .InSingletonNopScope();
-            _kernel.Bind<IAssetReader<Option<Mod.Manifest>>>()
-                .ToRecursiveNopMethod(x => new JsonAssetReader<Mod.Manifest>(x))
                 .InSingletonNopScope();
 
             // Associative services dictionaries
