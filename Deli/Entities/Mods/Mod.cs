@@ -38,7 +38,9 @@ namespace Deli
             public Version Version { get; }
             public Dictionary<string, Version> Dependencies { get; }
 
+            [JsonProperty(Required = Required.Default)]
             public Option<string> Name { get; }
+            [JsonProperty(Required = Required.Default)]
             public Option<string[]> Authors { get; }
 
             public Dictionary<string, string> Assets { get; }
