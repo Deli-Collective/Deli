@@ -208,15 +208,15 @@ namespace Deli
                 _kernel.Get<IList<IDisposable>>().Unwrap().Add(raw);
 
                 var zip = ZipFile.Read(raw);
-                var io = new NormalizeRawIO(new ArchiveRawIO(zip), '/', '\\');
+                var io = new ArchiveRawIO(zip);
                 
                 if (!CreateMod(io).MatchSome(out var mod))
                 {
-                    LogFailure(type, archiveFile);
+                    LogFailure(type, dir);
                     continue;
                 }
 
-                LogSuccess(type, archiveFile);
+                LogSuccess(type, dir);
                 yield return mod;
             }
 
