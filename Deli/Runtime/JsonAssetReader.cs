@@ -29,10 +29,14 @@ namespace Deli
                 }
                 catch (JsonReaderException e)
                 {
-                    if (_services.Get<ManualLogSource>().MatchSome(out var log))
+                    if (!_services.Get<ManualLogSource>().MatchSome(out var log))
                     {
-                        log.LogWarning($"JSON manifest parse error at {e.LineNumber}:{e.LinePosition} ({e.Path})");
+                        // We shouldn't swallow the error if it isn't reported.
+                        throw;
                     }
+
+                    log.LogWarning($"JSON parse error: " + e.Message);
+                    log.LogDebug(e.ToString());
 
                     return Option.None<T>();
                 }
