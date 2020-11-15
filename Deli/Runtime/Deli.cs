@@ -205,12 +205,15 @@ namespace Deli
                 const string type = "archive";
 
                 var raw = archiveFile.OpenRead();
-                _kernel.Get<IList<IDisposable>>().Unwrap().Add(raw);
-
                 var zip = ZipFile.Read(raw);
+
                 if (zip.Entries.Any(x => x.FileName.Contains('\\')))
                 {
-                    Logger.LogWarning($"Found at least one bad zip path in {archiveFile}. Resources affected will be inaccessible until this is fixed. To fix it, try rezipping the archive or use a different zip utility.");
+                    Logger.LogError($"Found a bad zip path in {archiveFile}. To fix it, try rezipping the archive or use a different zip utility.");
+
+                    zip.Dispose();
+                    raw.Dispose();
+                    continue;
                 }
 
                 var io = new ArchiveRawIO(zip);
@@ -218,8 +221,15 @@ namespace Deli
                 if (!CreateMod(io).MatchSome(out var mod))
                 {
                     LogFailure(type, archiveFile);
+
+                    zip.Dispose();
+                    raw.Dispose();
                     continue;
                 }
+
+                var disposables = _kernel.Get<IList<IDisposable>>().Unwrap();
+                disposables.Add(zip);
+                disposables.Add(raw);
 
                 LogSuccess(type, archiveFile);
                 yield return mod;
