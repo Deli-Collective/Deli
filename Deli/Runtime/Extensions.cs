@@ -105,7 +105,7 @@ namespace Deli
                 return Option.Some(ctor);   
             }
 
-            H3ModFramework.Logger.LogError($"Type {@this} is annotated with {typeof(TAttribute)}, but does not contain a public, parameterless constructor.");
+            Deli.Logger.LogError($"Type {@this} is annotated with {typeof(TAttribute)}, but does not contain a public, parameterless constructor.");
             return Option.None<ConstructorInfo>();
         }
     }

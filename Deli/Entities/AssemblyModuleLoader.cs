@@ -100,14 +100,14 @@ namespace Deli
                     continue;
                 }
 
-                if (type.IsSubclassOf(typeof(H3VRMod)))
+                if (type.IsSubclassOf(typeof(DeliMod)))
                 {
                     var manager = kernel.Get<GameObject>().Unwrap();
 
                     manager.SetActive(false);
                     try
                     {
-                        var modClass = (H3VRMod) manager.AddComponent(type);
+                        var modClass = (DeliMod) manager.AddComponent(type);
                         modClass.BaseMod = mod;
                         modClass.Logger = kernel.Get<ManualLogSource, string>(mod.Name).Unwrap();
                     }

@@ -13,7 +13,7 @@ using UnityEngine;
 namespace Deli
 {
     [BepInPlugin(Constants.Guid, Constants.Name, Constants.Version)]
-    public class H3ModFramework : BaseUnityPlugin
+    public class Deli : BaseUnityPlugin
     {
         private static readonly StandardServiceKernel Kernel;
 
@@ -21,7 +21,7 @@ namespace Deli
 
         public new static ManualLogSource Logger => Services.Get<ManualLogSource>().Unwrap();
 
-        static H3ModFramework()
+        static Deli()
         {
             Kernel = new StandardServiceKernel();
 
@@ -66,7 +66,7 @@ namespace Deli
 
         private void Awake()
         {
-            Kernel.Bind<H3ModFramework>()
+            Kernel.Bind<Deli>()
                 .ToConstant(this);
             Kernel.Bind<ManualLogSource>()
                 .ToConstant(base.Logger);

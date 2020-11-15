@@ -57,7 +57,7 @@ namespace Deli
             }
 
             // If it's not found
-            H3ModFramework.Logger.LogWarning($"Resource {path} requested in mod {Guid} but it doesn't exist!");
+            Deli.Logger.LogWarning($"Resource {path} requested in mod {Guid} but it doesn't exist!");
             return new byte[0];
         }
 
@@ -80,7 +80,7 @@ namespace Deli
             if (bytes.Length == 0) return default;
 
             // Check if we have a type reader for the type
-            if (H3ModFramework.Services.Get<IAssetReader<T>>().MatchSome(out var reader))
+            if (Deli.Services.Get<IAssetReader<T>>().MatchSome(out var reader))
             {
                 // Invoke the type reader with the bytes from before
                 var result = reader.ReadAsset(bytes);
@@ -88,7 +88,7 @@ namespace Deli
                 return result;
             }
 
-            H3ModFramework.Logger.LogError($"Resource {path} in {Guid} was requested with type {nameof(T)} but no TypeLoader exists for this type!");
+            Deli.Logger.LogError($"Resource {path} in {Guid} was requested with type {nameof(T)} but no TypeLoader exists for this type!");
             return default;
         }
 
@@ -108,14 +108,14 @@ namespace Deli
             catch (Exception e)
             {
                 // This method should only be passed zip files, so we should provide a stack trace if this errors.
-                H3ModFramework.Logger.LogError($"Could not load mod archive ({path})\n{e}");
+                Deli.Logger.LogError($"Could not load mod archive ({path})\n{e}");
                 return null;
             }
 
             // Try to locate the manifest file
             if (!archive.ContainsEntry(Constants.ManifestFileName))
             {
-                H3ModFramework.Logger.LogError($"Could not load {path} as it is not a valid mod.");
+                Deli.Logger.LogError($"Could not load {path} as it is not a valid mod.");
                 return null;
             }
 
@@ -143,7 +143,7 @@ namespace Deli
         {
             if (!File.Exists(path))
             {
-                H3ModFramework.Logger.LogError($"Could not load {path} as a mod, it is missing a manifest.");
+                Deli.Logger.LogError($"Could not load {path} as a mod, it is missing a manifest.");
                 return null;
             }
 
