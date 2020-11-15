@@ -75,7 +75,7 @@ namespace Deli
             // Basic impls
             _kernel.Bind<IAssetReader<Assembly>>()
                 .ToConstant(new AssemblyAssetReader());
-            _kernel.Bind<IAssetReader<Mod.Manifest>>()
+            _kernel.Bind<IAssetReader<Option<Mod.Manifest>>>()
                 .ToRecursiveNopMethod(x => new JsonAssetReader<Mod.Manifest>(x))
                 .InSingletonNopScope();
 
@@ -137,16 +137,20 @@ namespace Deli
 
         private Option<Mod> CreateMod(IRawIO raw)
         {
+            const string prefix = "Failed to acquire the ";
             var resources = new CachedResourceIO(new ResolverResourceIO(raw, Services));
-            var info = resources.Get<Mod.Manifest>(Constants.ManifestFileName).Unwrap();
 
-            if (!Services.Get<ConfigFile, string>(info.Guid).MatchSome(out var config))
+            if (!resources.Get<Option<Mod.Manifest>>(Constants.ManifestFileName).Flatten().MatchSome(out var info))
             {
-                Logger.LogWarning("Failed to acquire config file for " + info);
+                Logger.LogWarning(prefix + "manifest file");
+            }
+            else if (!Services.Get<ConfigFile, string>(info.Guid).MatchSome(out var config))
+            {
+                Logger.LogWarning(prefix + "config file for " + info);
             }
             else if (!Services.Get<ManualLogSource, string>(info.Name.UnwrapOr(info.Guid)).MatchSome(out var log))
             {
-                Logger.LogWarning("Failed to log source for " + info);
+                Logger.LogWarning(prefix + "log source for " + info);
             }
             else
             {

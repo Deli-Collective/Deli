@@ -1,10 +1,11 @@
 using System.IO;
 using Atlas;
+using BepInEx.Logging;
 using Valve.Newtonsoft.Json;
 
 namespace Deli
 {
-    public class JsonAssetReader<T> : IAssetReader<T>
+    public class JsonAssetReader<T> : IAssetReader<Option<T>>
     {
         private IServiceResolver _services;
 
@@ -13,7 +14,7 @@ namespace Deli
             _services = services;
         }
 
-        public T ReadAsset(byte[] raw)
+        public Option<T> ReadAsset(byte[] raw)
         {
             var serializer = _services.Get<JsonSerializer>().Expect("JSON serializer not found");
 
@@ -21,7 +22,22 @@ namespace Deli
             using (var text = new StreamReader(memory))
             using (var json = new JsonTextReader(text))
             {
-                return serializer.Deserialize<T>(json);
+                T result;
+                try 
+                {
+                    result = serializer.Deserialize<T>(json);
+                }
+                catch (JsonReaderException e)
+                {
+                    if (_services.Get<ManualLogSource>().MatchSome(out var log))
+                    {
+                        log.LogWarning($"JSON manifest parse error at {e.LineNumber}:{e.LinePosition} ({e.Path})");
+                    }
+
+                    return Option.None<T>();
+                }
+
+                return Option.Some(result);
             }
         }
     }
