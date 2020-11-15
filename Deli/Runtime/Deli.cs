@@ -140,7 +140,7 @@ namespace Deli
         private Option<Mod> CreateMod(IRawIO raw)
         {
             const string prefix = "Failed to acquire the ";
-            var resources = new CachedResourceIO(new ResolverResourceIO(raw, Services));
+            IResourceIO resources = new CachedResourceIO(new ResolverResourceIO(raw, Services));
 
             if (!resources.Get<Option<Mod.Manifest>>(Constants.ManifestFileName).Flatten().MatchSome(out var info))
             {
@@ -156,7 +156,10 @@ namespace Deli
             }
             else
             {
-                return Option.Some(new Mod(info, resources, config, log));
+                resources = new LoggedModIO(log, resources);
+                var mod = new Mod(info, resources, config, log);
+
+                return Option.Some(mod);
             }
 
             return Option.None<Mod>();
@@ -248,7 +251,7 @@ namespace Deli
             // Discover all the mods
             var modsDir = new DirectoryInfo(Constants.ModDirectory);
             var mods = DiscoverMods(modsDir).ToDictionary(x => x.Info.Guid, x => x);
-            Logger.LogInfo($"Created {mods.Count} mods");
+            Logger.LogInfo($"{mods.Count} mods to load");
 
             // Make sure all dependencies are satisfied
             if (!CheckDependencies(mods))
@@ -273,6 +276,8 @@ namespace Deli
                     break;
                 }
             }
+
+            Logger.LogInfo("Mod loading complete");
         }
 
         private bool CheckDependencies(Dictionary<string, Mod> mods)
@@ -311,7 +316,9 @@ namespace Deli
 
         private void LoadMod(Mod mod)
         {
-            // For each module inside the mod, load it
+            Logger.LogInfo("Loading " + mod);
+
+            // For each asset inside the mod, load it
             foreach (var asset in mod.Info.Assets)
             {
                 var assetPath = asset.Key;
@@ -319,14 +326,15 @@ namespace Deli
 
                 if (!Services.Get<IAssetLoader, string>(assetLoader).MatchSome(out var loader))
                 {
-                    Logger.LogError($"Asset loader not found for {mod}: {assetLoader}");
-                    continue;
+                    // Throw instead of skip, because this might be a critical part of the mod
+                    throw new InvalidOperationException($"Asset loader not found: " + assetLoader);
                 }
 
+                Logger.LogDebug($"Loading asset: [{assetLoader}: {assetPath}]");
                 loader.LoadAsset(_kernel, mod, assetPath);
             }
 
-            // Add the ModInfo to the kernel.
+            // Add the Mod to the kernel.
             Services.Get<IDictionary<string, Mod>>().Unwrap().Add(mod.Info.Guid, mod);
         }
     }
