@@ -26,7 +26,7 @@ namespace Deli
                 {
                     result = v.ToObject<T>(serializer);
                 }
-                catch (JsonReaderException e)
+                catch (JsonSerializationException e)
                 {
                     if (!_services.Get<ManualLogSource>().MatchSome(out var log))
                     {
