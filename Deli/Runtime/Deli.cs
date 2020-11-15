@@ -212,11 +212,11 @@ namespace Deli
                 
                 if (!CreateMod(io).MatchSome(out var mod))
                 {
-                    LogFailure(type, dir);
+                    LogFailure(type, archiveFile);
                     continue;
                 }
 
-                LogSuccess(type, dir);
+                LogSuccess(type, archiveFile);
                 yield return mod;
             }
 
