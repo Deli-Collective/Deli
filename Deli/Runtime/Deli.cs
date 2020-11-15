@@ -330,7 +330,7 @@ namespace Deli
                     throw new InvalidOperationException($"Asset loader not found: " + assetLoader);
                 }
 
-                Logger.LogDebug($"Loading asset: [{assetLoader}: {assetPath}]");
+                Logger.LogDebug($"Loading asset [{assetLoader}: {assetPath}]");
                 loader.LoadAsset(_kernel, mod, assetPath);
             }
 
