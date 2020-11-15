@@ -1,5 +1,4 @@
-﻿using BepInEx.Logging;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Deli
 {
@@ -8,7 +7,6 @@ namespace Deli
     /// </summary>
     public abstract class DeliMod : MonoBehaviour
     {
-        public ModInfo BaseMod;
-        public ManualLogSource Logger;
+        public Mod BaseMod;
     }
 }
