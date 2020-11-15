@@ -12,6 +12,7 @@ using BepInEx.Logging;
 using Ionic.Zip;
 using UnityEngine;
 using Valve.Newtonsoft.Json;
+using Valve.Newtonsoft.Json.Linq;
 using Valve.Newtonsoft.Json.Serialization;
 
 namespace Deli
@@ -75,6 +76,9 @@ namespace Deli
             // Basic impls
             _kernel.Bind<IAssetReader<Assembly>>()
                 .ToConstant(new AssemblyAssetReader());
+            _kernel.Bind<IAssetReader<Option<JObject>>>()
+                .ToRecursiveNopMethod(x => new JObjectAssetReader(x))
+                .InSingletonNopScope();
             _kernel.Bind<IAssetReader<Option<Mod.Manifest>>>()
                 .ToRecursiveNopMethod(x => new JsonAssetReader<Mod.Manifest>(x))
                 .InSingletonNopScope();
