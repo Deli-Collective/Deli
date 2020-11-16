@@ -30,8 +30,6 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
-[Ll]ibs/**
-![Ll]ibs/README.md
 uTinyExport/
 
 # Visual Studio 2015/2017 cache/options directory
@@ -360,9 +358,3 @@ MigrationBackup/
 
 # VS Code
 .vscode/
-
-# Un-Ignore dependencies we can include in the repo
-![Ll]ibs/Valve.Newtonsoft.Json.dll
-# Temporary workaround until Atlas is on Nuget
-![Ll]ibs/Atlas.dll
-![Ll]ibs/Atlas.xml

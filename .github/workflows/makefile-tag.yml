@@ -1,0 +1,31 @@
+name: makefile (tagged)
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  makefile:
+    name: Run Makefile for Tag
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+
+    - name: Execute make
+      shell: bash
+      run: make VERSION="${GITHUB_REF/refs\/tags\/v/}"
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: Deli
+        path: |
+          Deli/Deli.zip
+          Deli.Core/Deli.Core.zip
