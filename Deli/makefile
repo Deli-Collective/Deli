@@ -4,19 +4,25 @@ ZIP              = $(NAME).zip
 TEMP             = temp
 TEMP_PLUGINS     = $(TEMP)/BepInEx/plugins/Deli
 
-.PHONY: all macros build pack clean
+.PHONY: all macros-precompile build macros-postcompile pack clean
 
-all: clean macros build pack
+all: clean build pack
 
-macros:
+build: compile macros-postcompile
+
+macros-precompile:
 	tee $(CONSTANTS_SOURCE).old < $(CONSTANTS_SOURCE)
-	sed -i \ 
-		's/STUB_GIT_BRANCH/$(GIT_BRANCH/' \
-		's/STUB_GIT_HASH/$(GIT_HASH)/' \
+	sed -i \
+		-e 's|STUB_GIT_DESCRIBE|$(GIT_DESCRIBE)|g' \
+		-e 's|STUB_GIT_BRANCH|$(GIT_BRANCH)|g' \
+		-e 's|STUB_GIT_HASH|$(GIT_HASH)|g' \
 		$(CONSTANTS_SOURCE)
 
-build:
+compile: macros-precompile
 	dotnet build --configuration $(CONFIG) --framework $(FRAMEWORK) $(BUILD_PROPERTIES)
+
+macros-postcompile: compile
+	mv $(CONSTANTS_SOURCE).old $(CONSTANTS_SOURCE)
 
 pack: build
 	mkdir -p $(TEMP_PLUGINS)
@@ -29,8 +35,4 @@ pack: build
 	rm -r $(TEMP)
 
 clean:
-	if [ -f $(CONSTANTS_SOURCE).old ]; then \
-		mv $(CONSTANTS_SOURCE).old $(CONSTANTS_SOURCE) \
-	fi
-	rm -rf $(TEMP)
 	rm -f $(ZIP)

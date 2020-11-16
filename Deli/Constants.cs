@@ -9,6 +9,7 @@
 
         // Git
         // These are set in the makefile, via the "macros" recipe
+        public const string GitDescribe = "STUB_GIT_DESCRIBE";
         public const string GitBranch = "STUB_GIT_BRANCH";
         public const string GitHash = "STUB_GIT_HASH";
 
