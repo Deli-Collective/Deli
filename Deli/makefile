@@ -13,9 +13,10 @@ build: compile macros-postcompile
 macros-precompile:
 	tee $(CONSTANTS_SOURCE).old < $(CONSTANTS_SOURCE)
 	sed -i \
-		-e 's|STUB_GIT_DESCRIBE|$(GIT_DESCRIBE)|g' \
-		-e 's|STUB_GIT_BRANCH|$(GIT_BRANCH)|g' \
-		-e 's|STUB_GIT_HASH|$(GIT_HASH)|g' \
+		-e 's|MACRO_VERSION|$(VERSION)|g' \
+		-e 's|MACRO_GIT_DESCRIBE|$(GIT_DESCRIBE)|g' \
+		-e 's|MACRO_GIT_BRANCH|$(GIT_BRANCH)|g' \
+		-e 's|MACRO_GIT_HASH|$(GIT_HASH)|g' \
 		$(CONSTANTS_SOURCE)
 
 compile: macros-precompile
