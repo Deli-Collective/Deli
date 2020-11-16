@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    tags:
+      - v*
   pull_request:
     branches:
       - master
@@ -23,7 +25,7 @@ jobs:
 
     - name: Execute make
       shell: bash
-      run: make
+      run: make VERSION=$([ -z "$GITHUB_REF" ] && echo "0.0.0" || echo "${GITHUB_REF/refs\/tags\/v/}")
     
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
