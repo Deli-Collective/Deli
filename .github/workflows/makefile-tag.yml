@@ -1,16 +1,13 @@
-name: makefile
+name: makefile (tagged)
 
 on:
   push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+    tags:
+      - v*
 
 jobs:
   makefile:
-    name: Run Makefile
+    name: Run Makefile for Tag
     runs-on: ubuntu-latest
 
     steps:
@@ -23,7 +20,7 @@ jobs:
 
     - name: Execute make
       shell: bash
-      run: make
+      run: make VERSION="${GITHUB_REF/refs\/tags\/v/}"
     
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
