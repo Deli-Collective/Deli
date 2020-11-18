@@ -15,7 +15,7 @@ namespace Deli
             _raw = raw;
             _cache = new StandardServiceKernel
             {
-                MaxRecursion = Option.Some(0)
+                MaxRecursion = Option.Some(1)
             };
         }
 

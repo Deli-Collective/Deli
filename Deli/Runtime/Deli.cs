@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,6 +25,8 @@ namespace Deli
 
         public IServiceResolver Services => _kernel;
 
+        private ConfigEntry<bool> WaitForDebugger;
+        
         private void Bind()
         {
             // Cleanup
@@ -123,7 +126,22 @@ namespace Deli
         {
             _kernel = new StandardServiceKernel();
             Bind();
-            
+
+            RegisterConfig();
+            if (WaitForDebugger.Value) StartCoroutine(WaitForKeypress());
+            else Initialize();
+
+        }
+
+        private void RegisterConfig()
+        {
+            WaitForDebugger = Config.Bind("Debugging", "WaitForDebugger", false, "If set to true, this will delay initializing the framework until you press the R key to give you time to attach a debugger.");
+        }
+        
+        // Small coroutine to wait for a keypress before initializing.
+        private IEnumerator WaitForKeypress()
+        {
+            while (!Input.GetKeyDown(KeyCode.R)) yield return null;
             Initialize();
         }
 
