@@ -16,7 +16,7 @@ namespace Deli
         {
             get
             {
-                var relativePath = Path.Combine(_root.Name, path);
+                var relativePath = Path.Combine(_root.FullName, path);
                 var file = new FileInfo(relativePath);
                 if (!file.Exists)
                 {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -181,7 +181,7 @@ namespace Deli
                 Logger.LogDebug("Created mod from " + type + ": " + path);
             }
 
-            var manifestPath = Path.Combine(dir.Name, Constants.ManifestFileName);
+            var manifestPath = Path.Combine(dir.FullName, Constants.ManifestFileName);
             if (File.Exists(manifestPath)) // Directory mod
             {
                 const string type = "directory";
@@ -190,12 +190,12 @@ namespace Deli
 
                 if (CreateMod(io).MatchSome(out var mod))
                 {
-                    LogFailure(type, dir);
+                    LogSuccess(type, dir);
                     yield return mod;
                 }
                 else
                 {
-                    LogSuccess(type, dir);
+                    LogFailure(type, dir);
                 }
 
                 // Halt discovery in this directory
