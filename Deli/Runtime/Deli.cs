@@ -115,7 +115,7 @@ namespace Deli
                 .ToContextualNopMethod(x => BepInEx.Logging.Logger.CreateLogSource(x))
                 .InSingletonScope();
             _kernel.Bind<ConfigFile, string>()
-                .ToContextualNopMethod(x => new ConfigFile(Path.Combine(Constants.ConfigDirectory, $"{x}.cfg"), true))
+                .ToContextualNopMethod(x => new ConfigFile(Path.Combine(Constants.ConfigDirectory, $"{x}.cfg"), false))
                 .InSingletonScope();
         }
 
