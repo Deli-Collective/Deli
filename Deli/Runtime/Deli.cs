@@ -83,6 +83,8 @@ namespace Deli
             _kernel.Bind<IAssetReader<Option<JObject>>>()
                 .ToRecursiveNopMethod(x => new JObjectAssetReader(x))
                 .InSingletonNopScope();
+            _kernel.Bind<IAssetReader<byte[]>>()
+                .ToConstant(new ByteArrayAssetReader());
 
             // Associative services dictionaries
             _kernel.Bind<IDictionary<string, IAssetLoader>>()
@@ -124,9 +126,9 @@ namespace Deli
 
         private void Awake()
         {
+            Logger.LogInfo($"Deli is Awake! Version {Constants.Version} ({Constants.GitBranch}-{Constants.GitDescribe})");
             _kernel = new StandardServiceKernel();
             Bind();
-
             RegisterConfig();
             if (WaitForDebugger.Value) StartCoroutine(WaitForKeypress());
             else Initialize();

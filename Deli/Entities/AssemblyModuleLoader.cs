@@ -31,7 +31,12 @@ namespace Deli
         public void LoadAsset(IServiceKernel kernel, Mod mod, string path)
         {
             // Load the assembly and scan it for new module loaders and resource type loaders
-            var assembly = mod.Resources.Get<Assembly>(path).Expect("Assembly not found at path: " + path);
+            var rawAssembly = mod.Resources.Get<byte[]>(path).Expect("Assembly not found at path: " + path);
+            
+            // If the assembly debugging symbols are also included load those too.
+            var assembly = mod.Resources.Get<byte[]>(path + ".mdb").MatchSome(out var symbols)
+                ? Assembly.Load(rawAssembly, symbols)
+                : Assembly.Load(rawAssembly);
 
             // Try to discover any mod plugins in the assembly
             foreach (var type in assembly.GetTypesSafe())
