@@ -1,5 +1,10 @@
-# Deli
+# Deli ![Version: unreleased](https://img.shields.io/badge/Version%3A-unreleased-inactive?style=flat-square)
 Deli is a modding framework based on BepInEx which provides one standard uniform way of packaging and loading any number of assets of any type. Originally built for the popular VR firearms sandbox game _Hotdogs, Horseshoes & Hand Grenades_ but theoretically usable under any Unity game with BepInEx.
+
+## Quick Links
+- [Installing](https://github.com/nrgill28/Deli/wiki/Installation)
+- [Project boards](https://github.com/nrgill28/Deli/projects)
+
 ## Features
 - **Standardized way of loading mods**: Have a mod you want to install? Drop it in the mods folder and you're good to go.
 - **Easy resource and dependency management**: Mods built for the framework can enjoy easy-to-use asset loading and dependency management built into the framework.
