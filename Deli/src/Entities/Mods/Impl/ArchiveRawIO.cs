@@ -17,10 +17,7 @@ namespace Deli
         {
             get
             {
-                if (!_archive.ContainsEntry(path))
-                {
-                    return Option.None<byte[]>();
-                }
+                if (!_archive.ContainsEntry(path)) return Option.None<byte[]>();
 
                 var entry = _archive[path];
                 using (var reader = entry.OpenReader())

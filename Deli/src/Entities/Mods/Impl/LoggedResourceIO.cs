@@ -17,7 +17,7 @@ namespace Deli
         public Option<T> Get<T>(string path)
         {
             _log.LogDebug($"Retrieving asset [{typeof(T)}: {path}]");
-                
+
             return _resources.Get<T>(path);
         }
     }

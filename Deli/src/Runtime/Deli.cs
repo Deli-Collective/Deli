@@ -23,106 +23,9 @@ namespace Deli
     {
         private StandardServiceKernel _kernel;
 
-        public IServiceResolver Services => _kernel;
-
         private ConfigEntry<bool> WaitForDebugger;
-        
-        private void Bind()
-        {
-            // Cleanup
-            _kernel.Bind<IList<IDisposable>>()
-                .ToConstant(new List<IDisposable>());
 
-            // Simple constants
-            _kernel.Bind<Deli>()
-                .ToConstant(this);
-            _kernel.Bind<ManualLogSource>()
-                .ToConstant(base.Logger);
-            {
-                var manager = new GameObject("Deli Manager");
-                DontDestroyOnLoad(manager);
-                
-                _kernel.Bind<GameObject>()
-                    .ToConstant(manager);
-            }
-
-            // JSON
-            _kernel.Bind<NamingStrategy>()
-                .ToConstant(new CamelCaseNamingStrategy());
-            _kernel.Bind<IContractResolver>()
-                .ToRecursiveNopMethod(x => new DefaultContractResolver
-                {
-                    NamingStrategy = x.Get<NamingStrategy>().Expect("JSON naming strategy not found")
-                })
-                .InSingletonNopScope();
-            _kernel.Bind<IList<JsonConverter>>()
-                .ToConstant(new List<JsonConverter>
-                {
-                    new OptionJsonConverter()
-                });
-            _kernel.Bind<JsonSerializerSettings>()
-                .ToRecursiveNopMethod(x => new JsonSerializerSettings
-                {
-                    ContractResolver = x.Get<IContractResolver>().Expect("JSON contract resolver not found"),
-                    Converters = x.Get<IList<JsonConverter>>().Expect("JSON converters not found")
-                })
-                .InSingletonNopScope();
-            _kernel.Bind<JsonSerializer>()
-                .ToRecursiveNopMethod(x =>
-                {
-                    var settings = x.Get<JsonSerializerSettings>().Expect("JSON settings not found.");
-
-                    return JsonSerializer.Create(settings);
-                })
-                .InSingletonNopScope();
-            _kernel.BindJson<Mod.Manifest>();
-
-            // Basic impls
-            _kernel.Bind<IAssetReader<Assembly>>()
-                .ToConstant(new AssemblyAssetReader());
-            _kernel.Bind<IAssetReader<Option<JObject>>>()
-                .ToRecursiveNopMethod(x => new JObjectAssetReader(x))
-                .InSingletonNopScope();
-            _kernel.Bind<IAssetReader<byte[]>>()
-                .ToConstant(new ByteArrayAssetReader());
-
-            // Associative services dictionaries
-            _kernel.Bind<IDictionary<string, IAssetLoader>>()
-                .ToConstant(new Dictionary<string, IAssetLoader>
-            {
-                ["assembly"] = new AssemblyModuleLoader()
-            });
-            _kernel.Bind<IDictionary<string, Mod>>()
-                .ToConstant(new Dictionary<string, Mod>());
-
-            // Enumerables
-            _kernel.Bind<IEnumerable<IAssetLoader>>()
-                .ToRecursiveMethod(x => x.Get<IDictionary<string, IAssetLoader>>().Map(v => (IEnumerable<IAssetLoader>) v.Values))
-                .InTransientScope();
-            _kernel.Bind<IEnumerable<Mod>>()
-                .ToRecursiveMethod(x => x.Get<IDictionary<string, Mod>>().Map(v => (IEnumerable<Mod>) v.Values))
-                .InTransientScope();
-
-            // Contextual to dictionaries
-            _kernel.Bind<IAssetLoader, string>()
-                .ToWholeMethod((services, context) => services.Get<IDictionary<string, IAssetLoader>>()
-                    .Map(x => x.OptionGetValue(context))
-                    .Flatten())
-                .InTransientScope();
-            _kernel.Bind<Mod, string>()
-                .ToWholeMethod((services, context) => services.Get<IDictionary<string, Mod>>()
-                    .Map(x => x.OptionGetValue(context))
-                    .Flatten())
-                .InTransientScope();
-
-            // Custom impls
-            _kernel.Bind<ManualLogSource, string>()
-                .ToContextualNopMethod(x => BepInEx.Logging.Logger.CreateLogSource(x))
-                .InSingletonScope();
-            _kernel.Bind<ConfigFile, string>()
-                .ToContextualNopMethod(x => new ConfigFile(Path.Combine(Constants.ConfigDirectory, $"{x}.cfg"), false))
-                .InSingletonScope();
-        }
+        public IServiceResolver Services => _kernel;
 
         private void Awake()
         {
@@ -132,29 +35,88 @@ namespace Deli
             RegisterConfig();
             if (WaitForDebugger.Value) StartCoroutine(WaitForKeypress());
             else Initialize();
-
-        }
-
-        private void RegisterConfig()
-        {
-            WaitForDebugger = Config.Bind("Debugging", "WaitForDebugger", false, "If set to true, this will delay initializing the framework until you press the R key to give you time to attach a debugger.");
-        }
-        
-        // Small coroutine to wait for a keypress before initializing.
-        private IEnumerator WaitForKeypress()
-        {
-            while (!Input.GetKeyDown(KeyCode.R)) yield return null;
-            Initialize();
         }
 
         private void OnDestroy()
         {
             var disposables = Services.Get<IList<IDisposable>>().Expect("Could not find disposables.");
 
-            foreach (var disposable in disposables)
+            foreach (var disposable in disposables) disposable.Dispose();
+        }
+
+        private void Bind()
+        {
+            // Cleanup
+            _kernel.Bind<IList<IDisposable>>().ToConstant(new List<IDisposable>());
+
+            // Simple constants
+            _kernel.Bind<Deli>().ToConstant(this);
+            _kernel.Bind<ManualLogSource>().ToConstant(Logger);
             {
-                disposable.Dispose();
+                var manager = new GameObject("Deli Manager");
+                DontDestroyOnLoad(manager);
+
+                _kernel.Bind<GameObject>().ToConstant(manager);
             }
+
+            // JSON
+            _kernel.Bind<NamingStrategy>().ToConstant(new CamelCaseNamingStrategy());
+            _kernel.Bind<IContractResolver>().ToRecursiveNopMethod(x => new DefaultContractResolver
+            {
+                NamingStrategy = x.Get<NamingStrategy>().Expect("JSON naming strategy not found")
+            }).InSingletonNopScope();
+            _kernel.Bind<IList<JsonConverter>>().ToConstant(new List<JsonConverter>
+            {
+                new OptionJsonConverter()
+            });
+            _kernel.Bind<JsonSerializerSettings>().ToRecursiveNopMethod(x => new JsonSerializerSettings
+            {
+                ContractResolver = x.Get<IContractResolver>().Expect("JSON contract resolver not found"),
+                Converters = x.Get<IList<JsonConverter>>().Expect("JSON converters not found")
+            }).InSingletonNopScope();
+            _kernel.Bind<JsonSerializer>().ToRecursiveNopMethod(x =>
+            {
+                var settings = x.Get<JsonSerializerSettings>().Expect("JSON settings not found.");
+
+                return JsonSerializer.Create(settings);
+            }).InSingletonNopScope();
+            _kernel.BindJson<Mod.Manifest>();
+
+            // Basic impls
+            _kernel.Bind<IAssetReader<Assembly>>().ToConstant(new AssemblyAssetReader());
+            _kernel.Bind<IAssetReader<Option<JObject>>>().ToRecursiveNopMethod(x => new JObjectAssetReader(x)).InSingletonNopScope();
+            _kernel.Bind<IAssetReader<byte[]>>().ToConstant(new ByteArrayAssetReader());
+
+            // Associative services dictionaries
+            _kernel.Bind<IDictionary<string, IAssetLoader>>().ToConstant(new Dictionary<string, IAssetLoader>
+            {
+                ["assembly"] = new AssemblyAssetLoader()
+            });
+            _kernel.Bind<IDictionary<string, Mod>>().ToConstant(new Dictionary<string, Mod>());
+
+            // Enumerables
+            _kernel.Bind<IEnumerable<IAssetLoader>>().ToRecursiveMethod(x => x.Get<IDictionary<string, IAssetLoader>>().Map(v => (IEnumerable<IAssetLoader>) v.Values)).InTransientScope();
+            _kernel.Bind<IEnumerable<Mod>>().ToRecursiveMethod(x => x.Get<IDictionary<string, Mod>>().Map(v => (IEnumerable<Mod>) v.Values)).InTransientScope();
+
+            // Contextual to dictionaries
+            _kernel.Bind<IAssetLoader, string>().ToWholeMethod((services, context) => services.Get<IDictionary<string, IAssetLoader>>().Map(x => x.OptionGetValue(context)).Flatten()).InTransientScope();
+            _kernel.Bind<Mod, string>().ToWholeMethod((services, context) => services.Get<IDictionary<string, Mod>>().Map(x => x.OptionGetValue(context)).Flatten()).InTransientScope();
+
+            // Custom impls
+            _kernel.Bind<ManualLogSource, string>().ToContextualNopMethod(x => BepInEx.Logging.Logger.CreateLogSource(x)).InSingletonScope();
+            _kernel.Bind<ConfigFile, string>().ToContextualNopMethod(x => new ConfigFile(Path.Combine(Constants.ConfigDirectory, $"{x}.cfg"), false)).InSingletonScope();
+        }
+
+        private void RegisterConfig()
+        {
+            WaitForDebugger = Config.Bind("Debugging", "WaitForDebugger", false, "If set to true, this will delay initializing the framework until you press the R key to give you time to attach a debugger.");
+        }
+
+        // Small coroutine to wait for a keypress before initializing.
+        private IEnumerator WaitForKeypress()
+        {
+            while (!Input.GetKeyDown(KeyCode.R)) yield return null;
+            Initialize();
         }
 
         private Option<Mod> CreateMod(IRawIO raw)
@@ -240,7 +202,7 @@ namespace Deli
                 }
 
                 var io = new ArchiveRawIO(zip);
-                
+
                 if (!CreateMod(io).MatchSome(out var mod))
                 {
                     LogFailure(type, archiveFile);
@@ -258,10 +220,7 @@ namespace Deli
                 yield return mod;
             }
 
-            foreach (var mod in dir.GetDirectories().SelectMany(DiscoverMods))
-            {
-                yield return mod;
-            }
+            foreach (var mod in dir.GetDirectories().SelectMany(DiscoverMods)) yield return mod;
         }
 
         private void Initialize()
@@ -285,7 +244,6 @@ namespace Deli
 
             // Load the mods
             foreach (var mod in sorted)
-            {
                 try
                 {
                     LoadMod(mod);
@@ -295,7 +253,6 @@ namespace Deli
                     Logger.LogError($"Failed to load mod {mod}. No additional mods will be loaded.\nException: " + e);
                     break;
                 }
-            }
 
             Logger.LogInfo("Mod loading complete");
         }
@@ -345,10 +302,8 @@ namespace Deli
                 var assetLoader = asset.Value;
 
                 if (!Services.Get<IAssetLoader, string>(assetLoader).MatchSome(out var loader))
-                {
                     // Throw instead of skip, because this might be a critical part of the mod
-                    throw new InvalidOperationException($"Asset loader not found: " + assetLoader);
-                }
+                    throw new InvalidOperationException("Asset loader not found: " + assetLoader);
 
                 Logger.LogDebug($"Loading asset [{assetLoader}: {assetPath}]");
                 loader.LoadAsset(_kernel, mod, assetPath);

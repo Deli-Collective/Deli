@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using Atlas;
 using Atlas.Fluent;
-using BepInEx.Logging;
 
 namespace Deli
 {
@@ -44,7 +42,8 @@ namespace Deli
         }
 
         /// <summary>
-        ///     Checks if the provided dependant version string is satisfied by the source version
+        ///     Checks if the provided dependant version string is satisfied by the source
+        ///     version
         /// </summary>
         public static bool Satisfies(this Version source, Version dependant)
         {
@@ -53,8 +52,8 @@ namespace Deli
         }
 
         /// <summary>
-        /// Extension for Assembly.GetTypes() that won't throw an exception.
-        /// This is needed to avoid a slew of ReflectionTypeLoadExceptions
+        ///     Extension for Assembly.GetTypes() that won't throw an exception.
+        ///     This is needed to avoid a slew of ReflectionTypeLoadExceptions
         /// </summary>
         /// <param name="assembly">Assembly to get types of</param>
         /// <returns>Array of not-null types in the assembly</returns>
@@ -95,23 +94,17 @@ namespace Deli
         {
             var attrs = @this.GetCustomAttributes(typeof(TAttribute), false);
 
-            return attrs.Length > 0
-                ? Option.Some((TAttribute) attrs[0])
-                : Option.None<TAttribute>();
+            return attrs.Length > 0 ? Option.Some((TAttribute) attrs[0]) : Option.None<TAttribute>();
         }
 
         public static Option<ConstructorInfo> GetParameterlessCtor(this Type @this)
         {
-            return @this.GetConstructor(new Type[0]) is ConstructorInfo ctor
-                ? Option.Some(ctor)
-                : Option.None<ConstructorInfo>();
+            return @this.GetConstructor(new Type[0]) is ConstructorInfo ctor ? Option.Some(ctor) : Option.None<ConstructorInfo>();
         }
 
         public static void BindJson<T>(this IServiceKernel @this)
         {
-            @this.Bind<IAssetReader<Option<T>>>()
-                .ToRecursiveNopMethod(x => new JsonAssetReader<T>(x))
-                .InSingletonNopScope();
+            @this.Bind<IAssetReader<Option<T>>>().ToRecursiveNopMethod(x => new JsonAssetReader<T>(x)).InSingletonNopScope();
         }
     }
 }

@@ -3,7 +3,7 @@
 namespace Deli.Core
 {
     [QuickUnnamedBind]
-    public class TextureAssetReader: IAssetReader<Texture2D>
+    public class TextureAssetReader : IAssetReader<Texture2D>
     {
         public Texture2D ReadAsset(byte[] raw)
         {

@@ -1,4 +1,3 @@
-using System.IO;
 using Atlas;
 using BepInEx.Logging;
 using Valve.Newtonsoft.Json;
@@ -6,44 +5,41 @@ using Valve.Newtonsoft.Json.Linq;
 
 namespace Deli
 {
-    public class JObjectAssetReader : IAssetReader<Option<JObject>>
+    public class JsonAssetReader<T> : IAssetReader<Option<T>>
     {
         private readonly IServiceResolver _services;
 
-        public JObjectAssetReader(IServiceResolver services)
+        public JsonAssetReader(IServiceResolver services)
         {
             _services = services;
         }
 
-        public Option<JObject> ReadAsset(byte[] raw)
+        public Option<T> ReadAsset(byte[] raw)
         {
             var serializer = _services.Get<JsonSerializer>().Expect("JSON serializer not found");
+            var jObject = _services.Get<IAssetReader<Option<JObject>>>().Expect("JSON parser not found");
 
-            using (var memory = new MemoryStream(raw))
-            using (var text = new StreamReader(memory))
-            using (var json = new JsonTextReader(text))
+            return jObject.ReadAsset(raw).Map(v =>
             {
-                JObject result;
-                try 
+                T result;
+                try
                 {
-                    result = JObject.Load(json);
+                    result = v.ToObject<T>(serializer);
                 }
-                catch (JsonReaderException e)
+                catch (JsonSerializationException e)
                 {
                     if (!_services.Get<ManualLogSource>().MatchSome(out var log))
-                    {
                         // We shouldn't swallow the error if it isn't reported.
                         throw;
-                    }
 
-                    log.LogWarning($"JSON parse error: " + e.Message);
+                    log.LogWarning($"Typed JSON ({typeof(T)}) parse error: " + e.Message);
                     log.LogDebug(e.ToString());
 
-                    return Option.None<JObject>();
+                    return Option.None<T>();
                 }
 
                 return Option.Some(result);
-            }
+            }).Flatten();
         }
     }
 }

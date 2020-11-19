@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using Atlas;
-using Atlas.Impl;
 using Atlas.Fluent;
+using Atlas.Impl;
 
 namespace Deli
 {
     public class CachedResourceIO : IResourceIO
     {
-        private readonly IResourceIO _raw;
         private readonly IServiceKernel _cache;
+        private readonly IResourceIO _raw;
 
         public CachedResourceIO(IResourceIO raw)
         {
@@ -25,8 +25,7 @@ namespace Deli
             {
                 typeCache = new Dictionary<string, Option<T>>();
 
-                _cache.Bind<IDictionary<string, Option<T>>>()
-                    .ToConstant(typeCache);
+                _cache.Bind<IDictionary<string, Option<T>>>().ToConstant(typeCache);
             }
 
             return typeCache.GetOrInsertWith(path, () => _raw.Get<T>(path));

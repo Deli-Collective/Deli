@@ -39,7 +39,9 @@ namespace Deli
         }
 
         /// <summary>
-        ///     A simple printout of this mod's identity. Use <seealso cref="Info"/> in conjunction with <see cref="Manifest.ToPrettyString"/> to get a more complete printout.
+        ///     A simple printout of this mod's identity. Use <seealso cref="Info" /> in
+        ///     conjunction with <see cref="Manifest.ToPrettyString" /> to get a more
+        ///     complete printout.
         /// </summary>
         public override string ToString()
         {
@@ -50,7 +52,8 @@ namespace Deli
         public readonly struct Manifest
         {
             /// <summary>
-            ///     The globally unique identitifer of this mod. This cannot conflict with any other mods.
+            ///     The globally unique identitifer of this mod. This cannot conflict with any
+            ///     other mods.
             /// </summary>
             public string Guid { get; }
 
@@ -93,7 +96,7 @@ namespace Deli
 
                 Name = name;
                 Authors = authors;
-                
+
                 Assets = assets;
             }
 
@@ -107,35 +110,23 @@ namespace Deli
             public string ToPrettyString()
             {
                 var builder = new StringBuilder();
-                
+
                 var hasName = Name.MatchSome(out var name);
-                if (hasName)
-                {
-                    builder.Append(name).Append(" (");
-                }
+                if (hasName) builder.Append(name).Append(" (");
 
                 builder.Append(Guid).Append(" @ ").Append(Version);
 
-                if (hasName)
-                {
-                    builder.Append(')');
-                }
+                if (hasName) builder.Append(')');
 
                 if (Authors.MatchSome(out var authors))
                 {
                     builder.Append(' ');
 
                     var iLast = authors.Length - 1;
-                    for (var i = 0; i < iLast; ++i)
-                    {
-                        builder.Append(authors[i]).Append(", ");
-                    }
+                    for (var i = 0; i < iLast; ++i) builder.Append(authors[i]).Append(", ");
 
-                    if (authors.Length > 1)
-                    {
-                        builder.Append("and ");
-                    }
-                    
+                    if (authors.Length > 1) builder.Append("and ");
+
                     builder.Append(authors[iLast]);
                 }
 

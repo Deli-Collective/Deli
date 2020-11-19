@@ -25,22 +25,18 @@ namespace Deli
             var value = serializer.Deserialize(reader, generics[0]);
             var optionSome = typeof(Option).GetMethod(nameof(Option.Some)).MakeGenericMethod(generics);
 
-            return optionSome.Invoke(null, new[] { value });
+            return optionSome.Invoke(null, new[] {value});
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var matchSomeMethod = value.GetType().GetMethod(nameof(Option<object>.MatchSome));
 
-            var match = new object[] { null };
+            var match = new object[] {null};
             if ((bool) matchSomeMethod.Invoke(value, match))
-            {
                 serializer.Serialize(writer, match[0]);
-            }
             else
-            {
                 writer.WriteNull();
-            }
         }
     }
 }

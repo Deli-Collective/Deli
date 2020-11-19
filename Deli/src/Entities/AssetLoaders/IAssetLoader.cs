@@ -3,7 +3,7 @@
 namespace Deli
 {
     /// <summary>
-    /// Interface for asset loaders
+    ///     Interface for asset loaders
     /// </summary>
     public interface IAssetLoader
     {
