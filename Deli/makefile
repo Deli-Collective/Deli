@@ -1,4 +1,4 @@
-CONSTANTS_SOURCE = Constants.cs
+CONSTANTS_SOURCE = src/Constants.cs
 CONTENTS         = $(addsuffix .dll,$(NAME) Atlas DotNetZip)
 ZIP              = $(NAME).zip
 TEMP             = temp
