@@ -7,15 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="Atlas">
-      <HintPath>..\libs\Atlas.dll</HintPath>
-    </Reference>
     <Reference Include="Valve.Newtonsoft.Json">
       <HintPath>..\libs\Valve.Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ADepIn" Version="20.11.19.2309" />
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" />
     <PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1" />
 

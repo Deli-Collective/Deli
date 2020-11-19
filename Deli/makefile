@@ -1,5 +1,5 @@
 CONSTANTS_SOURCE = src/Constants.cs
-CONTENTS         = $(addsuffix .dll,$(NAME) Atlas DotNetZip)
+CONTENTS         = $(addsuffix .dll,$(NAME) ADepIn DotNetZip)
 ZIP              = $(NAME).zip
 TEMP             = temp
 TEMP_PLUGINS     = $(TEMP)/BepInEx/plugins/Deli

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Atlas;
-using Atlas.Fluent.Impl;
+using ADepIn;
+using ADepIn.Fluent.Impl;
 using BepInEx.Logging;
 using UnityEngine;
 

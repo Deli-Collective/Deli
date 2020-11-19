@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Atlas;
-using Atlas.Fluent;
+using ADepIn;
+using ADepIn.Fluent;
 
 namespace Deli
 {

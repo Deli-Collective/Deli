@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Atlas;
+using ADepIn;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using Valve.Newtonsoft.Json;

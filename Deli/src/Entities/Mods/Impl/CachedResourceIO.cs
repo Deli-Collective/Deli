@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using Atlas;
-using Atlas.Fluent;
-using Atlas.Impl;
+using ADepIn;
+using ADepIn.Fluent;
+using ADepIn.Impl;
 
 namespace Deli
 {
