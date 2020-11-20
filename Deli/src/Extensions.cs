@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using ADepIn;
 using ADepIn.Fluent;
+using BepInEx.Logging;
 
 namespace Deli
 {
@@ -57,7 +58,7 @@ namespace Deli
         /// </summary>
         /// <param name="assembly">Assembly to get types of</param>
         /// <returns>Array of not-null types in the assembly</returns>
-        public static Type[] GetTypesSafe(this Assembly assembly)
+        public static Type[] GetTypesSafe(this Assembly assembly, ManualLogSource log)
         {
             try
             {
@@ -65,6 +66,9 @@ namespace Deli
             }
             catch (ReflectionTypeLoadException e)
             {
+                var exceptionsFormatted = e.LoaderExceptions.Where(x => x != null).Select(x => x.Message).ToArray();
+                log.LogError($"Encountered one or more type load exceptions while getting types from {assembly}:\n{string.Join("\n", exceptionsFormatted)}");
+
                 return e.Types.Where(t => t != null).ToArray();
             }
         }

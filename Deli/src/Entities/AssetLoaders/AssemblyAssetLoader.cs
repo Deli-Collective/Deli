@@ -21,8 +21,11 @@ namespace Deli
             // If the assembly debugging symbols are also included load those too.
             var assembly = mod.Resources.Get<byte[]>(path + ".mdb").MatchSome(out var symbols) ? Assembly.Load(rawAssembly, symbols) : Assembly.Load(rawAssembly);
 
+            // Get log in case a type load exception occurs.
+            var log = kernel.Get<ManualLogSource>().Expect("Failed to acquire logger.");
+
             // Try to discover any mod plugins in the assembly
-            foreach (var type in assembly.GetTypesSafe())
+            foreach (var type in assembly.GetTypesSafe(log))
             {
                 // If the type is a kernel entry module, load it and return
                 if (kernel.LoadEntryType(type).IsSome) continue;
