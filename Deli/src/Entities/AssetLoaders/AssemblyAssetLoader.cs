@@ -146,17 +146,11 @@ namespace Deli
         private bool CheckIsDeliMod(IServiceResolver services, Mod mod, Type type)
         {
             if (!type.IsSubclassOf(typeof(DeliMod))) return false;
+            
             var manager = services.Get<GameObject>().Expect("Could not find manager object.");
-            manager.SetActive(false);
-            try
-            {
-                var modClass = (DeliMod) manager.AddComponent(type);
-                modClass.BaseMod = mod;
-            }
-            finally
-            {
-                manager.SetActive(true);
-            }
+            services.Get<IDictionary<Type, Mod>>().Expect("Could not find mod type dictionary.").Add(type, mod);
+
+            manager.AddComponent(type);
 
             return true;
         }
