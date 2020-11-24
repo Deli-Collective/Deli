@@ -10,7 +10,7 @@ namespace Deli.Core
 	[QuickNamedBind("assembly.native")]
 	public class NativeAssemblyAssetLoader : IAssetLoader
 	{
-		[DllImport("kernel32.dll")]
+		[DllImport("kernel32.dll", SetLastError = true)]
 		private static extern IntPtr LoadLibrary(string path);
 
 		private readonly DirectoryInfo _root;
