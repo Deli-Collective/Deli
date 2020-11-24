@@ -1,12 +1,12 @@
-﻿using ADepIn;
+using ADepIn;
 
 namespace Deli
 {
-    /// <summary>
-    ///     Interface for asset loaders
-    /// </summary>
-    public interface IAssetLoader
-    {
-        void LoadAsset(IServiceKernel kernel, Mod mod, string path);
-    }
+	/// <summary>
+	///		Interface for asset loaders
+	/// </summary>
+	public interface IAssetLoader
+	{
+		void LoadAsset(IServiceKernel kernel, Mod mod, string path);
+	}
 }
