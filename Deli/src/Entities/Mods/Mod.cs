@@ -8,7 +8,7 @@ using Valve.Newtonsoft.Json;
 
 namespace Deli
 {
-	public readonly struct Mod
+	public class Mod
 	{
 		/// <summary>
 		///		Information about the mod
