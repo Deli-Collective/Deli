@@ -313,7 +313,7 @@ namespace Deli
             }
 
             // Add the Mod to the kernel.
-            Services.Get<IDictionary<string, Mod>>().Unwrap().Add(mod.Info.Guid, mod);
+            Services.Get<IDictionary<string, Mod>>().Expect("Could not find mod GUID dictionary.").Add(mod.Info.Guid, mod);
         }
     }
 }
