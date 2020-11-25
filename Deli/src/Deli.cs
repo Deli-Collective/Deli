@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using ADepIn;
 using ADepIn.Fluent;
 using ADepIn.Impl;
@@ -34,6 +36,7 @@ namespace Deli
 		private void Awake()
 		{
 			Logger.LogInfo($"Deli is Awake! Version {Constants.Version} ({Constants.GitBranch}-{Constants.GitDescribe})");
+			ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 			Bind();
 			RegisterConfig();
 			if (WaitForDebugger.Value) StartCoroutine(WaitForKeypress());
@@ -97,6 +100,7 @@ namespace Deli
 			});
 			Kernel.Bind<IDictionary<string, Mod>>().ToConstant(new Dictionary<string, Mod>());
 			Kernel.Bind<IDictionary<Type, Mod>>().ToConstant(new Dictionary<Type, Mod>());
+			Kernel.Bind<IDictionary<string, IVersionChecker>>().ToConstant(new Dictionary<string, IVersionChecker>());
 
 			// Enumerables
 			Kernel.Bind<IEnumerable<IAssetLoader>>().ToRecursiveMethod(x => x.Get<IDictionary<string, IAssetLoader>>().Map(v => (IEnumerable<IAssetLoader>) v.Values)).InTransientScope();
@@ -251,7 +255,7 @@ namespace Deli
 			}
 
 			// Sort the mods in the order they depend on each other
-			var sorted = mods.Values.TSort(x => x.Info.Dependencies.Keys.Select(dep => mods[dep]), true);
+			var sorted = mods.Values.TSort(x => x.Info.Dependencies.Keys.Select(dep => mods[dep]), true).ToArray();
 
 			// Load the mods
 			foreach (var mod in sorted)
@@ -265,6 +269,11 @@ namespace Deli
 					break;
 				}
 
+			// Perform version checks on all the mods
+			foreach (var mod in sorted)
+				StartCoroutine(CheckModLatestVersion(mod));
+
+			// Callback after done loading
 			Logger.LogInfo("Mod loading complete");
 			foreach (var callback in Services.Get<IList<LoadingCompleteEvent>>().Expect("Missing callback list for loading complete event"))
 				callback();
@@ -328,6 +337,42 @@ namespace Deli
 			// Perform the callbacks
 			foreach (var callback in Services.Get<IList<ModLoadedEvent>>().Expect("Missing callback list for mod loaded event"))
 				callback(mod);
+		}
+
+		private IEnumerator CheckModLatestVersion(Mod mod)
+		{
+			// Exit if this mod doesn't have a source
+			if (!mod.Info.SourceUrl.MatchSome(out var url) || string.IsNullOrEmpty(url))
+			{
+				mod.Log.LogInfo("Mod has no source");
+				yield break;
+			}
+
+			var regex = new Regex(@"^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)", RegexOptions.IgnoreCase);
+			var domain = regex.Match(url).Groups[0].Value;
+			var checker = Kernel.Get<IDictionary<string, IVersionChecker>>().Expect("Missing version checker dict").FirstOrDefault(x => x.Key == domain).Value;
+
+			// Exit if we don't have a version checker for the domain
+			if (checker == null)
+			{
+				mod.Log.LogInfo($"No version checker registered for the domain {domain}");
+				yield break;
+			}
+
+			// Check
+			yield return checker.GetLatestVersion(mod);
+			var result = checker.Result;
+
+			if (result.MatchSome(out var version))
+			{
+				if (version == mod.Info.Version)
+					mod.Log.LogInfo($"Mod is up to date! ({version})");
+				else if (version > mod.Info.Version)
+					mod.Log.LogWarning($"There is a newer version of this mod available. ({mod.Info.Version}) -> ({version})");
+				else
+					mod.Log.LogWarning($"This mod is more recent than the most recent version found at its source! ({version})");
+			}
+			else mod.Log.LogWarning($"Source URL for this mod is set but no version was found.");
 		}
 	}
 }
