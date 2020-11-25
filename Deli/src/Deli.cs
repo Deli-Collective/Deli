@@ -28,6 +28,9 @@ namespace Deli
 
 		private ConfigEntry<bool> WaitForDebugger;
 
+		public delegate void ModLoadedEvent(Mod mod);
+		public delegate void LoadingCompleteEvent();
+
 		private void Awake()
 		{
 			Logger.LogInfo($"Deli is Awake! Version {Constants.Version} ({Constants.GitBranch}-{Constants.GitDescribe})");
@@ -108,6 +111,11 @@ namespace Deli
 			// Custom impls
 			Kernel.Bind<ManualLogSource, string>().ToContextualNopMethod(x => BepInEx.Logging.Logger.CreateLogSource(x)).InSingletonScope();
 			Kernel.Bind<ConfigFile, string>().ToContextualNopMethod(x => new ConfigFile(Path.Combine(Constants.ConfigDirectory, $"{x}.cfg"), false)).InSingletonScope();
+
+			// Callbacks
+			Kernel.Bind<IList<ModLoadedEvent>>().ToConstant(new List<ModLoadedEvent>());
+			Kernel.Bind<IList<LoadingCompleteEvent>>().ToConstant(new List<LoadingCompleteEvent>());
+
 		}
 
 		private void RegisterConfig()
@@ -258,6 +266,8 @@ namespace Deli
 				}
 
 			Logger.LogInfo("Mod loading complete");
+			foreach (var callback in Services.Get<IList<LoadingCompleteEvent>>().Expect("Missing callback list for loading complete event"))
+				callback();
 		}
 
 		private bool CheckDependencies(Dictionary<string, Mod> mods)
@@ -314,6 +324,10 @@ namespace Deli
 
 			// Add the Mod to the kernel.
 			Services.Get<IDictionary<string, Mod>>().Expect("Could not find mod GUID dictionary.").Add(mod.Info.Guid, mod);
+
+			// Perform the callbacks
+			foreach (var callback in Services.Get<IList<ModLoadedEvent>>().Expect("Missing callback list for mod loaded event"))
+				callback(mod);
 		}
 	}
 }
