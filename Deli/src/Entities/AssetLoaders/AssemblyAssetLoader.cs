@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using ADepIn;
@@ -35,7 +35,7 @@ namespace Deli
 				if (CheckForNamedQuickBind(kernel, type)) continue;
 
 				// Check if it's a Deli mod.
-				CheckIsDeliMod(kernel, mod, type);
+				CheckIsDeliBehaviour(kernel, mod, type);
 			}
 		}
 
@@ -143,9 +143,9 @@ namespace Deli
 		/// <param name="mod">Base mod from where this type originated</param>
 		/// <param name="type">Type to check</param>
 		/// <returns>True if the type is a valid code mod</returns>
-		private bool CheckIsDeliMod(IServiceResolver services, Mod mod, Type type)
+		private bool CheckIsDeliBehaviour(IServiceResolver services, Mod mod, Type type)
 		{
-			if (!type.IsSubclassOf(typeof(DeliMod))) return false;
+			if (!type.IsSubclassOf(typeof(DeliBehaviour))) return false;
 
 			var manager = services.Get<GameObject>().Expect("Could not find manager object.");
 			services.Get<IDictionary<Type, Mod>>().Expect("Could not find mod type dictionary.").Add(type, mod);

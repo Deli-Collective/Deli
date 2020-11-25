@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -103,7 +103,7 @@ namespace Deli
 			Kernel.Bind<IAssetLoader, string>().ToWholeMethod((services, context) => services.Get<IDictionary<string, IAssetLoader>>().Map(x => x.OptionGetValue(context)).Flatten()).InTransientScope();
 			Kernel.Bind<Mod, string>().ToWholeMethod((services, context) => services.Get<IDictionary<string, Mod>>().Map(x => x.OptionGetValue(context)).Flatten()).InTransientScope();
 			Kernel.Bind<Mod, Type>().ToWholeMethod((services, context) => services.Get<IDictionary<Type, Mod>>().Map(x => x.OptionGetValue(context)).Flatten()).InTransientScope();
-			Kernel.Bind<Mod, DeliMod>().ToWholeMethod((services, context) => services.Get<Mod, Type>(context.GetType())).InTransientScope();
+			Kernel.Bind<Mod, DeliBehaviour>().ToWholeMethod((services, context) => services.Get<Mod, Type>(context.GetType())).InTransientScope();
 
 			// Custom impls
 			Kernel.Bind<ManualLogSource, string>().ToContextualNopMethod(x => BepInEx.Logging.Logger.CreateLogSource(x)).InSingletonScope();
