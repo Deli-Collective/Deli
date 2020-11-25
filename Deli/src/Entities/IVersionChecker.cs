@@ -2,7 +2,7 @@
 using System.Collections;
 using ADepIn;
 
-namespace Deli.Core.VersionCheckers
+namespace Deli
 {
 	public interface IVersionChecker
 	{

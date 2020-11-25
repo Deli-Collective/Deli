@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using ADepIn;
 using ADepIn.Fluent;
-using Deli.Core.VersionCheckers;
 
 namespace Deli.Core
 {

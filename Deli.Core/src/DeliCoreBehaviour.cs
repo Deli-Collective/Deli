@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using ADepIn;
 using Deli.Core.VersionCheckers;
-using UnityEngine.Networking;
 
 namespace Deli.Core
 {
@@ -25,15 +23,11 @@ namespace Deli.Core
 			_versionCheckers.Add("https://github.com", new GitHubVersionChecker());
 
 			// This is required because Mono doesn't ship with any root certificates
-			ServicePointManager.ServerCertificateValidationCallback = delegate
-			{
-				return true;
-			};
+			ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 		}
 
 		private void OnModLoaded(Mod mod)
 		{
-
 			StartCoroutine(FetchModLatestVersion(mod));
 		}
 
@@ -68,7 +62,8 @@ namespace Deli.Core
 					mod.Log.LogWarning($"There is a newer version of this mod available. ({mod.Info.Version}) -> ({version})");
 				else
 					mod.Log.LogWarning($"This mod is more recent than the most recent version found at its source! ({version})");
-			} else mod.Log.LogWarning($"Source URL for this mod is set but no version was found.");
+			}
+			else mod.Log.LogWarning($"Source URL for this mod is set but no version was found.");
 		}
 	}
 }
