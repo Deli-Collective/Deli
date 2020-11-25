@@ -81,6 +81,12 @@ namespace Deli
 			[JsonProperty(Required = Required.Default)]
 			public Option<string[]> Authors { get; }
 
+			/// <summary>
+			///		The source URL of the mod.
+			/// </summary>
+			[JsonProperty(Required = Required.Default)]
+			public Option<string> SourceUrl { get; }
+
 
 			/// <summary>
 			///		The asset paths and corresponding asset loaders that this mod contains.
@@ -88,7 +94,7 @@ namespace Deli
 			public Dictionary<string, string> Assets { get; }
 
 			[JsonConstructor]
-			public Manifest(string guid, Version version, Option<string> name, Option<string[]> authors, Dictionary<string, Version> dependencies, Dictionary<string, string> assets)
+			public Manifest(string guid, Version version, Option<string> name, Option<string[]> authors, Dictionary<string, Version> dependencies, Dictionary<string, string> assets, Option<string> sourceUrl)
 			{
 				Guid = guid;
 				Version = version;
@@ -98,6 +104,8 @@ namespace Deli
 				Authors = authors;
 
 				Assets = assets;
+
+				SourceUrl = sourceUrl;
 			}
 
 			/// <summary>

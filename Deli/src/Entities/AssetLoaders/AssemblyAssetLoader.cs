@@ -25,18 +25,16 @@ namespace Deli
 			var log = kernel.Get<ManualLogSource>().Expect("Failed to acquire logger.");
 
 			// Try to discover any mod plugins in the assembly
-			foreach (var type in assembly.GetTypesSafe(log))
-			{
-				// If the type is a kernel entry module, load it and return
-				if (kernel.LoadEntryType(type).IsSome) continue;
-
-				// Check if the type has either quick bind
-				if (CheckForUnnamedQuickBind(kernel, type)) continue;
-				if (CheckForNamedQuickBind(kernel, type)) continue;
-
-				// Check if it's a Deli mod.
+			// TODO: This isn't great
+			var types = assembly.GetTypesSafe(log);
+			foreach (var type in types)
+				kernel.LoadEntryType(type);
+			foreach (var type in types)
+				CheckForUnnamedQuickBind(kernel, type);
+			foreach (var type in types)
+				CheckForNamedQuickBind(kernel, type);
+			foreach (var type in types)
 				CheckIsDeliBehaviour(kernel, mod, type);
-			}
 		}
 
 		/// <summary>
