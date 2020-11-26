@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using ADepIn;
 using BepInEx.Logging;
 
@@ -16,9 +18,19 @@ namespace Deli
 
 		public Option<T> Get<T>(string path)
 		{
-			_log.LogDebug($"Retrieving asset [{typeof(T)}: {path}]");
+			var asset = _resources.Get<T>(path);
+			_log.LogDebug($"Retrieving asset [{typeof(T)}: {path}]: {(asset.IsSome ? "OK" : "FAIL")}");
+			return asset;
+		}
 
-			return _resources.Get<T>(path);
+		public IEnumerable<Option<T>> GetAll<T>(string pattern)
+		{
+			return Find(pattern).Select(Get<T>);
+		}
+
+		public IEnumerable<string> Find(string pattern)
+		{
+			return _resources.Find(pattern);
 		}
 	}
 }

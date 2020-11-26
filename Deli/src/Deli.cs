@@ -320,15 +320,19 @@ namespace Deli
 			// For each asset inside the mod, load it
 			foreach (var asset in mod.Info.Assets)
 			{
-				var assetPath = asset.Key;
+				var pattern = "^" + Regex.Escape(asset.Key).Replace( @"\*", ".*" ).Replace( @"\?", "." ) + "$";
 				var assetLoader = asset.Value;
 
-				if (!Services.Get<IAssetLoader, string>(assetLoader).MatchSome(out var loader))
-					// Throw instead of skip, because this might be a critical part of the mod
-					throw new InvalidOperationException("Asset loader not found: " + assetLoader);
+				foreach (var assetPath in mod.Resources.Find(pattern))
+				{
 
-				Logger.LogDebug($"Loading asset [{assetLoader}: {assetPath}]");
-				loader.LoadAsset(_kernel, mod, assetPath);
+					if (!Services.Get<IAssetLoader, string>(assetLoader).MatchSome(out var loader))
+						// Throw instead of skip, because this might be a critical part of the mod
+						throw new InvalidOperationException("Asset loader not found: " + assetLoader);
+
+					Logger.LogDebug($"Loading asset [{assetLoader}: {assetPath}]");
+					loader.LoadAsset(_kernel, mod, assetPath);
+				}
 			}
 
 			// Add the Mod to the kernel.

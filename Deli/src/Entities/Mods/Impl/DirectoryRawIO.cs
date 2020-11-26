@@ -1,4 +1,7 @@
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using ADepIn;
 
 namespace Deli
@@ -30,6 +33,12 @@ namespace Deli
 					}
 				}
 			}
+		}
+
+		public IEnumerable<string> Find(string pattern)
+		{
+			var regex = new Regex(pattern, RegexOptions.IgnoreCase);
+			return Directory.GetFiles(_root.FullName, "*.*", SearchOption.AllDirectories).Select(x => x.Replace(_root.FullName + "\\", "")).Where(p => regex.IsMatch(p));
 		}
 	}
 }
