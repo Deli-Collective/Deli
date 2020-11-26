@@ -49,6 +49,21 @@ namespace Deli
 		}
 
 		[JsonObject(ItemRequired = Required.Always)]
+		public readonly struct Assets
+		{
+			public Dictionary<string, string> Runtime { get; }
+
+			public Dictionary<string, string> Patcher { get; }
+
+			[JsonConstructor]
+			public Assets(Dictionary<string, string> runtime, Dictionary<string, string> patcher)
+			{
+				Runtime = runtime;
+				Patcher = patcher;
+			}
+		}
+
+		[JsonObject(ItemRequired = Required.Always)]
 		public readonly struct Manifest
 		{
 			/// <summary>
@@ -85,10 +100,10 @@ namespace Deli
 			/// <summary>
 			///		The asset paths and corresponding asset loaders that this mod contains.
 			/// </summary>
-			public Dictionary<string, string> Assets { get; }
+			public Assets Assets { get; }
 
 			[JsonConstructor]
-			public Manifest(string guid, Version version, Option<string> name, Option<string[]> authors, Dictionary<string, Version> dependencies, Dictionary<string, string> assets)
+			public Manifest(string guid, Version version, Option<string> name, Option<string[]> authors, Dictionary<string, Version> dependencies, Assets assets)
 			{
 				Guid = guid;
 				Version = version;

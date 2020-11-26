@@ -1,7 +1,7 @@
 namespace Deli
 {
 	// Constants beginning with MACRO are set via the "macros-precompile" recipe
-	internal static class Constants
+	public static class Constants
 	{
 		// GUID and Version
 		public const string Name = "Deli";
