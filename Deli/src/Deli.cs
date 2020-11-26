@@ -255,7 +255,7 @@ namespace Deli
 			}
 
 			// Sort the mods in the order they depend on each other
-			var sorted = mods.Values.TSort(x => x.Info.Dependencies.Keys.Select(dep => mods[dep]), true).ToArray();
+			var sorted = mods.Values.TSort(x => x.Info.Dependencies.Keys.Select(dep => mods[dep]), true);
 
 			// Load the mods
 			foreach (var mod in sorted)
@@ -270,7 +270,7 @@ namespace Deli
 				}
 
 			// Perform version checks on all the mods
-			foreach (var mod in sorted)
+			foreach (var mod in Kernel.Get<IEnumerable<Mod>>().Unwrap())
 				StartCoroutine(CheckModLatestVersion(mod));
 
 			// Callback after done loading
