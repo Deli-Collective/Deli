@@ -6,7 +6,7 @@ TEMP_PLUGINS     = $(TEMP)/BepInEx/plugins/Deli
 
 .PHONY: all macros-precompile build macros-postcompile pack clean
 
-all: clean build pack
+all: clean build nuget pack
 
 build: compile macros-postcompile
 
@@ -34,6 +34,10 @@ pack: build
 	zip -9r ../$(ZIP) .
 
 	rm -r $(TEMP)
+
+nuget:
+	mkdir -p ../nuget
+	dotnet pack --configuration $(CONFIG) $(BUILD_PROPERTIES) --no-build --output ../nuget
 
 clean:
 	rm -f $(ZIP)

@@ -29,3 +29,10 @@ jobs:
         path: |
           Deli/Deli.zip
           Deli.Core/Deli.Core.zip
+
+    - name: Push to nuget.org
+      if: github.ref == 'refs/heads/main'
+      shell: bash
+      run: dotnet nuget push "nuget/*.nupkg" -k "$KEY" -s https://api.nuget.org/v3/index.json
+      env:
+        KEY: ${{ secrets.NUGET_API_KEY }}
