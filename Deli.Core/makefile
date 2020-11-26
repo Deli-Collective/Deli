@@ -1,15 +1,15 @@
 CONTENTS = manifest.json $(NAME).dll
 ZIP      = $(NAME).zip
 
-.PHONY: all build pack clean
+.PHONY: all build clean
 
-all: clean build pack
+all: clean build $(ZIP)
 
 build:
 	dotnet build --configuration $(CONFIG) --framework $(FRAMEWORK) $(BUILD_PROPERTIES)
 
-pack: build
-	zip -9j $(ZIP) $(addprefix bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS))
+$(ZIP): build
+	zip -9j $@ $(addprefix bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS))
 
 clean:
 	rm -f $(ZIP)

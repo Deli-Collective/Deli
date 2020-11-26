@@ -4,6 +4,8 @@ export SHELL            = /bin/bash
 export CONFIG          ?= Release
 export FRAMEWORK       ?= net35
 export VERSION         ?= 0.0.0
+       NUGET           ?= nuget
+export NUGET_DIR        = ../$(NUGET)
 
 # DLL metadata
 export GIT_DESCRIBE     = $(shell git describe --long --always --dirty)
@@ -14,7 +16,7 @@ export BUILD_PROPERTIES = /p:Version="$(VERSION)" /p:RepositoryBranch="$(GIT_BRA
 # Local
 PROJECTS = Deli Deli.Core
 
-.PHONY: all
+.PHONY: all clean
 
 all: $(PROJECTS)
 	for p in $^; do \

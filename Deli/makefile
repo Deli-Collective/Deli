@@ -4,9 +4,9 @@ ZIP              = $(NAME).zip
 TEMP             = temp
 TEMP_PLUGINS     = $(TEMP)/BepInEx/plugins/Deli
 
-.PHONY: all macros-precompile build macros-postcompile pack clean
+.PHONY: all macros-precompile build macros-postcompile clean
 
-all: clean build nuget pack
+all: clean build $(NUGET_DIR) $(ZIP)
 
 build: compile macros-postcompile
 
@@ -25,19 +25,19 @@ compile: macros-precompile
 macros-postcompile: compile
 	mv $(CONSTANTS_SOURCE).old $(CONSTANTS_SOURCE)
 
-pack: build
+$(ZIP): build
 	mkdir -p $(TEMP_PLUGINS)
 	
 	mv $(addprefix bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS)) $(TEMP_PLUGINS)/
 
 	cd $(TEMP); \
-	zip -9r ../$(ZIP) .
+	zip -9r ../$@ .
 
 	rm -r $(TEMP)
 
-nuget:
-	mkdir -p ../nuget
-	dotnet pack --configuration $(CONFIG) $(BUILD_PROPERTIES) --no-build --output ../nuget
+$(NUGET_DIR): build
+	mkdir -p $@
+	dotnet pack --configuration $(CONFIG) $(BUILD_PROPERTIES) --no-build --output $@
 
 clean:
 	rm -f $(ZIP)
