@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using ADepIn;
 using ADepIn.Fluent.Impl;
-using BepInEx.Logging;
 
 namespace Deli
 {
-	public static class QuickBindUtilizer
+	internal static class QuickBindUtilizer
 	{
 		private delegate void CheckCallback<TAttribute>(IServiceKernel kernel, TAttribute attribute, Type[] services, object instance) where TAttribute : QuickBindAttribute;
 

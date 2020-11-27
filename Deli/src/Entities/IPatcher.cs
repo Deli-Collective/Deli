@@ -5,8 +5,6 @@ namespace Deli
 {
 	public interface IPatcher
 	{
-		string TargetDLL { get; }
-
 		void Patch(ref AssemblyDefinition assembly);
 	}
 }

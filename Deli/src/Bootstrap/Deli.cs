@@ -15,12 +15,33 @@ namespace Deli
 {
 	public static class Deli
 	{
-		private readonly static ManualLogSource _log;
-		private readonly static IServiceKernel _kernel;
-		private readonly static Dictionary<string, IAssetLoader> _assetLoaders;
-		private readonly static List<IPatcher> _patchers;
+		private enum Stage
+		{
+			Patcher,
+			Runtime
+		}
+
+		private static readonly ManualLogSource _log;
+		private static readonly IServiceKernel _kernel;
+		private static readonly Dictionary<string, IAssetLoader> _assetLoaders;
+		private static readonly Dictionary<string, IList<IPatcher>> _patchers;
+
+		private static Stage _stage;
 
 		public static IServiceResolver Services => _kernel;
+
+		public static IEnumerable<KeyValuePair<string, IAssetLoader>> AssetLoaders => _assetLoaders;
+
+		public static IEnumerable<KeyValuePair<string, IEnumerable<IPatcher>>> Patchers
+		{
+			get
+			{
+				foreach (var pair in _patchers)
+				{
+					yield return new KeyValuePair<string, IEnumerable<IPatcher>>(pair.Key, pair.Value);
+				}
+			}
+		}
 
 		public static IEnumerable<Mod> Mods { get; }
 
@@ -28,7 +49,11 @@ namespace Deli
 		{
 			_log = Logger.CreateLogSource(Constants.Name);
 			_kernel = new StandardServiceKernel();
-			_assetLoaders = new Dictionary<string, IAssetLoader>();
+			_assetLoaders = new Dictionary<string, IAssetLoader>
+			{
+				[Constants.AssemblyLoaderName] = new AssemblyAssetLoader(_log)
+			};
+			_patchers = new Dictionary<string, IList<IPatcher>>();
 
 			Bind();
 
@@ -40,6 +65,7 @@ namespace Deli
 			_kernel.Bind<ManualLogSource>().ToConstant(_log);
 
 			BindJson();
+			BindPatchers();
 			BindAssetReaders();
 			BindAssetLoaders();
 			BindBepInEx();
@@ -70,6 +96,12 @@ namespace Deli
 			_kernel.BindJson<Mod.Manifest>();
 		}
 
+		private static void BindPatchers()
+		{
+			_kernel.Bind<IDictionary<string, IList<IPatcher>>>().ToConstant(_patchers);
+			_kernel.Bind<IList<IPatcher>, string>().ToWholeMethod((services, context) => services.Get<IDictionary<string, IList<IPatcher>>>().Map(v => v.GetOrInsertWith(context, () => new List<IPatcher>()))).InTransientScope();
+		}
+
 		private static void BindAssetReaders()
 		{
 			_kernel.Bind<IAssetReader<byte[]>>().ToConstant(new ByteArrayAssetReader());
@@ -80,9 +112,6 @@ namespace Deli
 		private static void BindAssetLoaders()
 		{
 			_kernel.Bind<IDictionary<string, IAssetLoader>>().ToConstant(_assetLoaders);
-
-			_kernel.Bind<IEnumerable<IAssetLoader>>().ToRecursiveMethod(x => x.Get<IDictionary<string, IAssetLoader>>().Map(v => (IEnumerable<IAssetLoader>) v.Values)).InTransientScope();
-
 			_kernel.Bind<IAssetLoader, string>().ToWholeMethod((services, context) => services.Get<IDictionary<string, IAssetLoader>>().Map(x => x.OptionGetValue(context)).Flatten()).InTransientScope();
 		}
 
@@ -112,14 +141,6 @@ namespace Deli
 			}
 		}
 
-		private enum Stage
-		{
-			Patch,
-			Runtime
-		}
-
-		private static Stage _stage;
-
 		private static void StageCheck(Stage stage)
 		{
 			if (_stage != stage)
@@ -130,31 +151,35 @@ namespace Deli
 			++_stage;
 		}
 
-		private const string PatcherLoader = "assembly.patcher";
-		internal static Dictionary<string, List<IPatcher>> Patch()
+		internal static void PatchStage()
 		{
-			StageCheck(Stage.Patch);
-			_assetLoaders.Add(PatcherLoader, new AssemblyAssetLoader(_log));
+			StageCheck(Stage.Patcher);
 
 			LoadMods(x => x.Patcher);
-
-			var dllPatchers = new Dictionary<string, List<IPatcher>>();
-			foreach (var patcher in _patchers)
-			{
-				var patchersForDll = dllPatchers.GetOrInsertWith(patcher.TargetDLL, () => new List<IPatcher>());
-				patchersForDll.Add(patcher);
-			}
-
-			return dllPatchers;
 		}
 
-		public static void Runtime(IModule module)
+		internal static void RuntimeStage(IModule module)
 		{
 			StageCheck(Stage.Runtime);
-			_assetLoaders.Remove(PatcherLoader);
 
 			module.Load(_kernel);
+
 			LoadMods(x => x.Runtime);
+		}
+
+		public static void AddLoader(string name, IAssetLoader loader)
+		{
+			_assetLoaders.Add(name, loader);
+		}
+
+		public static void AddPatcher(string fileName, IPatcher patcher)
+		{
+			if (_stage != Stage.Patcher)
+			{
+				throw new InvalidOperationException("Patching has already been performed.");
+			}
+
+			_patchers.GetOrInsertWith(fileName, () => new List<IPatcher>()).Add(patcher);
 		}
 	}
 }

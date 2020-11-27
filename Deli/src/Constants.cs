@@ -14,6 +14,7 @@ namespace Deli
 		public const string GitHash = "MACRO_GIT_HASH";
 
 		// Loader constants
+		public const string AssemblyLoaderName = "assembly";
 		public const string ModExtension = "zip";
 		public const string ModDirectory = "mods";
 		public const string ConfigDirectory = "mods/configs";

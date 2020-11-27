@@ -12,19 +12,19 @@ namespace Deli
 	{
 		public DeliPostpatch()
 		{
-			Deli.Runtime(this);
+			Entrypoint.Postpatch(this);
 		}
 
 		public void Load(IServiceKernel kernel)
 		{
-			var manager = new GameObject("Deli Manager");
-			kernel.Bind<GameObject>().ToConstant(manager);
-
 			var log = kernel.Get<ManualLogSource>().Unwrap();
+			log.LogDebug("Injecting postpatch loader...");
+
+			var manager = new GameObject("Deli Manager");
 			var loader = new RuntimeAssemblyAssetLoader(manager, log);
 
 			var loaders = kernel.Get<IDictionary<string, IAssetLoader>>().Unwrap();
-			loaders.Add("assembly", loader);
+			loaders[Constants.AssemblyLoaderName] = loader;
 		}
 	}
 }

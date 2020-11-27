@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# 
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deli.Patcher", "Deli.Patcher\Deli.Patcher.csproj", "{AFF79E47-8610-47D3-88E6-DB6BB3173BA3}"
+#
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deli", "Deli\Deli.csproj", "{AFF79E47-8610-47D3-88E6-DB6BB3173BA3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deli.Core", "Deli.Core\Deli.Core.csproj", "{69FA58F8-726C-4DE8-9798-43FFDDF84B45}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deli", "Deli\Deli.csproj", "{95000ACC-97CC-48C9-B784-E55F6141733C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deli.Runtime", "Deli.Runtime\Deli.Runtime.csproj", "{95000ACC-97CC-48C9-B784-E55F6141733C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deli.MonoMod", "Deli.MonoMod\Deli.MonoMod.csproj", "{20A88B88-421B-4D72-BA42-9DD9022043B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,5 +27,9 @@ Global
 		{95000ACC-97CC-48C9-B784-E55F6141733C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95000ACC-97CC-48C9-B784-E55F6141733C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95000ACC-97CC-48C9-B784-E55F6141733C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20A88B88-421B-4D72-BA42-9DD9022043B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20A88B88-421B-4D72-BA42-9DD9022043B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20A88B88-421B-4D72-BA42-9DD9022043B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20A88B88-421B-4D72-BA42-9DD9022043B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
