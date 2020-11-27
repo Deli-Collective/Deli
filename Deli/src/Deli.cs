@@ -31,6 +31,7 @@ namespace Deli
 		private ConfigEntry<bool> WaitForDebugger;
 
 		public delegate void ModLoadedEvent(Mod mod);
+
 		public delegate void LoadingCompleteEvent();
 
 		private void Awake()
@@ -103,12 +104,15 @@ namespace Deli
 			Kernel.Bind<IDictionary<string, IVersionChecker>>().ToConstant(new Dictionary<string, IVersionChecker>());
 
 			// Enumerables
-			Kernel.Bind<IEnumerable<IAssetLoader>>().ToRecursiveMethod(x => x.Get<IDictionary<string, IAssetLoader>>().Map(v => (IEnumerable<IAssetLoader>) v.Values)).InTransientScope();
+			Kernel.Bind<IEnumerable<IAssetLoader>>().ToRecursiveMethod(x => x.Get<IDictionary<string, IAssetLoader>>().Map(v => (IEnumerable<IAssetLoader>) v.Values))
+				.InTransientScope();
 			Kernel.Bind<IEnumerable<Mod>>().ToRecursiveMethod(x => x.Get<IDictionary<string, Mod>>().Map(v => (IEnumerable<Mod>) v.Values)).InTransientScope();
 
 			// Contextual to dictionaries
-			Kernel.Bind<IAssetLoader, string>().ToWholeMethod((services, context) => services.Get<IDictionary<string, IAssetLoader>>().Map(x => x.OptionGetValue(context)).Flatten()).InTransientScope();
-			Kernel.Bind<Mod, string>().ToWholeMethod((services, context) => services.Get<IDictionary<string, Mod>>().Map(x => x.OptionGetValue(context)).Flatten()).InTransientScope();
+			Kernel.Bind<IAssetLoader, string>()
+				.ToWholeMethod((services, context) => services.Get<IDictionary<string, IAssetLoader>>().Map(x => x.OptionGetValue(context)).Flatten()).InTransientScope();
+			Kernel.Bind<Mod, string>().ToWholeMethod((services, context) => services.Get<IDictionary<string, Mod>>().Map(x => x.OptionGetValue(context)).Flatten())
+				.InTransientScope();
 			Kernel.Bind<Mod, Type>().ToWholeMethod((services, context) => services.Get<IDictionary<Type, Mod>>().Map(x => x.OptionGetValue(context)).Flatten()).InTransientScope();
 			Kernel.Bind<Mod, DeliBehaviour>().ToWholeMethod((services, context) => services.Get<Mod, Type>(context.GetType())).InTransientScope();
 
@@ -119,12 +123,12 @@ namespace Deli
 			// Callbacks
 			Kernel.Bind<IList<ModLoadedEvent>>().ToConstant(new List<ModLoadedEvent>());
 			Kernel.Bind<IList<LoadingCompleteEvent>>().ToConstant(new List<LoadingCompleteEvent>());
-
 		}
 
 		private void RegisterConfig()
 		{
-			WaitForDebugger = Config.Bind("Debugging", "WaitForDebugger", false, "If set to true, this will delay initializing the framework until you press the R key to give you time to attach a debugger.");
+			WaitForDebugger = Config.Bind("Debugging", "WaitForDebugger", false,
+				"If set to true, this will delay initializing the framework until you press the R key to give you time to attach a debugger.");
 		}
 
 		// Small coroutine to wait for a keypress before initializing.
@@ -200,39 +204,42 @@ namespace Deli
 				yield break;
 			}
 
-			foreach (var archiveFile in dir.GetFiles("*." + Constants.ModExtension))
+			foreach (var extension in Constants.ModExtensions)
 			{
-				const string type = "archive";
-
-				var raw = archiveFile.OpenRead();
-				var zip = ZipFile.Read(raw);
-
-				if (zip.Entries.Any(x => x.FileName.Contains('\\')))
+				foreach (var archiveFile in dir.GetFiles("*." + extension))
 				{
-					Logger.LogError($"Found a bad zip path in {archiveFile}. To fix it, try rezipping the archive or use a different zip utility.");
+					const string type = "archive";
 
-					zip.Dispose();
-					raw.Dispose();
-					continue;
+					var raw = archiveFile.OpenRead();
+					var zip = ZipFile.Read(raw);
+
+					if (zip.Entries.Any(x => x.FileName.Contains('\\')))
+					{
+						Logger.LogError($"Found a bad zip path in {archiveFile}. To fix it, try rezipping the archive or use a different zip utility.");
+
+						zip.Dispose();
+						raw.Dispose();
+						continue;
+					}
+
+					var io = new ArchiveRawIO(zip);
+
+					if (!CreateMod(io).MatchSome(out var mod))
+					{
+						LogFailure(type, archiveFile);
+
+						zip.Dispose();
+						raw.Dispose();
+						continue;
+					}
+
+					var disposables = Kernel.Get<IList<IDisposable>>().Unwrap();
+					disposables.Add(zip);
+					disposables.Add(raw);
+
+					LogSuccess(type, archiveFile);
+					yield return mod;
 				}
-
-				var io = new ArchiveRawIO(zip);
-
-				if (!CreateMod(io).MatchSome(out var mod))
-				{
-					LogFailure(type, archiveFile);
-
-					zip.Dispose();
-					raw.Dispose();
-					continue;
-				}
-
-				var disposables = Kernel.Get<IList<IDisposable>>().Unwrap();
-				disposables.Add(zip);
-				disposables.Add(raw);
-
-				LogSuccess(type, archiveFile);
-				yield return mod;
 			}
 
 			foreach (var mod in dir.GetDirectories().SelectMany(DiscoverMods)) yield return mod;
@@ -320,12 +327,11 @@ namespace Deli
 			// For each asset inside the mod, load it
 			foreach (var asset in mod.Info.Assets)
 			{
-				var pattern = "^" + Regex.Escape(asset.Key).Replace( @"\*", ".*" ).Replace( @"\?", "." ) + "$";
+				var pattern = "^" + Regex.Escape(asset.Key).Replace(@"\*", ".*").Replace(@"\?", ".") + "$";
 				var assetLoader = asset.Value;
 
 				foreach (var assetPath in mod.Resources.Find(pattern))
 				{
-
 					if (!Services.Get<IAssetLoader, string>(assetLoader).MatchSome(out var loader))
 						// Throw instead of skip, because this might be a critical part of the mod
 						throw new InvalidOperationException("Asset loader not found: " + assetLoader);
