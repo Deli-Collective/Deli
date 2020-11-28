@@ -56,6 +56,8 @@ namespace Deli
 			};
 			_patchers = new Dictionary<string, IList<IPatcher>>();
 
+			_stage = Stage.None;
+
 			Bind();
 
 			Mods = new DeliBootstrap(_log, _kernel).CreateMods();
@@ -122,11 +124,13 @@ namespace Deli
 			_kernel.Bind<ConfigFile, string>().ToContextualNopMethod(x => new ConfigFile(Path.Combine(Constants.ConfigDirectory, $"{x}.cfg"), false)).InSingletonScope();
 		}
 
-		private static void LoadMods(Func<Mod.Assets, Dictionary<string, string>> assetSelector)
+		private static void LoadMods(Stage stage, Func<Mod.Assets, Dictionary<string, string>> assetSelector)
 		{
+			var stageLoading = stage + "-loading ";
+
 			foreach (var mod in Mods)
 			{
-				_log.LogInfo("Loading " + mod);
+				_log.LogInfo(stageLoading + mod);
 
 				// For each asset inside the mod, load it
 				foreach (var asset in assetSelector(mod.Info.Assets))
@@ -154,18 +158,19 @@ namespace Deli
 
 		internal static void PatchStage()
 		{
-			StageCheck(Stage.Patcher);
+			const Stage stage = Stage.Patcher;
 
-			LoadMods(x => x.Patcher);
+			StageCheck(stage);
+			LoadMods(stage, x => x.Patcher);
 		}
 
 		internal static void RuntimeStage(IModule module)
 		{
-			StageCheck(Stage.Runtime);
+			const Stage stage = Stage.Runtime;
 
+			StageCheck(stage);
 			module.Load(_kernel);
-
-			LoadMods(x => x.Runtime);
+			LoadMods(stage, x => x.Runtime);
 		}
 
 		public static void AddLoader(string name, IAssetLoader loader)
