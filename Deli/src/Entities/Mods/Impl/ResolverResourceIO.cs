@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using ADepIn;
 
 namespace Deli
@@ -21,6 +23,16 @@ namespace Deli
 
 				return reader.ReadAsset(data);
 			});
+		}
+
+		public IEnumerable<Option<T>> GetAll<T>(string pattern)
+		{
+			return Find(pattern).Select(Get<T>);
+		}
+
+		public IEnumerable<string> Find(string pattern)
+		{
+			return _raw.Find(pattern);
 		}
 	}
 }

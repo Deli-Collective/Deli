@@ -4,6 +4,8 @@ export SHELL            = /bin/bash
 export CONFIG          ?= Release
 export FRAMEWORK       ?= net35
 export VERSION         ?= 0.0.0
+       NUGET           ?= nuget
+export NUGET_DIR        = ../$(NUGET)
 
 # DLL metadata
 export GIT_DESCRIBE     = $(shell git describe --long --always --dirty)
@@ -34,7 +36,7 @@ CONTENTS_PATCHERS = $(addsuffix .dll,$(PROJ_PATCHER) ADepIn DotNetZip)
 CONTENTS_PLUGINS  = $(addsuffix .dll,$(PROJ_RUNTIME))
 CONTENTS_MODS     = $(addsuffix /*.zip,$(PROJS_LIBS))
 
-.PHONY: clean nested-all
+.PHONY: all clean nested-all
 
 all: clean nested-all $(ZIP)
 

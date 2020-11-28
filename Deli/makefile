@@ -1,8 +1,8 @@
 CONSTANTS_SOURCE = src/Constants.cs
 
-.PHONY: all macros-precompile build macros-postcompile pack clean
+.PHONY: all macros-precompile build macros-postcompile clean
 
-all: clean build pack
+all: clean build $(NUGET_DIR) $(ZIP)
 
 build: compile macros-postcompile
 
@@ -20,6 +20,10 @@ compile: macros-precompile
 
 macros-postcompile: compile
 	mv $(CONSTANTS_SOURCE).old $(CONSTANTS_SOURCE)
+
+$(NUGET_DIR): build
+	mkdir -p $@
+	dotnet pack --configuration $(CONFIG) $(BUILD_PROPERTIES) --no-build --output $@
 
 clean:
 	rm -f $(ZIP)

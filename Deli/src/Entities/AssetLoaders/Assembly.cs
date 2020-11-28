@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using ADepIn;
 using BepInEx.Logging;
@@ -7,11 +8,32 @@ namespace Deli
 {
 	public class AssemblyAssetLoader : IAssetLoader
 	{
-		protected ManualLogSource Log { get; }
+		public delegate void TypeLoadHandler(IServiceKernel kernel, Mod mod, string path, Type type);
 
-		public AssemblyAssetLoader(ManualLogSource log)
+		private readonly ManualLogSource _log;
+
+		private readonly List<TypeLoadHandler> _handlers;
+
+		public AssemblyAssetLoader(ManualLogSource log, IEnumerable<TypeLoadHandler> handlers)
 		{
-			Log = log;
+			_log = log;
+
+			_handlers = new List<TypeLoadHandler>
+			{
+				LoadModule,
+				LoadQuickBind
+			};
+			_handlers.AddRange(handlers);
+		}
+
+		private void LoadModule(IServiceKernel kernel, Mod mod, string path, Type type)
+		{
+			kernel.LoadEntryType(type);
+		}
+
+		private void LoadQuickBind(IServiceKernel kernel, Mod mod, string path, Type type)
+		{
+			QuickBindUtilizer.TryBind(kernel, type);
 		}
 
 		public void LoadAsset(IServiceKernel kernel, Mod mod, string path)
@@ -22,20 +44,14 @@ namespace Deli
 			// If the assembly debugging symbols are also included load those too.
 			var assembly = mod.Resources.Get<byte[]>(path + ".mdb").MatchSome(out var symbols) ? Assembly.Load(rawAssembly, symbols) : Assembly.Load(rawAssembly);
 
-			foreach (var type in assembly.GetTypesSafe(Log))
+			var types = assembly.GetTypesSafe(_log);
+			foreach (var handler in _handlers)
 			{
-				// If the type is a kernel entry module, load it and continue
-				if (kernel.LoadEntryType(type).IsSome) continue;
-
-				// Check if the type has either quick bind
-				if (QuickBindUtilizer.TryBind(kernel, type)) continue;
-
-				TypeCallback(kernel, mod, path, type);
+				foreach (var type in types)
+				{
+					handler.Invoke(kernel, mod, path, type);
+				}
 			}
-		}
-
-		protected virtual void TypeCallback(IServiceKernel kernel, Mod mod, string path, Type type)
-		{
 		}
 	}
 }

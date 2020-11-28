@@ -95,7 +95,7 @@ namespace Deli
 				yield break;
 			}
 
-			foreach (var archiveFile in dir.GetFiles("*." + Constants.ModExtension))
+			foreach (var archiveFile in Constants.ModExtensions.SelectMany(x => dir.GetFiles("*." + x)))
 			{
 				const string type = "archive";
 

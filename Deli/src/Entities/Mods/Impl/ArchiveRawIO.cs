@@ -1,4 +1,7 @@
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using ADepIn;
 using Ionic.Zip;
 
@@ -32,6 +35,12 @@ namespace Deli
 					return Option.Some(buffer);
 				}
 			}
+		}
+
+		public IEnumerable<string> Find(string pattern)
+		{
+			var regex = new Regex(pattern, RegexOptions.IgnoreCase);
+			return _archive.EntryFileNames.Where(n => regex.IsMatch(n));
 		}
 	}
 }

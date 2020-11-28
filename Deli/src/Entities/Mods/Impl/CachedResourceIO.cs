@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using ADepIn;
 using ADepIn.Fluent;
 using ADepIn.Impl;
@@ -29,6 +30,16 @@ namespace Deli
 			}
 
 			return typeCache.GetOrInsertWith(path, () => _raw.Get<T>(path));
+		}
+
+		public IEnumerable<Option<T>> GetAll<T>(string pattern)
+		{
+			return Find(pattern).Select(Get<T>);
+		}
+
+		public IEnumerable<string> Find(string pattern)
+		{
+			return _raw.Find(pattern);
 		}
 	}
 }

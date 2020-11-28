@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using ADepIn;
 using ADepIn.Fluent;
@@ -26,6 +27,7 @@ namespace Deli
 		private static readonly IServiceKernel _kernel;
 		private static readonly Dictionary<string, IAssetLoader> _assetLoaders;
 		private static readonly Dictionary<string, IList<IPatcher>> _patchers;
+		private static readonly Dictionary<string, IVersionChecker> _versionCheckers;
 
 		private static Stage _stage;
 
@@ -46,13 +48,20 @@ namespace Deli
 
 		public static IEnumerable<Mod> Mods { get; }
 
+
+		public delegate void PatcherCompleteHandler();
+		public delegate void RuntimeCompleteHandler();
+
+		public static event PatcherCompleteHandler PatcherComplete;
+		public static event RuntimeCompleteHandler RuntimeComplete;
+
 		static Deli()
 		{
 			_log = Logger.CreateLogSource(Constants.Name);
 			_kernel = new StandardServiceKernel();
 			_assetLoaders = new Dictionary<string, IAssetLoader>
 			{
-				[Constants.AssemblyLoaderName] = new AssemblyAssetLoader(_log)
+				[Constants.AssemblyLoaderName] = new AssemblyAssetLoader(_log, Enumerable.Empty<AssemblyAssetLoader.TypeLoadHandler>())
 			};
 			_patchers = new Dictionary<string, IList<IPatcher>>();
 
@@ -71,6 +80,7 @@ namespace Deli
 			BindPatchers();
 			BindAssetReaders();
 			BindAssetLoaders();
+			BindVersionCheckers();
 			BindBepInEx();
 		}
 
@@ -118,6 +128,12 @@ namespace Deli
 			_kernel.Bind<IAssetLoader, string>().ToWholeMethod((services, context) => services.Get<IDictionary<string, IAssetLoader>>().Map(x => x.OptionGetValue(context)).Flatten()).InTransientScope();
 		}
 
+		private static void BindVersionCheckers()
+		{
+			_kernel.Bind<IDictionary<string, IVersionChecker>>().ToConstant(_versionCheckers);
+			_kernel.Bind<IVersionChecker, string>().ToWholeMethod((services, context) => services.Get<IDictionary<string, IVersionChecker>>().Map(x => x.OptionGetValue(context)).Flatten()).InTransientScope();
+		}
+
 		private static void BindBepInEx()
 		{
 			_kernel.Bind<ManualLogSource, string>().ToContextualNopMethod(Logger.CreateLogSource).InSingletonScope();
@@ -162,6 +178,8 @@ namespace Deli
 
 			StageCheck(stage);
 			LoadMods(stage, x => x.Patcher);
+
+			PatcherComplete?.Invoke();
 		}
 
 		internal static void RuntimeStage(IModule module)
@@ -171,6 +189,8 @@ namespace Deli
 			StageCheck(stage);
 			module.Load(_kernel);
 			LoadMods(stage, x => x.Runtime);
+
+			RuntimeComplete?.Invoke();
 		}
 
 		public static void AddLoader(string name, IAssetLoader loader)
@@ -186,6 +206,11 @@ namespace Deli
 			}
 
 			_patchers.GetOrInsertWith(fileName, () => new List<IPatcher>()).Add(patcher);
+		}
+
+		public static void AddVersionChecker(string domain, IVersionChecker checker)
+		{
+			_versionCheckers.Add(domain, checker);
 		}
 	}
 }

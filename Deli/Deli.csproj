@@ -4,6 +4,13 @@
     <TargetFramework>net35</TargetFramework>
     <LangVersion>7.3</LangVersion>
     <DebugType>Full</DebugType>
+
+    <Authors>nrgill28</Authors>
+    <Description>Universal modding framework based on BepInEx</Description>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+
+    <PackageProjectUrl>https://github.com/nrgill28/Deli</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/nrgill28/Deli.git</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +25,7 @@
 
     <PackageReference Include="ADepIn" Version="20.11.19.2309" />
     <PackageReference Include="BepInEx.Core" Version="5.4.0" />
-    <PackageReference Include="DotNetZip" Version="1.12.0" />
+    <PackageReference Include="DotNetZip" Version="1.12.0" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>
