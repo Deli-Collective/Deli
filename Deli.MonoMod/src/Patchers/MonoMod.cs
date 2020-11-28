@@ -25,11 +25,8 @@ namespace Deli.MonoMod
 
 			try
 			{
-				using (var modder = new LoggedMonoModder(_log))
+				using (var modder = new DeliMonoModder(_log, _resolver, assembly.MainModule))
 				{
-					modder.Module = assembly.MainModule;
-					modder.AssemblyResolver = _resolver;
-
 					foreach (var mod in mods)
 					{
 						modder.ReadMod(mod);
