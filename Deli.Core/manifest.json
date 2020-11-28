@@ -1,6 +1,6 @@
-{
+﻿{
   "guid": "deli.core",
-  "version": "0.0.0.0",
+  "version": "0.0.0",
   "dependencies": {},
   "name": "Deli Core",
   "authors": [ 
@@ -8,6 +8,9 @@
     "other contributors" 
   ],
   "assets": {
-    "Deli.Core.dll": "assembly"
+    "patcher": {},
+    "runtime": {
+      "Deli.Core.dll": "assembly"
+    }
   }
 }

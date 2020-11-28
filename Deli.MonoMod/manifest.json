@@ -1,0 +1,17 @@
+﻿{
+  "guid": "deli.monomod",
+  "version": "0.0.0",
+  "dependencies": {},
+  "name": "Deli MonoMod",
+  "authors": [ 
+    "Ash",
+    "other contributors" 
+  ],
+  "assets": {
+    "patcher": {
+      "MonoMod.dll": "assembly",
+      "Deli.MonoMod.dll": "assembly"
+    },
+    "runtime": {}
+  }
+}

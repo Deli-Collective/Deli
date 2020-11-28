@@ -8,9 +8,9 @@ using UnityEngine;
 namespace Deli
 {
 	[BepInPlugin(Constants.Guid, Constants.Name, Constants.Version)]
-	public class DeliPostpatch : BaseUnityPlugin, IModule
+	public class DeliRuntime : BaseUnityPlugin, IModule
 	{
-		public DeliPostpatch()
+		public DeliRuntime()
 		{
 			Entrypoint.Postpatch(this);
 		}
@@ -18,7 +18,7 @@ namespace Deli
 		public void Load(IServiceKernel kernel)
 		{
 			var log = kernel.Get<ManualLogSource>().Unwrap();
-			log.LogDebug("Injecting postpatch loader...");
+			log.LogDebug("Injecting runtime loader...");
 
 			var manager = new GameObject("Deli Manager");
 			var loader = new RuntimeAssemblyAssetLoader(manager, log);

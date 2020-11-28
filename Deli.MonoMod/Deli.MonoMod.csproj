@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Deli.Runtime\Deli.Runtime.csproj" />
+    <ProjectReference Include="..\Deli\Deli.csproj" />
   </ItemGroup>
 
 </Project>
