@@ -9,7 +9,7 @@
   ],
   "assets": {
     "patcher": {
-      "MonoMod.dll": "assembly",
+      "MonoMod.exe": "assembly",
       "Deli.MonoMod.dll": "assembly"
     },
     "runtime": {}
