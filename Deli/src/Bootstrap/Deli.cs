@@ -17,6 +17,7 @@ namespace Deli
 	{
 		private enum Stage
 		{
+			None,
 			Patcher,
 			Runtime
 		}
@@ -143,7 +144,7 @@ namespace Deli
 
 		private static void StageCheck(Stage stage)
 		{
-			if (_stage != stage)
+			if (_stage + 1 != stage)
 			{
 				throw new InvalidOperationException("Invalid stage.");
 			}
