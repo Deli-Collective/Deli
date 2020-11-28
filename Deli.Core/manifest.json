@@ -1,6 +1,6 @@
 ﻿{
   "guid": "deli.core",
-  "version": "0.1.0",
+  "version": "0.1.0.0",
   "dependencies": {},
   "name": "Deli Core",
   "sourceUrl": "https://github.com/nrgill28/Deli",
