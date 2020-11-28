@@ -11,10 +11,8 @@ using UnityEngine;
 namespace Deli
 {
 	[BepInPlugin(Constants.Guid, Constants.Name, Constants.Version)]
-	public class DeliRuntime : BaseUnityPlugin, IModule
+	public class DeliRuntime : BaseUnityPlugin, IDeliRuntime
 	{
-		private IServiceKernel _kernel;
-
 		public DeliRuntime()
 		{
 			Entrypoint.Postpatch(this);
@@ -22,11 +20,8 @@ namespace Deli
 			CheckModVersions();
 		}
 
-		public void Load(IServiceKernel kernel)
+		public IAssetLoader Load(ManualLogSource log)
 		{
-			_kernel = kernel;
-
-			var log = kernel.Get<ManualLogSource>().Unwrap();
 			log.LogDebug("Injecting runtime loader...");
 
 			var manager = new GameObject("Deli Manager");
@@ -37,8 +32,7 @@ namespace Deli
 				manager.AddComponent(type);
 			}
 
-			var loaders = kernel.Get<IDictionary<string, IAssetLoader>>().Unwrap();
-			loaders[Constants.AssemblyLoaderName] = new AssemblyAssetLoader(log, new AssemblyAssetLoader.TypeLoadHandler[]
+			return new AssemblyAssetLoader(log, new AssemblyAssetLoader.TypeLoadHandler[]
 			{
 				DeliBehaviourLoader
 			});
@@ -65,7 +59,7 @@ namespace Deli
 			var domain = regex.Match(url).Groups[0].Value;
 
 			// Exit if we don't have a version checker for the domain
-			if (!_kernel.Get<IVersionChecker, string>(domain).MatchSome(out var checker))
+			if (!Deli.GetVersionChecker(domain).MatchSome(out var checker))
 			{
 				mod.Log.LogInfo($"No version checker registered for the domain {domain}");
 				yield break;

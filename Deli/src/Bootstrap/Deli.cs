@@ -63,6 +63,7 @@ namespace Deli
 			{
 				[Constants.AssemblyLoaderName] = new AssemblyAssetLoader(_log, Enumerable.Empty<AssemblyAssetLoader.TypeLoadHandler>())
 			};
+			_versionCheckers = new Dictionary<string, IVersionChecker>();
 			_patchers = new Dictionary<string, IList<IPatcher>>();
 
 			_stage = Stage.None;
@@ -182,12 +183,12 @@ namespace Deli
 			PatcherComplete?.Invoke();
 		}
 
-		internal static void RuntimeStage(IModule module)
+		internal static void RuntimeStage(IDeliRuntime module)
 		{
 			const Stage stage = Stage.Runtime;
 
 			StageCheck(stage);
-			module.Load(_kernel);
+			_assetLoaders[Constants.AssemblyLoaderName] = module.Load(_log);
 			LoadMods(stage, x => x.Runtime);
 
 			RuntimeComplete?.Invoke();
@@ -211,6 +212,11 @@ namespace Deli
 		public static void AddVersionChecker(string domain, IVersionChecker checker)
 		{
 			_versionCheckers.Add(domain, checker);
+		}
+
+		public static Option<IVersionChecker> GetVersionChecker(string domain)
+		{
+			return _versionCheckers.OptionGetValue(domain);
 		}
 	}
 }

@@ -28,7 +28,8 @@ namespace Deli
 			_patchersNow = Option.None<IEnumerable<IPatcher>>();
 		}
 
-		public static void Postpatch(IModule module)
+		// Rerouted so people don't see this in the Deli class.
+		public static void Postpatch(IDeliRuntime module)
 		{
 			Deli.RuntimeStage(module);
 		}
