@@ -18,11 +18,11 @@ namespace Deli
 		public DeliBootstrap(ManualLogSource log, IServiceKernel kernel)
 		{
 			_log = log;
-			_log.LogInfo($"Deli bootstrap has begun! Version {Constants.Version} ({Constants.GitBranch}-{Constants.GitDescribe})");
+			_log.LogInfo($"Deli bootstrap has begun! Version {DeliConstants.Version} ({DeliConstants.GitBranch}-{DeliConstants.GitDescribe})");
 
 			_kernel = kernel;
-			_mods = Directory.CreateDirectory(Constants.ModDirectory);
-			_configs = Directory.CreateDirectory(Constants.ConfigDirectory);
+			_mods = Directory.CreateDirectory(DeliConstants.ModDirectory);
+			_configs = Directory.CreateDirectory(DeliConstants.ConfigDirectory);
 		}
 
 		private Option<Mod> CreateMod(IRawIO raw)
@@ -30,7 +30,7 @@ namespace Deli
 			const string failurePrefix = "Failed to acquire the ";
 			IResourceIO resources = new CachedResourceIO(new ResolverResourceIO(raw, _kernel));
 
-			if (!resources.Get<Option<Mod.Manifest>>(Constants.ManifestFileName).MatchSome(out var infoOpt))
+			if (!resources.Get<Option<Mod.Manifest>>(DeliConstants.ManifestFileName).MatchSome(out var infoOpt))
 			{
 				_log.LogError(failurePrefix + "manifest file");
 			}
@@ -73,7 +73,7 @@ namespace Deli
 				_log.LogDebug("Created mod from " + type + ": " + path);
 			}
 
-			var manifestPath = Path.Combine(dir.FullName, Constants.ManifestFileName);
+			var manifestPath = Path.Combine(dir.FullName, DeliConstants.ManifestFileName);
 			if (File.Exists(manifestPath)) // Directory mod
 			{
 				const string type = "directory";
@@ -95,7 +95,7 @@ namespace Deli
 				yield break;
 			}
 
-			foreach (var archiveFile in Constants.ModExtensions.SelectMany(x => dir.GetFiles("*." + x)))
+			foreach (var archiveFile in DeliConstants.ModExtensions.SelectMany(x => dir.GetFiles("*." + x)))
 			{
 				const string type = "archive";
 

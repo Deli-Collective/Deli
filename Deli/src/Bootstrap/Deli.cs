@@ -58,11 +58,11 @@ namespace Deli
 
 		static Deli()
 		{
-			_log = Logger.CreateLogSource(Constants.Name);
+			_log = Logger.CreateLogSource(DeliConstants.Name);
 			_kernel = new StandardServiceKernel();
 			_assetLoaders = new Dictionary<string, IAssetLoader>
 			{
-				[Constants.AssemblyLoaderName] = new AssemblyAssetLoader(_log, Enumerable.Empty<AssemblyAssetLoader.TypeLoadHandler>())
+				[DeliConstants.AssemblyLoaderName] = new AssemblyAssetLoader(_log, Enumerable.Empty<AssemblyAssetLoader.TypeLoadHandler>())
 			};
 			_versionCheckers = new Dictionary<string, IVersionChecker>();
 			_patchers = new Dictionary<string, IList<IPatcher>>();
@@ -139,7 +139,7 @@ namespace Deli
 		private static void BindBepInEx()
 		{
 			_kernel.Bind<ManualLogSource, string>().ToContextualNopMethod(Logger.CreateLogSource).InSingletonScope();
-			_kernel.Bind<ConfigFile, string>().ToContextualNopMethod(x => new ConfigFile(Path.Combine(Constants.ConfigDirectory, $"{x}.cfg"), false)).InSingletonScope();
+			_kernel.Bind<ConfigFile, string>().ToContextualNopMethod(x => new ConfigFile(Path.Combine(DeliConstants.ConfigDirectory, $"{x}.cfg"), false)).InSingletonScope();
 		}
 
 		private static void LoadMods(Stage stage, Func<Mod.Manifest, Option<Dictionary<string, string>>> assetSelector)
@@ -151,7 +151,7 @@ namespace Deli
 				_log.LogInfo(stageLoading + mod);
 
 				if (!assetSelector(mod.Info).MatchSome(out var assets)) continue;
-				
+
 				// For each asset inside the mod, load it
 				foreach (var asset in assets)
 				{
@@ -194,7 +194,7 @@ namespace Deli
 			const Stage stage = Stage.Runtime;
 
 			StageCheck(stage);
-			_assetLoaders[Constants.AssemblyLoaderName] = module.Load(_log);
+			_assetLoaders[DeliConstants.AssemblyLoaderName] = module.Load(_log);
 			LoadMods(stage, x => x.Runtime);
 
 			RuntimeComplete?.Invoke();

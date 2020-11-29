@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Deli
 {
-	[BepInPlugin(Constants.Guid, Constants.Name, Constants.Version)]
+	[BepInPlugin(DeliConstants.Guid, DeliConstants.Name, DeliConstants.Version)]
 	public class DeliRuntime : BaseUnityPlugin, IDeliRuntime
 	{
 		public DeliRuntime()

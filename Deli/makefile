@@ -1,4 +1,4 @@
-CONSTANTS_SOURCE = src/Constants.cs
+CONSTANTS_SOURCE = src/DeliConstants.cs
 
 .PHONY: all macros-precompile build macros-postcompile clean
 
