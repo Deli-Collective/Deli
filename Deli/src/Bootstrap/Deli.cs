@@ -139,7 +139,7 @@ namespace Deli
 		private static void BindBepInEx()
 		{
 			_kernel.Bind<ManualLogSource, string>().ToContextualNopMethod(Logger.CreateLogSource).InSingletonScope();
-			_kernel.Bind<ConfigFile, string>().ToContextualNopMethod(x => new ConfigFile(Path.Combine(DeliConstants.ConfigDirectory, $"{x}.cfg"), false)).InSingletonScope();
+			_kernel.Bind<ConfigFile, string>().ToContextualNopMethod(x => new ConfigFile(Path.Combine(DeliConstants.ConfigDirectory, x + "." + DeliConstants.ConfigExtension), false)).InSingletonScope();
 		}
 
 		private static void LoadMods(Stage stage, Func<Mod.Manifest, Option<Dictionary<string, string>>> assetSelector)
