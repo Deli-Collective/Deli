@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using ADepIn;
 using ADepIn.Fluent;
 using ADepIn.Impl;
@@ -152,13 +153,16 @@ namespace Deli
 				// For each asset inside the mod, load it
 				foreach (var asset in assetSelector(mod.Info.Assets))
 				{
-					var assetPath = asset.Key;
-					var assetLoader = asset.Value;
+					var pattern = "^" + Regex.Escape(asset.Key).Replace(@"\*", ".*").Replace(@"\?", ".") + "$";
+					var loaderName = asset.Value;
 
-					_log.LogDebug($"Loading asset [{assetLoader}: {assetPath}]");
+					foreach (var assetPath in mod.Resources.Find(pattern))
+					{
+						_log.LogDebug($"Loading asset [{loaderName}: {assetPath}]");
 
-					var loader = _kernel.Get<IAssetLoader, string>(assetLoader).Expect("Loader not present: " + assetLoader);
-					loader.LoadAsset(_kernel, mod, assetPath);
+						var loader = _kernel.Get<IAssetLoader, string>(loaderName).Expect("Loader not present: " + loaderName);
+						loader.LoadAsset(_kernel, mod, assetPath);
+					}
 				}
 			}
 		}
