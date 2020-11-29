@@ -1,18 +1,14 @@
 ﻿{
   "guid": "deli.monomod",
   "version": "0.1.0.0",
-  "dependencies": {},
   "name": "Deli MonoMod",
   "sourceUrl": "https://github.com/nrgill28/Deli",
   "authors": [ 
     "Ash",
     "other contributors" 
   ],
-  "assets": {
-    "patcher": {
-      "MonoMod.exe": "assembly",
-      "Deli.MonoMod.dll": "assembly"
-    },
-    "runtime": {}
+  "patcher": {
+    "MonoMod.exe": "assembly",
+    "Deli.MonoMod.dll": "assembly"
   }
 }

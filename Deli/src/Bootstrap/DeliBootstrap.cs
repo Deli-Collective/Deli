@@ -143,7 +143,7 @@ namespace Deli
 			}
 
 			// Sort the mods in the order they depend on each other
-			var sorted = mods.Values.TSort(x => x.Info.Dependencies.Keys.Select(dep => mods[dep]), true);
+			var sorted = mods.Values.TSort(x => x.Info.Dependencies.Map(v => v.Keys.Select(dep => mods[dep])).UnwrapOr(Enumerable.Empty<Mod>()), true);
 
 			return sorted;
 		}
@@ -151,25 +151,29 @@ namespace Deli
 		private bool CheckDependencies(Dictionary<string, Mod> mods)
 		{
 			foreach (var mod in mods.Values)
-			foreach (var dep in mod.Info.Dependencies)
 			{
-				string DepToString()
-				{
-					return $"{dep.Key} @ {dep.Value}";
-				}
+				if (!mod.Info.Dependencies.MatchSome(out var deps)) continue;
 
-				// Try finding the installed dependency
-				if (!mods.TryGetValue(dep.Key, out var resolved))
+				foreach (var dep in deps)
 				{
-					_log.LogError($"Mod {mod} depends on {DepToString()}, but it is not installed!");
-					return false;
-				}
+					string DepToString()
+					{
+						return $"{dep.Key} @ {dep.Value}";
+					}
 
-				// Check if the installed version satisfies the dependency request
-				if (!resolved.Info.Version.Satisfies(dep.Value))
-				{
-					_log.LogError($"Mod {mod} depends on {DepToString()}, but version {resolved.Info.Version} is installed!");
-					return false;
+					// Try finding the installed dependency
+					if (!mods.TryGetValue(dep.Key, out var resolved))
+					{
+						_log.LogError($"Mod {mod} depends on {DepToString()}, but it is not installed!");
+						return false;
+					}
+
+					// Check if the installed version satisfies the dependency request
+					if (!resolved.Info.Version.Satisfies(dep.Value))
+					{
+						_log.LogError($"Mod {mod} depends on {DepToString()}, but version {resolved.Info.Version} is installed!");
+						return false;
+					}
 				}
 			}
 

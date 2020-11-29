@@ -142,7 +142,7 @@ namespace Deli
 			_kernel.Bind<ConfigFile, string>().ToContextualNopMethod(x => new ConfigFile(Path.Combine(Constants.ConfigDirectory, $"{x}.cfg"), false)).InSingletonScope();
 		}
 
-		private static void LoadMods(Stage stage, Func<Mod.Assets, Dictionary<string, string>> assetSelector)
+		private static void LoadMods(Stage stage, Func<Mod.Manifest, Option<Dictionary<string, string>>> assetSelector)
 		{
 			var stageLoading = stage + "-loading ";
 
@@ -150,8 +150,10 @@ namespace Deli
 			{
 				_log.LogInfo(stageLoading + mod);
 
+				if (!assetSelector(mod.Info).MatchSome(out var assets)) continue;
+				
 				// For each asset inside the mod, load it
-				foreach (var asset in assetSelector(mod.Info.Assets))
+				foreach (var asset in assets)
 				{
 					var pattern = "^" + Regex.Escape(asset.Key).Replace(@"\*", ".*").Replace(@"\?", ".") + "$";
 					var loaderName = asset.Value;
