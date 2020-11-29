@@ -3,13 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net35</TargetFramework>
     <LangVersion>7.3</LangVersion>
+    <DebugType>Full</DebugType>
+    <RootNamespace>Deli</RootNamespace>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Reference Include="Valve.Newtonsoft.Json">
-      <HintPath>..\libs\Valve.Newtonsoft.Json.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="all" />
@@ -21,11 +17,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Deli\Deli.csproj" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <None Update="manifest.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 
 </Project>
+

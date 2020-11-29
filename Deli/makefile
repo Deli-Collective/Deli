@@ -1,8 +1,4 @@
-CONSTANTS_SOURCE = src/Constants.cs
-CONTENTS         = $(addsuffix .dll,$(NAME) ADepIn DotNetZip)
-ZIP              = $(NAME).zip
-TEMP             = temp
-TEMP_PLUGINS     = $(TEMP)/BepInEx/plugins/Deli
+CONSTANTS_SOURCE = src/DeliConstants.cs
 
 .PHONY: all macros-precompile build macros-postcompile clean
 
@@ -24,16 +20,6 @@ compile: macros-precompile
 
 macros-postcompile: compile
 	mv $(CONSTANTS_SOURCE).old $(CONSTANTS_SOURCE)
-
-$(ZIP): build
-	mkdir -p $(TEMP_PLUGINS)
-	
-	mv $(addprefix bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS)) $(TEMP_PLUGINS)/
-
-	cd $(TEMP); \
-	zip -9r ../$@ .
-
-	rm -r $(TEMP)
 
 $(NUGET_DIR): build
 	mkdir -p $@

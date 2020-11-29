@@ -6,6 +6,8 @@ using System.Reflection;
 using ADepIn;
 using ADepIn.Fluent;
 using BepInEx.Logging;
+using Valve.Newtonsoft.Json;
+using Valve.Newtonsoft.Json.Linq;
 
 namespace Deli
 {
@@ -94,11 +96,29 @@ namespace Deli
 			dest.Write(buffer, 0, read);
 		}
 
-		public static Option<TAttribute> GetCustomAttribute<TAttribute>(this Type @this) where TAttribute : Attribute
+		public static Option<TAttribute> GetCustomAttribute<TAttribute>(this Type @this, bool inherit = false) where TAttribute : Attribute
 		{
-			var attrs = @this.GetCustomAttributes(typeof(TAttribute), false);
+			using (var enumerator = @this.GetCustomAttributes<TAttribute>(inherit).GetEnumerator())
+			{
+				if (!enumerator.MoveNext())
+				{
+					return Option.None<TAttribute>();
+				}
 
-			return attrs.Length > 0 ? Option.Some((TAttribute) attrs[0]) : Option.None<TAttribute>();
+				var attr = enumerator.Current;
+
+				if (enumerator.MoveNext())
+				{
+					throw new ArgumentException("Multiple attributes present", nameof(@this));
+				}
+
+				return Option.Some(attr);
+			}
+		}
+
+		public static IEnumerable<TAttribute> GetCustomAttributes<TAttribute>(this Type @this, bool inherit = false) where TAttribute : Attribute
+		{
+			return @this.GetCustomAttributes(typeof(TAttribute), inherit).Cast<TAttribute>();
 		}
 
 		public static Option<ConstructorInfo> GetParameterlessCtor(this Type @this)
@@ -108,7 +128,14 @@ namespace Deli
 
 		public static void BindJson<T>(this IServiceKernel @this)
 		{
-			@this.Bind<IAssetReader<Option<T>>>().ToRecursiveNopMethod(x => new JsonAssetReader<T>(x)).InSingletonNopScope();
+			@this.Bind<IAssetReader<Option<T>>>().ToRecursiveNopMethod(x =>
+			{
+				var log = x.Get<ManualLogSource>().Unwrap();
+				var jObject = x.Get<IAssetReader<Option<JObject>>>().Unwrap();
+				var serializer = x.Get<JsonSerializer>().Unwrap();
+
+				return new JsonAssetReader<T>(log, jObject, serializer);
+			}).InSingletonNopScope();
 		}
 	}
 }

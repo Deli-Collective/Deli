@@ -1,14 +1,13 @@
-{
+﻿{
   "guid": "deli.core",
   "version": "0.1.0.0",
-  "dependencies": {},
   "name": "Deli Core",
   "sourceUrl": "https://github.com/nrgill28/Deli",
   "authors": [ 
     "Nathan Gill",
     "other contributors" 
   ],
-  "assets": {
+  "runtime": {
     "Deli.Core.dll": "assembly"
   }
 }

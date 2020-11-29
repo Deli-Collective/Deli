@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 namespace Deli
 {
 	// Constants beginning with MACRO are set via the "macros-precompile" recipe
-	internal static class Constants
+	public static class DeliConstants
 	{
 		// GUID and Version
 		public const string Name = "Deli";
@@ -17,6 +17,7 @@ namespace Deli
 		public const string GitHash = "MACRO_GIT_HASH";
 
 		// Loader constants
+		public const string AssemblyLoaderName = "assembly";
 		public static IEnumerable<string> ModExtensions { get; } = new ReadOnlyCollection<string>(new []{"zip", "deli"});
 		public const string ModDirectory = "mods";
 		public const string ConfigDirectory = "mods/configs";

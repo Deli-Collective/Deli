@@ -65,7 +65,7 @@ namespace Deli
 			/// <summary>
 			///		The GUIDs and corresponding versions of mods that this mod requires.
 			/// </summary>
-			public Dictionary<string, Version> Dependencies { get; }
+			public Option<Dictionary<string, Version>> Dependencies { get; }
 
 
 			/// <summary>
@@ -89,12 +89,19 @@ namespace Deli
 
 
 			/// <summary>
-			///		The asset paths and corresponding asset loaders that this mod contains.
+			///		The patcher asset paths and corresponding asset loaders that this mod contains.
 			/// </summary>
-			public Dictionary<string, string> Assets { get; }
+			[JsonProperty(Required = Required.Default)]
+			public Option<Dictionary<string, string>> Patcher { get; }
+
+			/// <summary>
+			///		The runtime asset paths and corresponding asset loaders that this mod contains.
+			/// </summary>
+			[JsonProperty(Required = Required.Default)]
+			public Option<Dictionary<string, string>> Runtime { get; }
 
 			[JsonConstructor]
-			public Manifest(string guid, Version version, Option<string> name, Option<string[]> authors, Dictionary<string, Version> dependencies, Dictionary<string, string> assets, Option<string> sourceUrl)
+			public Manifest(string guid, Version version, Option<Dictionary<string, Version>> dependencies, Option<string> name, Option<string[]> authors, Option<string> sourceUrl, Option<Dictionary<string, string>> patcher, Option<Dictionary<string, string>> runtime)
 			{
 				Guid = guid;
 				Version = version;
@@ -103,7 +110,8 @@ namespace Deli
 				Name = name;
 				Authors = authors;
 
-				Assets = assets;
+				Patcher = patcher;
+				Runtime = runtime;
 
 				SourceUrl = sourceUrl;
 			}

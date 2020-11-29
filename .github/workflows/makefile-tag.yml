@@ -28,8 +28,7 @@ jobs:
         name: Deli
         path: |
           nuget/*
-          Deli/Deli.zip
-          Deli.Core/Deli.Core.zip
+          Deli.zip
 
     - name: Push to nuget.org
       shell: bash
