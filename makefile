@@ -3,7 +3,7 @@ export SHELL            = /bin/bash
 # Settings
 export CONFIG          ?= Release
 export FRAMEWORK       ?= net35
-export VERSION         ?= $(shell git describe --tags | sed 's/v\(.*\)-\(.*\)-\(.*\)/\1/')
+export VERSION         ?= $(shell git describe --tags --abbrev=0 | sed -n 's/v\([0-9\.]+\)*/\1/p')
        NUGET           ?= nuget
 export NUGET_DIR        = ../$(NUGET)
 
