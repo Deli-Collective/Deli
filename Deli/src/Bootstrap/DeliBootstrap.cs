@@ -18,7 +18,7 @@ namespace Deli
 		public DeliBootstrap(ManualLogSource log, IServiceKernel kernel)
 		{
 			_log = log;
-			_log.LogInfo($"Deli bootstrap has begun! Version {DeliConstants.Version} ({DeliConstants.GitBranch}-{DeliConstants.GitDescribe})");
+			_log.LogInfo($"Deli bootstrap has begun! Version {DeliConstants.Version} ({DeliConstants.GitBranch} @ {DeliConstants.GitDescribe})");
 
 			_kernel = kernel;
 			_mods = Directory.CreateDirectory(DeliConstants.ModDirectory);
