@@ -48,18 +48,21 @@ namespace Deli
 			return Info.ToString();
 		}
 
-		[JsonObject(ItemRequired = Required.Always)]
 		public readonly struct Manifest
 		{
+			#region Critical metadata
+
 			/// <summary>
 			///		The globally unique identitifer of this mod. This cannot conflict with any
 			///		other mods.
 			/// </summary>
+			[JsonProperty(Required = Required.Always)]
 			public string Guid { get; }
 
 			/// <summary>
 			///		The current version of this mod.
 			/// </summary>
+			[JsonProperty(Required = Required.Always)]
 			public Version Version { get; }
 
 			/// <summary>
@@ -67,38 +70,40 @@ namespace Deli
 			/// </summary>
 			public Option<Dictionary<string, Version>> Dependencies { get; }
 
+			#endregion
+
+			#region Helpful metadata
 
 			/// <summary>
 			///		The user-friendly name for this mod.
 			/// </summary>
-			[JsonProperty(Required = Required.Default)]
 			public Option<string> Name { get; }
 
 			/// <summary>
 			///		The creators of this mod.
 			/// </summary>
-			/// <value></value>
-			[JsonProperty(Required = Required.Default)]
 			public Option<string[]> Authors { get; }
 
 			/// <summary>
 			///		The source URL of the mod.
 			/// </summary>
-			[JsonProperty(Required = Required.Default)]
 			public Option<string> SourceUrl { get; }
 
+			#endregion
+
+			#region Assets
 
 			/// <summary>
 			///		The patcher asset paths and corresponding asset loaders that this mod contains.
 			/// </summary>
-			[JsonProperty(Required = Required.Default)]
 			public Option<Dictionary<string, string>> Patcher { get; }
 
 			/// <summary>
 			///		The runtime asset paths and corresponding asset loaders that this mod contains.
 			/// </summary>
-			[JsonProperty(Required = Required.Default)]
 			public Option<Dictionary<string, string>> Runtime { get; }
+
+			#endregion
 
 			[JsonConstructor]
 			public Manifest(string guid, Version version, Option<Dictionary<string, Version>> dependencies, Option<string> name, Option<string[]> authors, Option<string> sourceUrl, Option<Dictionary<string, string>> patcher, Option<Dictionary<string, string>> runtime)
