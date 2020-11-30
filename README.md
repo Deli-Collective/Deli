@@ -6,7 +6,7 @@ Deli is a modding framework based on BepInEx which provides one standard uniform
 ## Quick Links
 - [Installing](https://github.com/nrgill28/Deli/wiki/Installation)
 - [Project boards](https://github.com/nrgill28/Deli/projects)
-- Join us on Discord for discussions, updates and support: https://discord.gg/g8xeFyt42j
+- [Join us on Discord for discussions, updates and support](https://discord.gg/g8xeFyt42j)
 
 ## Features
 - **Standardized way of loading mods**: Have a mod you want to install? Drop it in the mods folder and you're good to go.
