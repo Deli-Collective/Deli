@@ -160,7 +160,7 @@ namespace Deli
 
 					foreach (var assetPath in mod.Resources.Find(pattern))
 					{
-						_log.LogDebug($"Loading asset [{loaderName}: {assetPath}]");
+						_log.LogDebug($"Loading asset {{{loaderName}: {assetPath}}}");
 
 						var loader = _kernel.Get<IAssetLoader, string>(loaderName).Expect("Loader not present: " + loaderName);
 						loader.LoadAsset(_kernel, mod, assetPath);
