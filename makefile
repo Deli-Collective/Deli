@@ -11,7 +11,12 @@ export NUGET_DIR        = ../$(NUGET)
 export GIT_DESCRIBE     = $(shell git describe --long --always --dirty)
 export GIT_BRANCH       = $(shell git rev-parse --abbrev-ref HEAD)
 export GIT_HASH         = $(shell git rev-parse HEAD)
-export BUILD_PROPERTIES = /p:Version="$(VERSION)" /p:RepositoryBranch="$(GIT_BRANCH)" /p:RepositoryCommit="$(GIT_HASH)"
+
+ifeq ($(OS),Windows_NT)
+	export BUILD_PROPERTIES = -p:Version="$(VERSION)" -p:RepositoryBranch="$(GIT_BRANCH)" -p:RepositoryCommit="$(GIT_HASH)"
+else
+	export BUILD_PROPERTIES = /p:Version="$(VERSION)" /p:RepositoryBranch="$(GIT_BRANCH)" /p:RepositoryCommit="$(GIT_HASH)"
+endif
 
 # Local
 NAME              = Deli
@@ -42,7 +47,7 @@ all: clean nested-all $(ZIP)
 
 nested-all: $(PROJS)
 	for p in $^; do \
-		$(MAKE) -C $$p NAME=$$p; \
+		"$(MAKE)" -C $$p NAME=$$p; \
 	done
 
 $(ZIP): nested-all
