@@ -2,6 +2,9 @@
 
 namespace Deli
 {
+	/// <summary>
+	/// 	Represents a searchable handle to paths
+	/// </summary>
 	public interface IFindableIO
 	{
 		/// <summary>

@@ -32,10 +32,19 @@ namespace Deli
 
 		private static Stage _stage;
 
+		/// <summary>
+		/// 	All of the services available to Deli
+		/// </summary>
 		public static IServiceResolver Services => _kernel;
 
+		/// <summary>
+		/// 	All of the named <see cref="IAssetLoader"/>s available to Deli
+		/// </summary>
 		public static IEnumerable<KeyValuePair<string, IAssetLoader>> AssetLoaders => _assetLoaders;
 
+		/// <summary>
+		/// 	All of the <see cref="IPatcher"/>s and corresponding DLL targets available to Deli
+		/// </summary>
 		public static IEnumerable<KeyValuePair<string, IEnumerable<IPatcher>>> Patchers
 		{
 			get
@@ -47,14 +56,20 @@ namespace Deli
 			}
 		}
 
+		/// <summary>
+		/// 	All of the Deli mods that were able to be created
+		/// </summary>
 		public static IEnumerable<Mod> Mods { get; }
 
+		/// <summary>
+		/// 	Called when patching is complete
+		/// </summary>
+		public static event Action PatcherComplete;
 
-		public delegate void PatcherCompleteHandler();
-		public delegate void RuntimeCompleteHandler();
-
-		public static event PatcherCompleteHandler PatcherComplete;
-		public static event RuntimeCompleteHandler RuntimeComplete;
+		/// <summary>
+		/// 	Called when runtime initialization is complete
+		/// </summary>
+		public static event Action RuntimeComplete;
 
 		static Deli()
 		{
@@ -200,11 +215,21 @@ namespace Deli
 			RuntimeComplete?.Invoke();
 		}
 
-		public static void AddLoader(string name, IAssetLoader loader)
+		/// <summary>
+		/// 	Adds an asset loader name and associated asset loader
+		/// </summary>
+		/// <param name="name">The name of the asset loader</param>
+		/// <param name="loader">The asset loader itself</param>
+		public static void AddAssetLoader(string name, IAssetLoader loader)
 		{
 			_assetLoaders.Add(name, loader);
 		}
 
+		/// <summary>
+		/// 	Adds a patcher for the specified file name
+		/// </summary>
+		/// <param name="fileName">The name of the file (not path) to patch</param>
+		/// <param name="patcher">The patcher itself</param>
 		public static void AddPatcher(string fileName, IPatcher patcher)
 		{
 			if (_stage != Stage.Patcher)
@@ -215,11 +240,20 @@ namespace Deli
 			_patchers.GetOrInsertWith(fileName, () => new List<IPatcher>()).Add(patcher);
 		}
 
+		/// <summary>
+		/// 	Adds a version checker for the specified domain
+		/// </summary>
+		/// <param name="domain">The domain the version checker is responsible for</param>
+		/// <param name="checker">The version checker itself</param>
 		public static void AddVersionChecker(string domain, IVersionChecker checker)
 		{
 			_versionCheckers.Add(domain, checker);
 		}
 
+		/// <summary>
+		/// 	Gets a version checker for a specified domain
+		/// </summary>
+		/// <param name="domain">The domain of the version checker to get</param>
 		public static Option<IVersionChecker> GetVersionChecker(string domain)
 		{
 			return _versionCheckers.OptionGetValue(domain);

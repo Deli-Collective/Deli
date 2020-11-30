@@ -10,7 +10,7 @@ namespace Deli.MonoMod
 			var log = kernel.Get<ManualLogSource, string>(DeliConstants.Name + " MonoMod").Expect("Could not acquire MonoMod log.");
 
 			var loader = new MonoModAssetLoader(log);
-			Deli.AddLoader("monomod", loader);
+			Deli.AddAssetLoader("monomod", loader);
 		}
 	}
 }

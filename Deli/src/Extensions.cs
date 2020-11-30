@@ -87,15 +87,25 @@ namespace Deli
 			var buffer = new byte[bufferLength];
 
 			var read = source.Read(buffer, 0, bufferLength);
+			// Until Read does not fill the buffer...
 			while (read == bufferLength)
 			{
+				// Copy data to destination
 				dest.Write(buffer, 0, bufferLength);
+				// Read additional data
 				read = source.Read(buffer, 0, bufferLength);
 			}
 
+			// Copy remaining data to destination
 			dest.Write(buffer, 0, read);
 		}
 
+		/// <summary>
+		///		Gets the singular attribute of type <typeparamref name="TAttribute"/>
+		/// </summary>
+		/// <param name="this"></param>
+		/// <param name="inherit">Whether or not to search parent members for attributes</param>
+		/// <typeparam name="TAttribute">The type of the attribute</typeparam>
 		public static Option<TAttribute> GetCustomAttribute<TAttribute>(this Type @this, bool inherit = false) where TAttribute : Attribute
 		{
 			using (var enumerator = @this.GetCustomAttributes<TAttribute>(inherit).GetEnumerator())
@@ -109,23 +119,37 @@ namespace Deli
 
 				if (enumerator.MoveNext())
 				{
-					throw new ArgumentException("Multiple attributes present", nameof(@this));
+					return Option.None<TAttribute>();
 				}
 
 				return Option.Some(attr);
 			}
 		}
 
+		/// <summary>
+		/// 	Gets custom attributes of type <typeparamref name="TAttribute"/>
+		/// </summary>
+		/// <param name="this"></param>
+		/// <param name="inherit">Whether or not to search parent members for attributes</param>
+		/// <typeparam name="TAttribute">The type of the attribute</typeparam>
 		public static IEnumerable<TAttribute> GetCustomAttributes<TAttribute>(this Type @this, bool inherit = false) where TAttribute : Attribute
 		{
 			return @this.GetCustomAttributes(typeof(TAttribute), inherit).Cast<TAttribute>();
 		}
 
+		/// <summary>
+		/// 	Gets a parameterless constructor from a type
+		/// </summary>
 		public static Option<ConstructorInfo> GetParameterlessCtor(this Type @this)
 		{
 			return @this.GetConstructor(new Type[0]) is ConstructorInfo ctor ? Option.Some(ctor) : Option.None<ConstructorInfo>();
 		}
 
+		/// <summary>
+		/// 	Binds a <see cref="JsonAssetReader{T}"/> for the specified type.
+		/// 	<p>Note that <see cref="JsonAssetReader{T}"/> implements an asset reader for <see cref="Option{T}}"/>, and not <typeparamref name="T"/>.</p>
+		/// </summary>
+		/// <typeparam name="T">The type to bind a JSON asset reader to</typeparam>
 		public static void BindJson<T>(this IServiceKernel @this)
 		{
 			@this.Bind<IAssetReader<Option<T>>>().ToRecursiveNopMethod(x =>

@@ -1,10 +1,12 @@
-using System;
 using System.Collections.Generic;
 using ADepIn;
 using Mono.Cecil;
 
 namespace Deli
 {
+	/// <summary>
+	/// 	The Deli patcher and runtime entry points. This is not meant to be accessed by anything, save for BepInEx.
+	/// </summary>
 	public static class Entrypoint
 	{
 		private static Option<IEnumerable<IPatcher>> _patchersNow;
