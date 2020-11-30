@@ -1,0 +1,14 @@
+﻿{
+  "guid": "deli.monomod",
+  "version": "0.1.0.0",
+  "name": "Deli MonoMod",
+  "sourceUrl": "https://github.com/nrgill28/Deli",
+  "authors": [ 
+    "Ash",
+    "other contributors" 
+  ],
+  "patcher": {
+    "MonoMod.exe": "assembly",
+    "Deli.MonoMod.dll": "assembly"
+  }
+}

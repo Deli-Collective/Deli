@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ADepIn;
@@ -18,8 +19,18 @@ namespace Deli
 
 		public Option<T> Get<T>(string path)
 		{
-			var asset = _resources.Get<T>(path);
-			_log.LogDebug($"Retrieving asset [{typeof(T)}: {path}]: {(asset.IsSome ? "OK" : "FAIL")}");
+			Option<T> asset;
+			try
+			{
+				asset = _resources.Get<T>(path);
+			}
+			catch (Exception e)
+			{
+				throw new Exception($"Failed to retrieve asset at {path}", e);
+			}
+
+			_log.LogDebug($"Retrieved asset at {path}: {asset}");
+
 			return asset;
 		}
 

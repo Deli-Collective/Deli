@@ -8,17 +8,15 @@ namespace Deli
 {
 	public class JObjectAssetReader : IAssetReader<Option<JObject>>
 	{
-		private readonly IServiceResolver _services;
+		private readonly ManualLogSource _log;
 
-		public JObjectAssetReader(IServiceResolver services)
+		public JObjectAssetReader(ManualLogSource log)
 		{
-			_services = services;
+			_log = log;
 		}
 
 		public Option<JObject> ReadAsset(byte[] raw)
 		{
-			var serializer = _services.Get<JsonSerializer>().Expect("JSON serializer not found");
-
 			using (var memory = new MemoryStream(raw))
 			using (var text = new StreamReader(memory))
 			using (var json = new JsonTextReader(text))
@@ -30,12 +28,8 @@ namespace Deli
 				}
 				catch (JsonReaderException e)
 				{
-					if (!_services.Get<ManualLogSource>().MatchSome(out var log))
-						// We shouldn't swallow the error if it isn't reported.
-						throw;
-
-					log.LogWarning("JSON parse error: " + e.Message);
-					log.LogDebug(e.ToString());
+					_log.LogWarning("JSON parse error: " + e.Message);
+					_log.LogDebug(e.ToString());
 
 					return Option.None<JObject>();
 				}
