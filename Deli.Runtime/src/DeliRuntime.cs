@@ -52,7 +52,7 @@ namespace Deli
 			// Exit if this mod doesn't have a source
 			if (!mod.Info.SourceUrl.MatchSome(out var url) || string.IsNullOrEmpty(url))
 			{
-				mod.Log.LogInfo("Mod has no source");
+				mod.Logger.LogInfo("Mod has no source");
 				yield break;
 			}
 
@@ -61,7 +61,7 @@ namespace Deli
 			// Exit if we don't have a version checker for the domain
 			if (!Deli.GetVersionChecker(domain).MatchSome(out var checker))
 			{
-				mod.Log.LogInfo($"No version checker registered for the domain {domain}");
+				mod.Logger.LogInfo($"No version checker registered for the domain {domain}");
 				yield break;
 			}
 
@@ -72,13 +72,13 @@ namespace Deli
 			if (result.MatchSome(out var version))
 			{
 				if (version == mod.Info.Version)
-					mod.Log.LogInfo($"Mod is up to date! ({version})");
+					mod.Logger.LogInfo($"Mod is up to date! ({version})");
 				else if (version > mod.Info.Version)
-					mod.Log.LogWarning($"There is a newer version of this mod available. ({mod.Info.Version}) -> ({version})");
+					mod.Logger.LogWarning($"There is a newer version of this mod available. ({mod.Info.Version}) -> ({version})");
 				else
-					mod.Log.LogWarning($"This mod is more recent than the most recent version found at its source! ({version})");
+					mod.Logger.LogWarning($"This mod is more recent than the most recent version found at its source! ({version})");
 			}
-			else mod.Log.LogWarning($"Source URL for this mod is set but no version was found.");
+			else mod.Logger.LogWarning($"Source URL for this mod is set but no version was found.");
 		}
 	}
 }

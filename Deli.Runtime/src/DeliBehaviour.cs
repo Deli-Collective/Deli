@@ -32,7 +32,7 @@ namespace Deli
 		/// <summary>
 		/// 	The log available to the source mod
 		/// </summary>
-		protected ManualLogSource Log => Source.Log;
+		protected ManualLogSource Logger => Source.Logger;
 
 		protected DeliBehaviour()
 		{

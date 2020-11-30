@@ -28,14 +28,14 @@ namespace Deli
 		/// <summary>
 		///		The log to be used by the mod
 		/// </summary>
-		public ManualLogSource Log { get; }
+		public ManualLogSource Logger { get; }
 
-		public Mod(Manifest info, IResourceIO resources, ConfigFile config, ManualLogSource log)
+		public Mod(Manifest info, IResourceIO resources, ConfigFile config, ManualLogSource logger)
 		{
 			Info = info;
 			Resources = resources;
 			Config = config;
-			Log = log;
+			Logger = logger;
 		}
 
 		/// <summary>
