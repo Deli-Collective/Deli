@@ -1,4 +1,3 @@
-using System;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using UnityEngine;
@@ -14,10 +13,6 @@ namespace Deli
 		///		The mod that contained this behaviour, refered to as the "source mod"
 		/// </summary>
 		protected Mod Source { get; }
-
-		// Obsoleted for naming and accessor purposes.
-		[Obsolete("Please change all references to " + nameof(Source) + ". This is merely a proxy to it.")]
-		public Mod BaseMod => Source;
 
 		/// <summary>
 		/// 	Information about the source mod
@@ -43,11 +38,5 @@ namespace Deli
 		{
 			Source = Deli.Services.Get<Mod, DeliBehaviour>(this).Expect("Could not acquire mod for behaviour: " + GetType());
 		}
-	}
-
-	// Obsoleted for naming purposes.
-	[Obsolete("Please change all references to" + nameof(DeliBehaviour) + ". This is merely a proxy to it.")]
-	public abstract class DeliMod : DeliBehaviour
-	{
 	}
 }
