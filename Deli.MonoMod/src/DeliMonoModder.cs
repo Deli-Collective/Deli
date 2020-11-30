@@ -21,13 +21,13 @@ namespace Deli.MonoMod
 			_log.LogDebug(value);
 		}
 
-        public override void Dispose()
-        {
+		public override void Dispose()
+		{
 			Module = null;
 			AssemblyResolver = null;
 
-            base.Dispose();
-        }
+			base.Dispose();
+		}
 
 	}
 }

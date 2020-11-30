@@ -1,84 +1,38 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using ADepIn;
-using ADepIn.Fluent;
-using BepInEx;
-using BepInEx.Logging;
 using UnityEngine;
 
 namespace Deli
 {
-	[BepInPlugin(DeliConstants.Guid, DeliConstants.Name, DeliConstants.Version)]
-	public class DeliRuntime : BaseUnityPlugin, IDeliRuntime
+	/// <summary>
+	/// 	Helper methods of Deli modding framework during runtime. This is only accessible at runtime, not at patch-time.
+	/// </summary>
+	public static class DeliRuntime
 	{
-		public DeliRuntime()
-		{
-			Entrypoint.Postpatch(this);
+		private static Option<DeliPlugin> _instance;
 
-			CheckModVersions();
+		internal static DeliPlugin Instance
+		{
+			private get => _instance.Expect("The Deli runtime has not started yet. If you are a BepInEx plugin (not a DeliBehaviour), please ensure you depend on \"" + DeliConstants.Guid + "\" to give it time to initialize.");
+			set => _instance = Option.Some(value);
 		}
 
-		public IAssetLoader Load(ManualLogSource log)
+		/// <summary>
+		/// 	Starts a coroutine via the Deli plugin component
+		/// </summary>
+		/// <param name="enumerator">The coroutine body to run</param>
+		public static Coroutine StartCoroutine(IEnumerator enumerator)
 		{
-			log.LogDebug("Injecting runtime loader...");
-
-			var manager = new GameObject("Deli Manager");
-			void DeliBehaviourLoader(IServiceKernel _0, Mod _1, string _2, Type type)
-			{
-				if (type.IsAbstract || !type.IsAssignableFrom(typeof(DeliBehaviour))) return;
-
-				manager.AddComponent(type);
-			}
-
-			return new AssemblyAssetLoader(log, new AssemblyAssetLoader.TypeLoadHandler[]
-			{
-				DeliBehaviourLoader
-			});
+			return Instance.StartCoroutine(enumerator);
 		}
 
-		private void CheckModVersions()
+		/// <summary>
+		/// 	Stops a coroutine started by <seealso cref="StartCoroutine"/>
+		/// </summary>
+		/// <param name="coroutine">The coroutine handle to stop</param>
+		public static void StopCoroutine(Coroutine coroutine)
 		{
-			var regex = new Regex(@"^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)", RegexOptions.IgnoreCase);
-
-			// Perform version checks on all the mods
-			foreach (var mod in Deli.Mods)
-				StartCoroutine(CheckModLatestVersion(mod, regex));
-		}
-
-		private IEnumerator CheckModLatestVersion(Mod mod, Regex regex)
-		{
-			// Exit if this mod doesn't have a source
-			if (!mod.Info.SourceUrl.MatchSome(out var url) || string.IsNullOrEmpty(url))
-			{
-				mod.Logger.LogInfo("Mod has no source");
-				yield break;
-			}
-
-			var domain = regex.Match(url).Groups[0].Value;
-
-			// Exit if we don't have a version checker for the domain
-			if (!Deli.GetVersionChecker(domain).MatchSome(out var checker))
-			{
-				mod.Logger.LogInfo($"No version checker registered for the domain {domain}");
-				yield break;
-			}
-
-			// Check
-			yield return checker.GetLatestVersion(mod);
-			var result = checker.Result;
-
-			if (result.MatchSome(out var version))
-			{
-				if (version == mod.Info.Version)
-					mod.Logger.LogInfo($"Mod is up to date! ({version})");
-				else if (version > mod.Info.Version)
-					mod.Logger.LogWarning($"There is a newer version of this mod available. ({mod.Info.Version}) -> ({version})");
-				else
-					mod.Logger.LogWarning($"This mod is more recent than the most recent version found at its source! ({version})");
-			}
-			else mod.Logger.LogWarning($"Source URL for this mod is set but no version was found.");
+			Instance.StopCoroutine(coroutine);
 		}
 	}
 }

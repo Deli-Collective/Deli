@@ -15,6 +15,9 @@ using Valve.Newtonsoft.Json.Serialization;
 
 namespace Deli
 {
+	/// <summary>
+	/// 	The core of the Deli modding framework, accessible at patch-time and runtime
+	/// </summary>
 	public static class Deli
 	{
 		private enum Stage
@@ -28,7 +31,7 @@ namespace Deli
 		private static readonly IServiceKernel _kernel;
 		private static readonly Dictionary<string, IAssetLoader> _assetLoaders;
 		private static readonly Dictionary<string, IList<IPatcher>> _patchers;
-		private static readonly Dictionary<string, IVersionChecker> _versionCheckers;
+		private static readonly Dictionary<string, IVersionCheckable> _versionCheckable;
 
 		private static Stage _stage;
 
@@ -79,7 +82,7 @@ namespace Deli
 			{
 				[DeliConstants.AssemblyLoaderName] = new AssemblyAssetLoader(_log, Enumerable.Empty<AssemblyAssetLoader.TypeLoadHandler>())
 			};
-			_versionCheckers = new Dictionary<string, IVersionChecker>();
+			_versionCheckable = new Dictionary<string, IVersionCheckable>();
 			_patchers = new Dictionary<string, IList<IPatcher>>();
 
 			_stage = Stage.None;
@@ -147,8 +150,8 @@ namespace Deli
 
 		private static void BindVersionCheckers()
 		{
-			_kernel.Bind<IDictionary<string, IVersionChecker>>().ToConstant(_versionCheckers);
-			_kernel.Bind<IVersionChecker, string>().ToWholeMethod((services, context) => services.Get<IDictionary<string, IVersionChecker>>().Map(x => x.OptionGetValue(context)).Flatten()).InTransientScope();
+			_kernel.Bind<IDictionary<string, IVersionCheckable>>().ToConstant(_versionCheckable);
+			_kernel.Bind<IVersionCheckable, string>().ToWholeMethod((services, context) => services.Get<IDictionary<string, IVersionCheckable>>().Map(x => x.OptionGetValue(context)).Flatten()).InTransientScope();
 		}
 
 		private static void BindBepInEx()
@@ -204,7 +207,7 @@ namespace Deli
 			PatcherComplete?.Invoke();
 		}
 
-		internal static void RuntimeStage(IDeliRuntime module)
+		internal static void RuntimeStage(IDeliPlugin module)
 		{
 			const Stage stage = Stage.Runtime;
 
@@ -241,22 +244,22 @@ namespace Deli
 		}
 
 		/// <summary>
-		/// 	Adds a version checker for the specified domain
+		/// 	Adds a version checkable for the specified domain
 		/// </summary>
-		/// <param name="domain">The domain the version checker is responsible for</param>
-		/// <param name="checker">The version checker itself</param>
-		public static void AddVersionChecker(string domain, IVersionChecker checker)
+		/// <param name="domain">The domain the version checkable is responsible for</param>
+		/// <param name="checker">The version checkable itself</param>
+		public static void AddVersionCheckable(string domain, IVersionCheckable checker)
 		{
-			_versionCheckers.Add(domain, checker);
+			_versionCheckable.Add(domain, checker);
 		}
 
 		/// <summary>
-		/// 	Gets a version checker for a specified domain
+		/// 	Gets a version checkable for a specified domain
 		/// </summary>
-		/// <param name="domain">The domain of the version checker to get</param>
-		public static Option<IVersionChecker> GetVersionChecker(string domain)
+		/// <param name="domain">The domain of the version checkable to get</param>
+		public static Option<IVersionCheckable> GetVersionCheckable(string domain)
 		{
-			return _versionCheckers.OptionGetValue(domain);
+			return _versionCheckable.OptionGetValue(domain);
 		}
 	}
 }

@@ -31,7 +31,7 @@ namespace Deli
 		}
 
 		// Rerouted so people don't see this in the Deli class.
-		public static void Postpatch(IDeliRuntime module)
+		public static void Postpatch(IDeliPlugin module)
 		{
 			Deli.RuntimeStage(module);
 		}

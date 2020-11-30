@@ -78,7 +78,7 @@ namespace Deli
 		#endregion
 
 		/// <summary>
-		/// 	The name of the asset loader that loads managed assemblies (applies to patcher-time and runtime)
+		/// 	The name of the asset loader that loads managed assemblies (applies to patch-time and runtime)
 		/// </summary>
 		public const string AssemblyLoaderName = "assembly";
 	}

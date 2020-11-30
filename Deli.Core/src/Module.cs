@@ -1,5 +1,4 @@
 ﻿using ADepIn;
-using Deli.Core.VersionCheckers;
 
 namespace Deli.Core
 {
@@ -7,7 +6,7 @@ namespace Deli.Core
 	{
 		public void Load(IServiceKernel kernel)
 		{
-			Deli.AddVersionChecker("https://github.com", new GitHubVersionChecker());
+			Deli.AddVersionCheckable("github.com", new GitHubVersionCheckable());
 		}
 	}
 }
