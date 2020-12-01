@@ -12,11 +12,7 @@ export GIT_DESCRIBE     = $(shell git describe --long --always --dirty)
 export GIT_BRANCH       = $(shell git rev-parse --abbrev-ref HEAD)
 export GIT_HASH         = $(shell git rev-parse HEAD)
 
-ifeq ($(OS),Windows_NT)
-	export BUILD_PROPERTIES = -p:Version="$(VERSION)" -p:RepositoryBranch="$(GIT_BRANCH)" -p:RepositoryCommit="$(GIT_HASH)"
-else
-	export BUILD_PROPERTIES = /p:Version="$(VERSION)" /p:RepositoryBranch="$(GIT_BRANCH)" /p:RepositoryCommit="$(GIT_HASH)"
-endif
+export BUILD_PROPERTIES = /p:Version="$(VERSION)" /p:RepositoryBranch="$(GIT_BRANCH)" /p:RepositoryCommit="$(GIT_HASH)"
 
 # Local
 NAME              = Deli
@@ -41,16 +37,15 @@ CONTENTS_PATCHERS = $(addsuffix .dll,$(PROJ_PATCHER) ADepIn DotNetZip)
 CONTENTS_PLUGINS  = $(addsuffix .dll,$(PROJ_RUNTIME))
 CONTENTS_MODS     = $(addsuffix /*.zip,$(PROJS_LIBS))
 
-.PHONY: all clean nested-all
+.PHONY: FORCE all clean
 
-all: clean nested-all $(ZIP)
+all: clean $(ZIP)
+FORCE:
 
-nested-all: $(PROJS)
-	for p in $^; do \
-		"$(MAKE)" -C $$p NAME=$$p; \
-	done
+$(PROJS): FORCE
+	"$(MAKE)" -C "$@" NAME="$@"
 
-$(ZIP): nested-all
+$(ZIP): $(PROJS)
 	for d in $(TEMP_DIRS); do \
 		mkdir -p $$d; \
 	done

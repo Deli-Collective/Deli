@@ -1,8 +1,11 @@
 CONSTANTS_SOURCE = src/DeliConstants.cs
+NUPKG            = $(NUGET_DIR)/$(NAME).$(VERSION).nupkg
 
-.PHONY: all macros-precompile build macros-postcompile clean
+.PHONY: build macros-precompile compile macros-postcompile
 
-all: clean build $(NUGET_DIR) $(ZIP)
+$(NUPKG): build
+	mkdir -p $(dir $@)
+	dotnet pack --configuration $(CONFIG) $(BUILD_PROPERTIES) --no-build --output $(dir $@)
 
 build: compile macros-postcompile
 
@@ -20,10 +23,3 @@ compile: macros-precompile
 
 macros-postcompile: compile
 	mv $(CONSTANTS_SOURCE).old $(CONSTANTS_SOURCE)
-
-$(NUGET_DIR): build
-	mkdir -p $@
-	dotnet pack --configuration $(CONFIG) $(BUILD_PROPERTIES) --no-build --output $@
-
-clean:
-	rm -f $(ZIP)
