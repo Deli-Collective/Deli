@@ -5,6 +5,13 @@
     <LangVersion>7.3</LangVersion>
     <DebugType>Full</DebugType>
     <RootNamespace>Deli</RootNamespace>
+
+    <Authors>nrgill28</Authors>
+    <Description>Runtime library for Deli: Universal modding framework based on BepInEx</Description>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+
+    <PackageProjectUrl>https://github.com/nrgill28/Deli</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/nrgill28/Deli.git</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
