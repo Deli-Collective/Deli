@@ -60,7 +60,7 @@ namespace Deli
 		/// </summary>
 		/// <param name="assembly">Assembly to get types of</param>
 		/// <returns>Array of not-null types in the assembly</returns>
-		public static Type[] GetTypesSafe(this Assembly assembly, ManualLogSource log)
+		public static IEnumerable<Type> GetTypesSafe(this Assembly assembly, ManualLogSource log)
 		{
 			try
 			{
@@ -69,9 +69,9 @@ namespace Deli
 			catch (ReflectionTypeLoadException e)
 			{
 				var exceptionsFormatted = e.LoaderExceptions.Where(x => x != null).Select(x => x.Message).ToArray();
-				log.LogError($"Encountered one or more type load exceptions while getting types from {assembly}:\n{string.Join("\n", exceptionsFormatted)}");
+				log.LogWarning($"Encountered one or more type load exceptions while getting types from {assembly}:\n{string.Join("\n", exceptionsFormatted)}");
 
-				return e.Types.Where(t => t != null).ToArray();
+				return e.Types.Where(t => t != null);
 			}
 		}
 

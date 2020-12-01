@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using ADepIn;
 using UnityEngine;
 
@@ -16,6 +18,8 @@ namespace Deli
 			private get => _instance.Expect("The Deli runtime has not started yet. If you are a BepInEx plugin (not a DeliBehaviour), please ensure you depend on \"" + DeliConstants.Guid + "\" to give it time to initialize.");
 			set => _instance = Option.Some(value);
 		}
+
+		internal static Dictionary<Type, Mod> BehaviourSources { get; } = new Dictionary<Type, Mod>();
 
 		/// <summary>
 		/// 	Starts a coroutine via the Deli plugin component

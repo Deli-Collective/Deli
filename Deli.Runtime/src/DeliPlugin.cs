@@ -24,16 +24,19 @@ namespace Deli
 			log.LogDebug("Injecting runtime loader...");
 
 			var manager = new GameObject("Deli Manager");
-			void DeliBehaviourLoader(IServiceKernel _0, Mod _1, string _2, Type type)
+			void LoadDeliBehaviour(IServiceKernel _0, Mod mod, string _1, Type type)
 			{
-				if (type.IsAbstract || !type.IsAssignableFrom(typeof(DeliBehaviour))) return;
+				if (type.IsAbstract || !typeof(DeliBehaviour).IsAssignableFrom(type)) return;
 
+				DeliRuntime.BehaviourSources.Add(type, mod);
 				manager.AddComponent(type);
+
+				log.LogDebug("Loaded DeliBehaviour: " + type);
 			}
 
 			return new AssemblyAssetLoader(log, new AssemblyAssetLoader.TypeLoadHandler[]
 			{
-				DeliBehaviourLoader
+				LoadDeliBehaviour
 			});
 		}
 

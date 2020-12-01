@@ -1,3 +1,4 @@
+using ADepIn;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using UnityEngine;
@@ -36,7 +37,14 @@ namespace Deli
 
 		protected DeliBehaviour()
 		{
-			Source = Deli.Services.Get<Mod, DeliBehaviour>(this).Expect("Could not acquire mod for behaviour: " + GetType());
+			var self = GetType();
+
+			// Yeah, you could use an indexer, but a KeyNotFoundException isn't very helpful
+			var sourceOpt = DeliRuntime.BehaviourSources.OptionGetValue(self);
+			Source = sourceOpt.Expect($"There was no behaviour source for {GetType()}. Was this instantiated by something other than Deli.Runtime?");
+			
+			// Disallow multiple instances
+			DeliRuntime.BehaviourSources.Remove(self);
 		}
 	}
 }
