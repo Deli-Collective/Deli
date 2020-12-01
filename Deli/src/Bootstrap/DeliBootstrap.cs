@@ -27,33 +27,46 @@ namespace Deli
 
 		private Option<Mod> CreateMod(IRawIO raw)
 		{
-			const string failurePrefix = "Failed to acquire the ";
+			const string serviceFailPrefix = "Failed to acquire the ";
 			IResourceIO resources = new CachedResourceIO(new ResolverResourceIO(raw, _kernel));
+
+			string errorMessage;
+			Option<ManualLogSource> errorLog = Option.None<ManualLogSource>();
 
 			if (!resources.Get<Option<Mod.Manifest>>(DeliConstants.ManifestFileName).MatchSome(out var infoOpt))
 			{
-				_log.LogError(failurePrefix + "manifest file");
+				errorMessage = serviceFailPrefix + "manifest file";
 			}
 			else if (!infoOpt.MatchSome(out var info))
 			{
-				_log.LogError("Manifest file was invalid");
-			}
-			else if (!_kernel.Get<ConfigFile, string>(info.Guid).MatchSome(out var config))
-			{
-				_log.LogError(failurePrefix + "config file for " + info);
+				errorMessage = "Manifest file was invalid";
 			}
 			else if (!_kernel.Get<ManualLogSource, string>(info.Name.UnwrapOr(info.Guid)).MatchSome(out var log))
 			{
-				_log.LogError(failurePrefix + "log source for " + info);
+				errorMessage = serviceFailPrefix + "log source for " + info;
 			}
 			else
 			{
-				resources = new LoggedModIO(log, resources);
-				var mod = new Mod(info, resources, config, log);
+				errorLog = Option.Some(log);
 
-				return Option.Some(mod);
+				if (info.Patcher.MapOr(true, v => v.Count == 0) && info.Runtime.MapOr(true, v => v.Count == 0))
+				{
+					errorMessage = "A manifest must contain at least 1 asset.";
+				}
+				else if (!_kernel.Get<ConfigFile, string>(info.Guid).MatchSome(out var config))
+				{
+					errorMessage = serviceFailPrefix + "config file for " + info;
+				}
+				else
+				{
+					resources = new LoggedModIO(log, resources);
+					var mod = new Mod(info, resources, config, log);
+
+					return Option.Some(mod);
+				}
 			}
 
+			errorLog.UnwrapOr(_log).LogError(errorMessage);
 			return Option.None<Mod>();
 		}
 
