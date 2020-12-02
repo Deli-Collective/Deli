@@ -1,5 +1,5 @@
 CONTENTS = manifest.json MonoMod.exe $(NAME).dll
-ZIP      = $(NAME).zip
+ZIP      = $(NAME).deli
 
 .PHONY: all build pack clean
 

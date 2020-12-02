@@ -35,7 +35,7 @@ TEMP_DIRS         = $(TEMP_PATCHERS) $(TEMP_PLUGINS) $(TEMP_MODS)
 
 CONTENTS_PATCHERS = $(addsuffix .dll,$(PROJ_PATCHER) ADepIn DotNetZip)
 CONTENTS_PLUGINS  = $(addsuffix .dll,$(PROJ_RUNTIME))
-CONTENTS_MODS     = $(addsuffix /*.zip,$(PROJS_LIBS))
+CONTENTS_MODS     = $(addsuffix /*.deli,$(PROJS_LIBS))
 
 .PHONY: FORCE all clean
 
