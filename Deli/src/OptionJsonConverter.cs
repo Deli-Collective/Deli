@@ -4,7 +4,7 @@ using Valve.Newtonsoft.Json;
 
 namespace Deli
 {
-	public class OptionJsonConverter : JsonConverter
+	internal class OptionJsonConverter : JsonConverter
 	{
 		public override bool CanConvert(Type objectType)
 		{

@@ -6,7 +6,7 @@ using ADepIn.Impl;
 
 namespace Deli
 {
-	public class CachedResourceIO : IResourceIO
+	internal class CachedResourceIO : IResourceIO
 	{
 		private readonly IServiceKernel _cache;
 		private readonly IResourceIO _raw;

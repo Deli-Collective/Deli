@@ -6,7 +6,7 @@ using ADepIn;
 
 namespace Deli
 {
-	public class DirectoryRawIO : IRawIO
+	internal class DirectoryRawIO : IRawIO
 	{
 		private readonly DirectoryInfo _root;
 

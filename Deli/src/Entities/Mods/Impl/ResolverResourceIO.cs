@@ -4,7 +4,7 @@ using ADepIn;
 
 namespace Deli
 {
-	public class ResolverResourceIO : IResourceIO
+	internal class ResolverResourceIO : IResourceIO
 	{
 		private readonly IRawIO _raw;
 		private readonly IServiceResolver _readers;

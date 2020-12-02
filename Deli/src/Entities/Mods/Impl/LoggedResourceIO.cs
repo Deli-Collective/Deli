@@ -6,7 +6,7 @@ using BepInEx.Logging;
 
 namespace Deli
 {
-	public class LoggedModIO : IResourceIO
+	internal class LoggedModIO : IResourceIO
 	{
 		private readonly ManualLogSource _log;
 		private readonly IResourceIO _resources;

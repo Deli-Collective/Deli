@@ -7,7 +7,7 @@ using Ionic.Zip;
 
 namespace Deli
 {
-	public class ArchiveRawIO : IRawIO
+	internal class ArchiveRawIO : IRawIO
 	{
 		private readonly ZipFile _archive;
 
