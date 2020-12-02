@@ -1,15 +1,15 @@
 CONSTANTS_SOURCE = src/DeliConstants.cs
 NUPKG            = $(NUGET_DIR)/$(NAME).$(VERSION).nupkg
 
-.PHONY: build macros-precompile compile macros-postcompile
+.PHONY: build macros-pre compile macros-post
 
 $(NUPKG): build
 	mkdir -p $(dir $@)
 	dotnet pack --configuration $(CONFIG) $(BUILD_PROPERTIES) --no-build --output $(dir $@)
 
-build: compile macros-postcompile
+build: compile macros-post
 
-macros-precompile:
+macros-pre:
 	tee $(CONSTANTS_SOURCE).old < $(CONSTANTS_SOURCE)
 	sed -i \
 		-e 's|MACRO_VERSION|$(VERSION)|g' \
@@ -18,8 +18,8 @@ macros-precompile:
 		-e 's|MACRO_GIT_HASH|$(GIT_HASH)|g' \
 		$(CONSTANTS_SOURCE)
 
-compile: macros-precompile
+compile: macros-pre
 	dotnet build --configuration $(CONFIG) --framework $(FRAMEWORK) $(BUILD_PROPERTIES)
 
-macros-postcompile: compile
+macros-post: compile
 	mv $(CONSTANTS_SOURCE).old $(CONSTANTS_SOURCE)

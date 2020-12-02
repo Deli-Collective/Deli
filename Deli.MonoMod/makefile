@@ -1,15 +1,23 @@
-CONTENTS = manifest.json MonoMod.exe $(NAME).dll
-ZIP      = $(NAME).deli
+CONTENTS += MonoMod.exe $(NAME).dll
 
-.PHONY: all build pack clean
+.PHONY: all macros-pre compile macros-post clean
 
-all: clean build pack
+all: clean $(PACKAGE) macros-post
 
-build:
+macros-pre:
+	tee $(MANIFEST).old < $(MANIFEST)
+	sed -i \
+		-e 's|MACRO_VERSION|$(VERSION)|g' \
+		$(MANIFEST)
+
+compile: macros-pre
 	dotnet build --configuration $(CONFIG) --framework $(FRAMEWORK) $(BUILD_PROPERTIES)
 
-pack: build
-	zip -9j $(ZIP) $(addprefix bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS))
+$(PACKAGE): compile
+	zip -9j $@ $(addprefix bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS))
+
+macros-post: $(PACKAGE)
+	mv $(MANIFEST_OLD) $(MANIFEST)
 
 clean:
-	rm -f $(ZIP)
+	rm -f $(PACKAGE)

@@ -1,6 +1,6 @@
 ﻿{
   "guid": "deli.core",
-  "version": "0.1.0.0",
+  "version": "MACRO_VERSION",
   "name": "Deli Core",
   "sourceUrl": "https://github.com/nrgill28/Deli",
   "authors": [ 
