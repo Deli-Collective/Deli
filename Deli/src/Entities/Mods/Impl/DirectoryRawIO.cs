@@ -38,7 +38,13 @@ namespace Deli
 		public IEnumerable<string> Find(string pattern)
 		{
 			var regex = new Regex(pattern, RegexOptions.IgnoreCase);
-			return Directory.GetFiles(_root.FullName, "*.*", SearchOption.AllDirectories).Select(x => x.Replace(_root.FullName + "\\", "")).Where(p => regex.IsMatch(p));
+			var dirs = _root.GetDirectories("*", SearchOption.AllDirectories).Select(x => x.FullName + "/");
+			var files = _root.GetFiles("*", SearchOption.AllDirectories).Select(x => x.FullName);
+			var rootLength = _root.FullName.Length + 1;
+
+			return dirs.Concat(files)
+				.Select(x => x.Substring(rootLength).Replace('\\', '/'))
+				.Where(x => regex.IsMatch(x));
 		}
 	}
 }
