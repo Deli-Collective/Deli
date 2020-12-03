@@ -75,6 +75,16 @@ namespace Deli
 		/// </summary>
 		public const string ManifestFileName = "manifest.json";
 
+		/// <summary>
+		///		A dictionary of glob characters to replace with regex stuff.
+		/// </summary>
+		public static readonly Dictionary<string, string> GlobReplacements = new Dictionary<string, string>
+		{
+			{"\\*", "[^/]+"},
+			{"\\?", "[^/]"},
+			{"\\*\\*", ".+?"}
+		};
+
 		#endregion
 
 		/// <summary>
