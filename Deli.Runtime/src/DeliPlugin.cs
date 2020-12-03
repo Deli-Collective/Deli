@@ -5,6 +5,7 @@ using ADepIn;
 using BepInEx;
 using BepInEx.Logging;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Deli
 {
@@ -24,6 +25,7 @@ namespace Deli
 			log.LogDebug("Injecting runtime loader...");
 
 			var manager = new GameObject("Deli Manager");
+			Object.DontDestroyOnLoad(manager);
 			void LoadDeliBehaviour(IServiceKernel _0, Mod mod, string _1, Type type)
 			{
 				if (type.IsAbstract || !typeof(DeliBehaviour).IsAssignableFrom(type)) return;
