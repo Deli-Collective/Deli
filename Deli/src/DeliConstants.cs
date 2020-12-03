@@ -80,9 +80,9 @@ namespace Deli
 		/// </summary>
 		public static readonly Dictionary<string, string> GlobReplacements = new Dictionary<string, string>
 		{
+			{"\\*\\*", ".+?"},
 			{"\\*", "[^\\/]+"},
-			{"\\?", "[^\\/]"},
-			{"\\*\\*", ".+?"}
+			{"\\?", "[^\\/]"}
 		};
 
 		#endregion
