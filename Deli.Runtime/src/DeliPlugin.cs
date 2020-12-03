@@ -12,7 +12,7 @@ namespace Deli
 	[BepInPlugin(DeliConstants.Guid, DeliConstants.Name, DeliConstants.Version)]
 	internal class DeliPlugin : BaseUnityPlugin, IDeliPlugin
 	{
-		public DeliPlugin()
+		private void Awake()
 		{
 			DeliRuntime.Instance = this;
 			Entrypoint.Postpatch(this);
