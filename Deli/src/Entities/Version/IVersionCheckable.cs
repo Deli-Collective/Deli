@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using ADepIn;
 
 namespace Deli
 {
 	/// <summary>
-	/// 	Represents a version checker for a domain(s). Similar to the <see cref="IEnumerable"/> pattern.
+	/// 	Represents a version checker for a domain(s). Similar to the <see cref="IEnumerable{T}"/> pattern.
 	/// </summary>
 	public interface IVersionCheckable
 	{

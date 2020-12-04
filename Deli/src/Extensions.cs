@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -55,12 +54,13 @@ namespace Deli
 			return source.Major == dependant.Major && source.Minor >= dependant.Minor;
 		}
 
-		/// <summary>
-		///		Extension for Assembly.GetTypes() that won't throw an exception.
-		///		This is needed to avoid a slew of ReflectionTypeLoadExceptions
-		/// </summary>
-		/// <param name="assembly">Assembly to get types of</param>
-		/// <returns>Array of not-null types in the assembly</returns>
+		///  <summary>
+		/// 		Extension for Assembly.GetTypes() that won't throw an exception.
+		/// 		This is needed to avoid a slew of <see cref="ReflectionTypeLoadException"/>s.
+		///  </summary>
+		///  <param name="assembly">Assembly to get types of</param>
+		///  <param name="log">The log to print exceptions to, if they arise</param>
+		///  <returns>Array of not-null types in the assembly</returns>
 		public static IEnumerable<Type> GetTypesSafe(this Assembly assembly, ManualLogSource log)
 		{
 			try
@@ -142,12 +142,13 @@ namespace Deli
 		/// </summary>
 		public static Option<ConstructorInfo> GetParameterlessCtor(this Type @this)
 		{
-			return @this.GetConstructor(new Type[0]) is ConstructorInfo ctor ? Option.Some(ctor) : Option.None<ConstructorInfo>();
+			var ctor = @this.GetConstructor(new Type[0]);
+			return ctor is null ? Option.None<ConstructorInfo>() : Option.Some(ctor);
 		}
 
 		/// <summary>
 		/// 	Binds a <see cref="JsonAssetReader{T}"/> for the specified type.
-		/// 	<p>Note that <see cref="JsonAssetReader{T}"/> implements an asset reader for <see cref="Option{T}}"/>, and not <typeparamref name="T"/>.</p>
+		/// 	<p>Note that <see cref="JsonAssetReader{T}"/> implements an asset reader for <see cref="Option{T}"/>, and not <typeparamref name="T"/>.</p>
 		/// </summary>
 		/// <typeparam name="T">The type to bind a JSON asset reader to</typeparam>
 		public static void BindJson<T>(this IServiceKernel @this)

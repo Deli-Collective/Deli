@@ -92,13 +92,13 @@ namespace Deli
 			}
 
 			mod.Logger.LogDebug("Checking version...");
-			var coroutine = CheckModVersion(mod, regex, checkerInner);
+			var coroutine = CheckModVersion(mod, checkerInner);
 
 			return Option.Some(coroutine);
 		}
 
 		// Asynchronous
-		private IEnumerator CheckModVersion(Mod mod, Regex regex, IVersionChecker checker)
+		private IEnumerator CheckModVersion(Mod mod, IVersionChecker checker)
 		{
 			yield return checker.Await();
 

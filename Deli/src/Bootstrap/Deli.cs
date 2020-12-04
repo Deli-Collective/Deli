@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -197,6 +198,7 @@ namespace Deli
 			}
 		}
 
+		[SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
 		private static void StageCheck(Stage stage)
 		{
 			if (_stage + 1 != stage)

@@ -4,7 +4,7 @@ using MonoMod;
 
 namespace Deli.MonoMod
 {
-	internal class DeliMonoModder : MonoModder
+	internal sealed class DeliMonoModder : MonoModder
 	{
 		private readonly ManualLogSource _log;
 

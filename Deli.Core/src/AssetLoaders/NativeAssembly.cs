@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -31,7 +30,7 @@ namespace Deli.Core
 		{
 			var raw = mod.Resources.Get<byte[]>(path).Expect("Failed to find native assembly at: " + path);
 
-			var modNatives = _modNativePairs.GetOrInsertWith(mod, () => 
+			var modNatives = _modNativePairs.GetOrInsertWith(mod, () =>
 			{
 				// Create directory for natives
 				var dir = _nativesRoot.CreateSubdirectory(_ticket++.ToString());

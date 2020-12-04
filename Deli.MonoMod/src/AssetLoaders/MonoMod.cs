@@ -40,7 +40,7 @@ namespace Deli.MonoMod
 			}
 		}
 
-		private void AddMod(IServiceKernel kernel, string fileName, byte[] monomod)
+		private void AddMod(string fileName, byte[] monomod)
 		{
 			var fileMonomods = _monomods.GetOrInsertWith(fileName, () =>
 			{
@@ -64,7 +64,7 @@ namespace Deli.MonoMod
 			// DllName.mm.dll -> DllName.dll
 			var originalFileName = Path.ChangeExtension(Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(fileName)), "dll");
 
-			AddMod(kernel, originalFileName, monomod);
+			AddMod(originalFileName, monomod);
 		}
 	}
 }
