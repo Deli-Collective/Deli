@@ -174,7 +174,7 @@ namespace Deli
 				// For each asset inside the mod, load it
 				foreach (var asset in assets)
 				{
-					var pattern = DeliConstants.GlobReplacements.Aggregate(Regex.Escape(asset.Key), (s, r) => s.Replace(r.Key, r.Value));
+					var pattern = DeliConstants.EscapedGlobReplacements.Aggregate(Regex.Escape(asset.Key), (s, r) => s.Replace(r.Key, r.Value));
 					pattern = $"^{pattern}$";
 
 					var loaderName = asset.Value;

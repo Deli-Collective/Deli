@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Deli
 {
@@ -80,10 +82,12 @@ namespace Deli
 		/// </summary>
 		public static readonly Dictionary<string, string> GlobReplacements = new Dictionary<string, string>
 		{
-			{"\\*\\*", ".+?"},
-			{"\\*", "[^\\/]+"},
-			{"\\?", "[^\\/]"}
+			["**"] = @".+?",
+			["*"] = @"[^\/]+",
+			["?"] = @"[^\/]"
 		};
+
+		public static readonly Dictionary<string, string> EscapedGlobReplacements = GlobReplacements.ToDictionary(x => Regex.Escape(x.Key), x => x.Value);
 
 		#endregion
 
