@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -108,22 +109,21 @@ namespace Deli
 		/// <typeparam name="TAttribute">The type of the attribute</typeparam>
 		public static Option<TAttribute> GetCustomAttribute<TAttribute>(this Type @this, bool inherit = false) where TAttribute : Attribute
 		{
-			using (var enumerator = @this.GetCustomAttributes<TAttribute>(inherit).GetEnumerator())
+			using var enumerator = @this.GetCustomAttributes<TAttribute>(inherit).GetEnumerator();
+
+			if (!enumerator.MoveNext())
 			{
-				if (!enumerator.MoveNext())
-				{
-					return Option.None<TAttribute>();
-				}
-
-				var attr = enumerator.Current;
-
-				if (enumerator.MoveNext())
-				{
-					return Option.None<TAttribute>();
-				}
-
-				return Option.Some(attr);
+				return Option.None<TAttribute>();
 			}
+
+			var attr = enumerator.Current;
+
+			if (enumerator.MoveNext())
+			{
+				return Option.None<TAttribute>();
+			}
+
+			return Option.Some(attr);
 		}
 
 		/// <summary>

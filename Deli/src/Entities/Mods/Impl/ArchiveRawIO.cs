@@ -23,17 +23,15 @@ namespace Deli
 				if (!_archive.ContainsEntry(path)) return Option.None<byte[]>();
 
 				var entry = _archive[path];
-				using (var reader = entry.OpenReader())
+				using var reader = entry.OpenReader();
+
+				var buffer = new byte[entry.UncompressedSize];
+				using (var memory = new MemoryStream(buffer))
 				{
-					var buffer = new byte[entry.UncompressedSize];
-
-					using (var memory = new MemoryStream(buffer))
-					{
-						reader.CopyTo(memory);
-					}
-
-					return Option.Some(buffer);
+					reader.CopyTo(memory);
 				}
+
+				return Option.Some(buffer);
 			}
 		}
 

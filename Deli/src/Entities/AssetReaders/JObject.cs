@@ -17,25 +17,24 @@ namespace Deli
 
 		public Option<JObject> ReadAsset(byte[] raw)
 		{
-			using (var memory = new MemoryStream(raw))
-			using (var text = new StreamReader(memory))
-			using (var json = new JsonTextReader(text))
+			using var memory = new MemoryStream(raw);
+			using var text = new StreamReader(memory);
+			using var json = new JsonTextReader(text);
+
+			JObject result;
+			try
 			{
-				JObject result;
-				try
-				{
-					result = JObject.Load(json);
-				}
-				catch (JsonReaderException e)
-				{
-					_log.LogWarning("JSON parse error: " + e.Message);
-					_log.LogDebug(e.ToString());
-
-					return Option.None<JObject>();
-				}
-
-				return Option.Some(result);
+				result = JObject.Load(json);
 			}
+			catch (JsonReaderException e)
+			{
+				_log.LogWarning("JSON parse error: " + e.Message);
+				_log.LogDebug(e.ToString());
+
+				return Option.None<JObject>();
+			}
+
+			return Option.Some(result);
 		}
 	}
 }

@@ -24,14 +24,11 @@ namespace Deli
 				if (!file.Exists) return Option.None<byte[]>();
 
 				// I *could* use File.ReadAllBytes here, but then I would be getting and passing the path instead of a handle (possible source of error).
-				using (var reader = file.OpenRead())
-				{
-					using (var memory = new MemoryStream())
-					{
-						reader.CopyTo(memory);
-						return Option.Some(memory.ToArray());
-					}
-				}
+				using var reader = file.OpenRead();
+				using var memory = new MemoryStream();
+
+				reader.CopyTo(memory);
+				return Option.Some(memory.ToArray());
 			}
 		}
 

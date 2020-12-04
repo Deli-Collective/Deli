@@ -177,24 +177,22 @@ namespace Deli
 					pattern = $"^{pattern}$";
 
 					var loaderName = asset.Value;
+					using var glob = mod.Resources.Find(pattern).GetEnumerator();
 
-					using (var assetEnumerator = mod.Resources.Find(pattern).GetEnumerator())
+					if (!glob.MoveNext())
 					{
-						if (!assetEnumerator.MoveNext())
-						{
-							_log.LogWarning("Path matched no files: " + pattern);
-							continue;
-						}
-
-						do
-						{
-							var assetPath = assetEnumerator.Current;
-							_log.LogDebug($"Loading asset {{{loaderName}: {assetPath}}}");
-
-							var loader = _kernel.Get<IAssetLoader, string>(loaderName).Expect("Loader not present: " + loaderName);
-							loader.LoadAsset(_kernel, mod, assetPath);
-						} while (assetEnumerator.MoveNext());
+						_log.LogWarning("Path matched no files: " + pattern);
+						continue;
 					}
+
+					do
+					{
+						var assetPath = glob.Current;
+						_log.LogDebug($"Loading asset {{{loaderName}: {assetPath}}}");
+
+						var loader = _kernel.Get<IAssetLoader, string>(loaderName).Expect("Loader not present: " + loaderName);
+						loader.LoadAsset(_kernel, mod, assetPath);
+					} while (glob.MoveNext());
 				}
 			}
 		}
