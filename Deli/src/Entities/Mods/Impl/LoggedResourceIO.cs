@@ -29,7 +29,7 @@ namespace Deli
 				throw new Exception($"Failed to retrieve asset at {path}", e);
 			}
 
-			_log.LogDebug($"Retrieved asset at {path}: {asset}");
+			_log.LogDebug($"Retrieved asset at {path}: {typeof(Option<T>)}");
 
 			return asset;
 		}
