@@ -2,9 +2,9 @@
 
 namespace Deli.Core
 {
-	internal class Module : IEntryModule<Module>
+	internal class Module : DeliModule
 	{
-		public void Load(IServiceKernel kernel)
+		public Module()
 		{
 			Deli.AddVersionCheckable("github.com", new GitHubVersionCheckable());
 		}

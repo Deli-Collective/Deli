@@ -1,14 +1,13 @@
 using ADepIn;
 using BepInEx.Configuration;
 using BepInEx.Logging;
-using UnityEngine;
 
 namespace Deli
 {
 	/// <summary>
-	///		The base class for Deli Unity-based code assets
+	///		The base class for Deli code assets, free from Unity's MonoBehaviour. Designed for patchers that want DeliBehaviour functionality.
 	/// </summary>
-	public abstract class DeliBehaviour : MonoBehaviour
+	public abstract class DeliModule
 	{
 		/// <summary>
 		///		The mod that contained this behaviour, refered to as the "source mod"
@@ -35,16 +34,16 @@ namespace Deli
 		/// </summary>
 		protected ManualLogSource Logger => Source.Logger;
 
-		protected DeliBehaviour()
+		protected DeliModule()
 		{
 			var self = GetType();
 
 			// Yeah, you could use an indexer, but a KeyNotFoundException isn't very helpful
-			var sourceOpt = DeliRuntime.BehaviourSources.OptionGetValue(self);
-			Source = sourceOpt.Expect($"There was no behaviour source for {GetType()}. Was this instantiated by something other than Deli.Runtime?");
+			var sourceOpt = Deli.ModuleSources.OptionGetValue(self);
+			Source = sourceOpt.Expect($"There was no module source for {GetType()}. Was this instantiated by something other than Deli?");
 
 			// Disallow multiple instances
-			DeliRuntime.BehaviourSources.Remove(self);
+			Deli.ModuleSources.Remove(self);
 		}
 	}
 }

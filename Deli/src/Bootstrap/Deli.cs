@@ -36,6 +36,8 @@ namespace Deli
 
 		private static Stage _stage;
 
+		internal static Dictionary<Type, Mod> ModuleSources { get; } = new Dictionary<Type, Mod>();
+
 		/// <summary>
 		/// 	All of the services available to Deli
 		/// </summary>

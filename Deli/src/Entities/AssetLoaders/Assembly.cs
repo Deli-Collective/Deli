@@ -21,17 +21,42 @@ namespace Deli
 
 			_handlers = new List<TypeLoadHandler>
 			{
-				LoadModule,
+				LoadKernelModule,
+				LoadDeliModule,
 				LoadQuickBind
 			};
 			_handlers.AddRange(handlers);
 		}
 
-		private void LoadModule(IServiceKernel kernel, Mod mod, string path, Type type)
+		private void LoadKernelModule(IServiceKernel kernel, Mod mod, string path, Type type)
 		{
 			if (kernel.LoadEntryType(type).IsNone) return;
 
 			_log.LogDebug("Loaded kernel module: " + type);
+		}
+
+		private void LoadDeliModule(IServiceKernel kernel, Mod mod, string path, Type type)
+		{
+			if (type.IsAbstract || !typeof(DeliModule).IsAssignableFrom(type)) return;
+
+			Deli.ModuleSources.Add(type, mod);
+
+			ConstructorInfo ctor;
+			if ((ctor = type.GetConstructor(new[] { typeof(IServiceKernel) })) != null)
+			{
+				ctor.Invoke(new[] { kernel });
+			}
+			else if ((ctor = type.GetConstructor(new Type[0])) != null)
+			{
+				ctor.Invoke(new object[0]);
+			}
+			else
+			{
+				_log.LogError("Invalid Deli module constructor signature: " + type);
+				return;
+			}
+
+			_log.LogDebug("Loaded Deli module: " + type);
 		}
 
 		private void LoadQuickBind(IServiceKernel kernel, Mod mod, string path, Type type)

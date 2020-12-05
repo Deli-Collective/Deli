@@ -1,15 +1,12 @@
 using ADepIn;
-using BepInEx.Logging;
 
 namespace Deli.MonoMod
 {
-	internal class Module : IEntryModule<Module>
+	internal class Module : DeliModule
 	{
-		public void Load(IServiceKernel kernel)
+		public Module()
 		{
-			var log = kernel.Get<ManualLogSource, string>(DeliConstants.Name + " MonoMod").Expect("Could not acquire MonoMod log.");
-
-			var loader = new MonoModAssetLoader(log);
+			var loader = new MonoModAssetLoader(Logger);
 			Deli.AddAssetLoader("monomod", loader);
 		}
 	}
