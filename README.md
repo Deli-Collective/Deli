@@ -1,11 +1,11 @@
 # Deli
-![Pre-release version](https://img.shields.io/github/v/release/nrgill28/Deli?include_prereleases&label=pre-release&style=flat-square) [![Discord](https://img.shields.io/discord/777351065950879744?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2&style=flat-square)](https://discord.gg/g8xeFyt42j)
+![Pre-release version](https://img.shields.io/github/v/release/Deli-Counter/Deli?include_prereleases&label=pre-release&style=flat-square) [![Discord](https://img.shields.io/discord/777351065950879744?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2&style=flat-square)](https://discord.gg/g8xeFyt42j)
 
 Deli is a modding framework based on BepInEx which provides one standard uniform way of packaging and loading mods containing any number of assets of any type. Originally built for the popular VR firearms sandbox game _Hotdogs, Horseshoes & Hand Grenades_ but theoretically usable under any Unity game with BepInEx.
 
 ## Quick Links
-- [Installing](https://github.com/nrgill28/Deli/wiki/Installation)
-- [Project boards](https://github.com/nrgill28/Deli/projects)
+- [Installing](https://github.com/Deli-Counter/Deli/wiki/Installation)
+- [Project boards](https://github.com/Deli-Counter/Deli/projects)
 - [Join us on Discord for discussions, updates and support](https://discord.gg/g8xeFyt42j)
 
 ## Features

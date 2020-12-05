@@ -10,8 +10,8 @@
     <Description>Runtime library for Deli: Universal modding framework based on BepInEx</Description>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
 
-    <PackageProjectUrl>https://github.com/nrgill28/Deli</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/nrgill28/Deli.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Deli-Counter/Deli</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Deli-Counter/Deli.git</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
