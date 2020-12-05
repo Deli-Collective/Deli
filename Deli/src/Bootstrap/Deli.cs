@@ -176,7 +176,8 @@ namespace Deli
 				// For each asset inside the mod, load it
 				foreach (var asset in assets)
 				{
-					var pattern = DeliConstants.EscapedGlobReplacements.Aggregate(Regex.Escape(asset.Key), (s, r) => s.Replace(r.Key, r.Value));
+					var path = asset.Key;
+					var pattern = DeliConstants.EscapedGlobReplacements.Aggregate(Regex.Escape(path), (s, r) => s.Replace(r.Key, r.Value));
 					pattern = $"^{pattern}$";
 
 					var loaderName = asset.Value;
@@ -184,7 +185,8 @@ namespace Deli
 
 					if (!glob.MoveNext())
 					{
-						_log.LogWarning("Path matched no files: " + pattern);
+						_log.LogWarning("Path matched no files: " + path);
+						_log.LogDebug("Path's pattern: " + pattern);
 						continue;
 					}
 
