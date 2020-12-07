@@ -28,7 +28,10 @@ namespace Deli.MonoMod.HookGen
 			};
 			modder.MapDependencies();
 
-			var generator = new HookGenerator(modder, "MMHOOK_" + assembly.MainModule.Name);
+			var generator = new HookGenerator(modder, "MMHOOK_" + assembly.MainModule.Name)
+			{
+				HookPrivate = true
+			};
 			generator.Generate();
 
 			generator.OutputModule.Write(_output);
