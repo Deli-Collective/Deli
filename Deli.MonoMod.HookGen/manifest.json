@@ -1,17 +1,17 @@
 ﻿{
-  "guid": "deli.monomod",
+  "guid": "deli.monomod.hookgen",
   "version": "MACRO_VERSION",
   "dependencies": {
     "deli.core": "MACRO_VERSION"
   },
-  "name": "Deli MonoMod",
+  "name": "Deli MonoMod Hook Generator",
   "sourceUrl": "https://github.com/Deli-Counter/Deli",
   "authors": [ 
     "Ash",
     "other contributors" 
   ],
   "patcher": {
-    "MonoMod.exe": "assembly",
-    "Deli.MonoMod.dll": "assembly"
+    "MonoMod.RuntimeDetour.HookGen.exe": "assembly",
+    "Deli.MonoMod.HookGen.dll": "assembly"
   }
 }

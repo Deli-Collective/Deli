@@ -1,4 +1,4 @@
-CONTENTS += $(NAME).dll
+CONTENTS = $(NAME).Patcher.dll $(NAME).Runtime.dll
 
 .PHONY: all macros-pre compile macros-post clean
 
@@ -11,10 +11,11 @@ macros-pre:
 		$(MANIFEST)
 
 compile: macros-pre
-	dotnet build --configuration $(CONFIG) --framework $(FRAMEWORK) $(BUILD_PROPERTIES)
+	$(BUILD) Deli.Core.Patcher
+	$(BUILD) Deli.Core.Runtime
 
 $(PACKAGE): compile
-	zip -9j $@ $(addprefix bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS))
+	zip -9j $@ $(MANIFEST) $(addprefix Deli.Core.*/bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS))
 
 macros-post: $(PACKAGE)
 	mv $(MANIFEST_OLD) $(MANIFEST)

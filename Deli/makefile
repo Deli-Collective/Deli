@@ -19,7 +19,7 @@ macros-pre:
 		$(CONSTANTS_SOURCE)
 
 compile: macros-pre
-	dotnet build --configuration $(CONFIG) --framework $(FRAMEWORK) $(BUILD_PROPERTIES)
+	$(BUILD)
 
 macros-post: compile
 	mv $(CONSTANTS_SOURCE).old $(CONSTANTS_SOURCE)

@@ -12,6 +12,7 @@ export GIT_DESCRIBE     = $(shell git describe --long --always --dirty)
 export GIT_BRANCH       = $(shell git rev-parse --abbrev-ref HEAD)
 export GIT_HASH         = $(shell git rev-parse HEAD)
 export BUILD_PROPERTIES = /p:Version="$(VERSION)" /p:RepositoryBranch="$(GIT_BRANCH)" /p:RepositoryCommit="$(GIT_HASH)"
+export BUILD            = dotnet build --configuration $(CONFIG) --framework $(FRAMEWORK) $(BUILD_PROPERTIES)
 
 # Packages
 export MANIFEST         = manifest.json
@@ -19,27 +20,28 @@ export MANIFEST_OLD     = $(MANIFEST).old
 export CONTENTS         = $(MANIFEST)
 
 # Local
-NAME              = Deli
-ZIP               = $(NAME).zip
-TEMP              = temp
+NAME                 = Deli
+ZIP                  = $(NAME).zip
+TEMP                 = temp
 
-PROJ_PATCHER      = $(NAME)
-PROJ_RUNTIME      = $(NAME).Runtime
-PROJ_CORE         = $(NAME).Core
-PROJ_MONOMOD      = $(NAME).MonoMod
+PROJ_PATCHER         = $(NAME)
+PROJ_RUNTIME         = $(NAME).Runtime
+PROJ_CORE            = $(NAME).Core
+PROJ_MONOMOD         = $(NAME).MonoMod
+PROJ_MONOMOD_HOOKGEN = $(NAME).MonoMod.HookGen
 
-PROJS_FRAMEWORK   = $(PROJ_PATCHER) $(PROJ_RUNTIME)
-PROJS_LIBS        = $(PROJ_CORE) $(PROJ_MONOMOD)
-PROJS             = $(PROJS_FRAMEWORK) $(PROJS_LIBS)
+PROJS_FRAMEWORK      = $(PROJ_PATCHER) $(PROJ_RUNTIME)
+PROJS_LIBS           = $(PROJ_CORE) $(PROJ_MONOMOD) $(PROJ_MONOMOD_HOOKGEN)
+PROJS                = $(PROJS_FRAMEWORK) $(PROJS_LIBS)
 
-TEMP_PATCHERS     = $(TEMP)/BepInEx/patchers/Deli
-TEMP_PLUGINS      = $(TEMP)/BepInEx/plugins/Deli
-TEMP_MODS         = $(TEMP)/mods
-TEMP_DIRS         = $(TEMP_PATCHERS) $(TEMP_PLUGINS) $(TEMP_MODS)
+TEMP_PATCHERS        = $(TEMP)/BepInEx/patchers/Deli
+TEMP_PLUGINS         = $(TEMP)/BepInEx/plugins/Deli
+TEMP_MODS            = $(TEMP)/mods
+TEMP_DIRS            = $(TEMP_PATCHERS) $(TEMP_PLUGINS) $(TEMP_MODS)
 
-CONTENTS_PATCHERS = $(addsuffix .dll,$(PROJ_PATCHER) ADepIn DotNetZip)
-CONTENTS_PLUGINS  = $(addsuffix .dll,$(PROJ_RUNTIME))
-CONTENTS_MODS     = $(addsuffix /*.deli,$(PROJS_LIBS))
+CONTENTS_PATCHERS    = $(addsuffix .dll,$(PROJ_PATCHER) ADepIn DotNetZip)
+CONTENTS_PLUGINS     = $(addsuffix .dll,$(PROJ_RUNTIME))
+CONTENTS_MODS        = $(addsuffix /*.deli,$(PROJS_LIBS))
 
 .PHONY: FORCE all clean
 

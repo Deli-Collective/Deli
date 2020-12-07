@@ -1,25 +1,32 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net35</TargetFramework>
     <LangVersion>8</LangVersion>
+    <RootNamespace>Deli.Core.Runtime</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Valve.Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\libs\Valve.Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="all" />
     <PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1" PrivateAssets="all" />
 
-    <PackageReference Include="MonoMod" Version="20.11.26.2" />
+    <PackageReference Include="UnityEngine.Core" Version="5.6.0" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <None Update="manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
+  
   <ItemGroup>
-    <ProjectReference Include="..\Deli.Core\Deli.Core.Patcher\Deli.Core.Patcher.csproj" />
+    <ProjectReference Include="..\..\Deli.Runtime\Deli.Runtime.csproj" />
   </ItemGroup>
 
 </Project>

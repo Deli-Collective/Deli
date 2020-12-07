@@ -1,4 +1,4 @@
-CONTENTS += MonoMod.exe $(NAME).dll
+CONTENTS += MonoMod.RuntimeDetour.HookGen.exe $(NAME).dll
 
 .PHONY: all macros-pre compile macros-post clean
 
@@ -11,7 +11,7 @@ macros-pre:
 		$(MANIFEST)
 
 compile: macros-pre
-	$(BUILD)
+	dotnet build --configuration $(CONFIG) --framework $(FRAMEWORK) $(BUILD_PROPERTIES)
 
 $(PACKAGE): compile
 	zip -9j $@ $(addprefix bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS))

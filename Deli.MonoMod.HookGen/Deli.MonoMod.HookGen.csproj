@@ -9,7 +9,7 @@
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="all" />
     <PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1" PrivateAssets="all" />
 
-    <PackageReference Include="MonoMod" Version="20.11.26.2" />
+    <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="20.11.26.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Deli.Core\Deli.Core.Patcher\Deli.Core.Patcher.csproj" />
+    <ProjectReference Include="..\Deli.MonoMod\Deli.MonoMod.csproj" />
   </ItemGroup>
 
 </Project>

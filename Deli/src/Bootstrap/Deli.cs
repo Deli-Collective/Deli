@@ -68,12 +68,17 @@ namespace Deli
 		public static IEnumerable<Mod> Mods { get; }
 
 		/// <summary>
-		/// 	Called when patching is complete
+		/// 	Called after patching is complete
 		/// </summary>
 		public static event Action PatcherComplete;
 
 		/// <summary>
-		/// 	Called when runtime initialization is complete
+		/// 	Called before runtime initialization
+		/// </summary>
+		public static event Action RuntimeStart;
+
+		/// <summary>
+		/// 	Called after runtime initialization
 		/// </summary>
 		public static event Action RuntimeComplete;
 
@@ -216,8 +221,8 @@ namespace Deli
 		internal static void PatchStage()
 		{
 			const Stage stage = Stage.Patcher;
-
 			StageCheck(stage);
+			
 			LoadMods(stage, x => x.Patcher);
 
 			PatcherComplete?.Invoke();
@@ -226,8 +231,10 @@ namespace Deli
 		internal static void RuntimeStage(IDeliPlugin module)
 		{
 			const Stage stage = Stage.Runtime;
-
 			StageCheck(stage);
+
+			RuntimeStart?.Invoke();
+
 			_assetLoaders[DeliConstants.AssemblyLoaderName] = module.Load(_log);
 			LoadMods(stage, x => x.Runtime);
 

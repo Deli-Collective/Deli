@@ -5,9 +5,13 @@
   "sourceUrl": "https://github.com/Deli-Counter/Deli",
   "authors": [ 
     "Nathan Gill",
+    "Ash",
     "other contributors" 
   ],
+  "patcher": {
+    "Deli.Core.Patcher.dll": "assembly"
+  },
   "runtime": {
-    "Deli.Core.dll": "assembly"
+    "Deli.Core.Runtime.dll": "assembly"
   }
 }
