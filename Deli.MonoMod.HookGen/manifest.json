@@ -2,7 +2,8 @@
   "guid": "deli.monomod.hookgen",
   "version": "MACRO_VERSION",
   "dependencies": {
-    "deli.core": "MACRO_VERSION"
+    "deli.core": "MACRO_VERSION",
+    "deli.monomod": "MACRO_VERSION"
   },
   "name": "Deli MonoMod Hook Generator",
   "sourceUrl": "https://github.com/Deli-Counter/Deli",

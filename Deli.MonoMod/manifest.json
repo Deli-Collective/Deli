@@ -1,9 +1,6 @@
 ﻿{
   "guid": "deli.monomod",
   "version": "MACRO_VERSION",
-  "dependencies": {
-    "deli.core": "MACRO_VERSION"
-  },
   "name": "Deli MonoMod",
   "sourceUrl": "https://github.com/Deli-Counter/Deli",
   "authors": [ 
