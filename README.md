@@ -15,5 +15,9 @@ Deli is a modding framework based on BepInEx which provides one standard uniform
 
 ## Advantages
 The main advantages to using this framework in addition to BepInEx are as follows:
-- Each Deli mod can include any number of assets of any type. You can bundle your code plugins with some default example content or even create a mega mod pack with lots of content of a certain theme. 
-- Code plugins can define asset loaders that will be used to automatically load assets of a certain type from other mods. This is where the framework becomes game-independent, as anyone can write code mods to load any game-specific content.
+- Each Deli mod can include any number of assets of any type, all within one mod file. It is possible to:
+  - Bundle example assets with behaviours and modules (code assets)
+  - Combine many assets of a certain theme to make a mega mod pack 
+- Code assets can define asset loaders, which can be used by other mods to load their own assets. Consider:
+  - Universal utility-like loaders, like the MonoMod patcher
+  - Game-specific utility/mutator loaders (this allows the framework to be game independent)
