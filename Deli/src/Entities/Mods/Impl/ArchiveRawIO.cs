@@ -10,10 +10,12 @@ namespace Deli
 	internal class ArchiveRawIO : IRawIO
 	{
 		private readonly ZipFile _archive;
+		private readonly string _path;
 
-		public ArchiveRawIO(ZipFile archive)
+		public ArchiveRawIO(ZipFile archive, string path)
 		{
 			_archive = archive;
+			_path = path;
 		}
 
 		public Option<byte[]> this[string path]
@@ -39,6 +41,11 @@ namespace Deli
 		{
 			var regex = new Regex(pattern, RegexOptions.IgnoreCase);
 			return _archive.EntryFileNames.Where(n => regex.IsMatch(n));
+		}
+
+		public override string ToString()
+		{
+			return _path;
 		}
 	}
 }

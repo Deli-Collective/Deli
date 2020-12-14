@@ -43,5 +43,10 @@ namespace Deli
 				.Select(x => x.Substring(rootLength).Replace('\\', '/'))
 				.Where(x => regex.IsMatch(x));
 		}
+
+		public override string ToString()
+		{
+			return _root.ToString();
+		}
 	}
 }

@@ -124,7 +124,7 @@ namespace Deli
 					continue;
 				}
 
-				var io = new ArchiveRawIO(zip);
+				var io = new ArchiveRawIO(zip, archiveFile.ToString());
 
 				if (!CreateMod(io).MatchSome(out var mod))
 				{
@@ -145,7 +145,18 @@ namespace Deli
 		public IEnumerable<Mod> CreateMods()
 		{
 			// Discover all the mods
-			var mods = DiscoverMods(_mods).ToDictionary(x => x.Info.Guid, x => x);
+			var mods = new Dictionary<string, Mod>();
+			foreach (var mod in DiscoverMods(_mods))
+			{
+				var guid = mod.Info.Guid;
+				if (mods.TryGetValue(guid, out var existing))
+				{
+					_log.LogError($"A mod was found with a GUID already in use: {guid} @ {existing.Resources}");
+					continue;
+				}
+
+				mods.Add(guid, mod);
+			}
 			_log.LogInfo($"{mods.Count} mods to load");
 
 			// Make sure all dependencies are satisfied
