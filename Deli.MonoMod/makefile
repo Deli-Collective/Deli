@@ -1,4 +1,4 @@
-CONTENTS += MonoMod.exe $(NAME).dll
+CONTENTS += licenses.txt MonoMod.exe $(NAME).dll
 
 .PHONY: all macros-pre compile macros-post clean
 

@@ -1,4 +1,4 @@
-CONTENTS += MonoMod.RuntimeDetour.HookGen.exe $(NAME).dll
+CONTENTS += licenses.txt MonoMod.RuntimeDetour.HookGen.exe $(NAME).dll
 
 .PHONY: all macros-pre compile macros-post clean
 
