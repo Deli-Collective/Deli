@@ -8,6 +8,11 @@ namespace Deli.Core
 		{
 			Deli.AddVersionCheckable("github.com", new GitHubVersionCheckable());
 
+			Deli.RuntimeComplete += RuntimeComplete;
+		}
+
+		private void RuntimeComplete()
+		{
 			SceneManager.activeSceneChanged += SceneChanged;
 		}
 
