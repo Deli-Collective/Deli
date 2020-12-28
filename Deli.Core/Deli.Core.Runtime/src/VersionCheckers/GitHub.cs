@@ -32,7 +32,7 @@ namespace Deli.Core
 			return Option.Some(checker);
 		}
 
-		private class VersionChecker : IVersionChecker
+		private class VersionChecker : CachedVersionChecker
 		{
 			private const string Api = "https://api.github.com/";
 
@@ -44,13 +44,8 @@ namespace Deli.Core
 			private readonly string _repo;
 
 			private Option<UnityWebRequest> _request;
-			private Option<Option<Version>> _result;
 
-			public Option<Version> Result
-			{
-				get => _result.Expect("The result has not yet been assigned.");
-				private set => _result = Option.Some(value);
-			}
+			protected override string Url  => Api + $"repos/{_owner}/{_repo}/releases/latest";
 
 			public VersionChecker(ManualLogSource log, string owner, string repo)
 			{
@@ -113,14 +108,12 @@ namespace Deli.Core
 				return Option.Some(version);
 			}
 
-			public IEnumerator Await()
+			protected override IEnumerator AwaitInternal()
 			{
 				_request.ExpectNone("Already awaiting");
 
 				// Create request
-				// https://api.github.com/repos/[owner]/[repo]/releases/latest
-				var url = Api + $"repos/{_owner}/{_repo}/releases/latest";
-				var request = UnityWebRequest.Get(url);
+				var request = UnityWebRequest.Get(Url);
 				_request = Option.Some(request);
 
 				// Get rate limit info
