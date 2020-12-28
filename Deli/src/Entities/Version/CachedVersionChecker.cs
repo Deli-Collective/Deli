@@ -26,7 +26,11 @@ namespace Deli
 		{
 			if (_cachedVersions.TryGetValue(Url, out var result))
 				Result = result;
-			else yield return AwaitInternal();
+			else
+			{
+				yield return AwaitInternal();
+				_cachedVersions[Url] = Result;
+			}
 		}
 
 		protected abstract string Url { get; }
