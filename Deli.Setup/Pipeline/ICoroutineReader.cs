@@ -1,8 +1,8 @@
 using Deli.VFS;
 
-namespace Deli
+namespace Deli.Setup
 {
-    public interface ICoroutineResourceReader<T>
+    public interface ICoroutineReader<T>
     {
 		ResultYieldInstruction<T> Read(IFileHandle handle);
 	}
