@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Deli
+namespace Deli.Setup
 {
 	public abstract class ResultYieldInstruction<T> : CustomYieldInstruction
 	{

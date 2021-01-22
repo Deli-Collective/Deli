@@ -1,6 +1,6 @@
 using Mono.Cecil;
 
-namespace Deli
+namespace Deli.Patcher
 {
 	public interface IPatcher
 	{

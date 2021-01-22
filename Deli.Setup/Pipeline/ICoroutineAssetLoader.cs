@@ -1,10 +1,10 @@
 using System.Collections;
 using Deli.VFS;
 
-namespace Deli
+namespace Deli.Setup
 {
     public interface ICoroutineAssetLoader
     {
-		IEnumerator LoadAsset(Mod mod, IHandle handle);
+		IEnumerator LoadAsset(ISetupStage stage, Mod mod, IHandle handle);
 	}
 }
