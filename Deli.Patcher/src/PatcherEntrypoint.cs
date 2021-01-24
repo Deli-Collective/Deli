@@ -87,6 +87,8 @@ namespace Deli.Patcher
 					}
 				}
 			}
+
+			return true;
 		}
 
 		private static IEnumerable<Mod> Sort(IEnumerable<Mod> mods)
