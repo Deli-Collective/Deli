@@ -18,9 +18,14 @@ namespace Deli
 
 		protected Dictionary<string, ISharedAssetLoader> SharedLoaders { get; }
 
+		/// <summary>
+		///		The collection of all the <see cref="IImmediateReader{T}"/>s publicly available.
+		/// </summary>
 		public ImmediateReaderCollection ImmediateReaders { get; }
 
-		public event Action? Started;
+		/// <summary>
+		///		Invoked when all operations that require this stage are complete.
+		/// </summary>
 		public event Action? Finished;
 
 		protected Stage(ManualLogSource logger, JsonSerializer serializer, JObjectImmediateReader jObjectImmediateReader, Dictionary<string, ISharedAssetLoader> sharedLoaders, ImmediateReaderCollection immediateReaders)
@@ -51,6 +56,10 @@ namespace Deli
 			return AddAssetLoader<ISharedAssetLoader, Stage>(name, loader, SharedLoaders);
 		}
 
+		/// <summary>
+		///		Creates and adds a JSON <see cref="IImmediateReader{T}"/> for the type provided.
+		/// </summary>
+		/// <typeparam name="T">The JSON model.</typeparam>
 		public JsonImmediateReader<T> RegisterImmediateJson<T>()
 		{
 			if (ImmediateReaders.TryGet<T>(out var unknown) && unknown is JsonImmediateReader<T> reader)

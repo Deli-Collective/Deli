@@ -5,8 +5,12 @@ using Newtonsoft.Json.Linq;
 
 namespace Deli.Patcher.Readers
 {
-	public class JObjectImmediateReader : IImmediateReader<JObject>
+	/// <summary>
+	///		An <see cref="IImmediateReader{T}"/> that reads <see cref="JObject"/>s.
+	/// </summary>
+	public sealed class JObjectImmediateReader : IImmediateReader<JObject>
 	{
+		/// <inheritdoc cref="IImmediateReader{T}.Read"/>
 		public JObject Read(IFileHandle handle)
 		{
 			using var raw = handle.OpenRead();
