@@ -2,7 +2,7 @@ using Deli.VFS;
 
 namespace Deli.Setup
 {
-    public interface ICoroutineReader<T>
+    public interface IDelayedReader<T>
     {
 		ResultYieldInstruction<T> Read(IFileHandle handle);
 	}

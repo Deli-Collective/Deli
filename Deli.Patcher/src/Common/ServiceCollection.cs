@@ -5,7 +5,7 @@ using BepInEx.Logging;
 
 namespace Deli
 {
-	public abstract class ServiceCollection
+	public abstract class ServiceCollection : IEnumerable
 	{
 		private readonly ManualLogSource _logger;
 
@@ -35,6 +35,16 @@ namespace Deli
 			}
 
 			return obj;
+		}
+
+		public Dictionary<Type,object>.ValueCollection.Enumerator GetEnumerator()
+		{
+			return Services.Values.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
 		}
 	}
 }
