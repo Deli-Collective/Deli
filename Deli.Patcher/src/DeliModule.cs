@@ -6,7 +6,7 @@ namespace Deli.Patcher
 {
 	public abstract class DeliModule
 	{
-		protected Mod Source { get; }
+		protected Mod Source { get; } = null!;
 
 		protected IDirectoryHandle Resources => Source.Resources;
 

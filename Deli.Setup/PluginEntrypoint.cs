@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using BepInEx;
 using BepInEx.Logging;
 using Deli.Patcher;
+using Deli.Patcher.Readers;
+using Newtonsoft.Json;
 
 namespace Deli.Setup
 {
@@ -13,9 +15,9 @@ namespace Deli.Setup
 			PatcherEntrypoint.Handoff(Entrypoint);
 		}
 
-		private void Entrypoint(ManualLogSource logger, Dictionary<string, ISharedAssetLoader> sharedAssetLoaders, ImmediateReaderCollection immediateReaders)
+		private void Entrypoint(ManualLogSource logger, JsonSerializer serializer, JObjectImmediateReader jObjectImmediateReader, Dictionary<string, ISharedAssetLoader> sharedLoaders, ImmediateReaderCollection immediateReaders)
 		{
-			var stage = new SetupStage(logger, sharedAssetLoaders, immediateReaders);
+			var stage = new SetupStage(logger, serializer, jObjectImmediateReader, sharedLoaders, immediateReaders);
 		}
 	}
 }

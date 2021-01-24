@@ -2,31 +2,21 @@ using System;
 using System.Collections.Generic;
 using BepInEx.Logging;
 using Deli.Patcher;
+using Deli.Patcher.Readers;
 using Deli.VFS;
+using Newtonsoft.Json;
 
 namespace Deli.Setup
 {
-	public class SetupStage
+	public class SetupStage : Stage
 	{
-		private readonly ManualLogSource _logger;
-
-		private readonly Dictionary<string, ISharedAssetLoader> _sharedLoaders;
 		private readonly Dictionary<string, IDelayedAssetLoader> _delayedLoaders = new();
 		private readonly Dictionary<Type, object> _wrapperReaders = new();
 
-		public ImmediateReaderCollection ImmediateReaders { get; }
-
 		public DelayedReaderCollection CoroutineReaders { get; }
 
-		public event Action? Started;
-		public event Action? Finished;
-
-		internal SetupStage(ManualLogSource logger, Dictionary<string, ISharedAssetLoader> sharedAssetLoaders, ImmediateReaderCollection immediateReaders)
+		internal SetupStage(ManualLogSource logger, JsonSerializer serializer, JObjectImmediateReader jObjectImmediateReader, Dictionary<string, ISharedAssetLoader> sharedLoaders, ImmediateReaderCollection immediateReaders) : base(logger, serializer, jObjectImmediateReader, sharedLoaders, immediateReaders)
 		{
-			_logger = logger;
-			_sharedLoaders = sharedAssetLoaders;
-
-			ImmediateReaders = immediateReaders;
 			CoroutineReaders = new DelayedReaderCollection(logger);
 		}
 

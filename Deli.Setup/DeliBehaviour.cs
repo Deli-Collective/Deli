@@ -7,7 +7,7 @@ namespace Deli.Setup
 {
 	public abstract class DeliBehaviour : MonoBehaviour
 	{
-		protected Mod Source { get; }
+		protected Mod Source { get; } = null!;
 
 		protected IDirectoryHandle Resources => Source.Resources;
 

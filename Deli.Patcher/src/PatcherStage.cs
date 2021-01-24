@@ -17,7 +17,7 @@ namespace Deli.Patcher
 				throw new InvalidOperationException("Stage has not initialized or handoff was already completed.");
 			}
 
-			callback(_instance.Logger, _instance.SharedLoaders, _instance.ImmediateReaders);
+			callback(_instance.Logger, _instance.Serializer, _instance.JObjectImmediateReader, _instance.SharedLoaders, _instance.ImmediateReaders);
 			_instance = null;
 		}
 
