@@ -32,8 +32,12 @@ namespace Deli.Patcher
 			Source = source;
 		}
 
+		/// <summary>
+		///		Invoked when the <see cref="PatcherStage"/> is in progress.
+		/// </summary>
 		protected abstract void RunStage(PatcherStage stage);
 
+		/// <inheritdoc cref="IDeliCode.RunStage"/>
 		public virtual void RunStage(Stage stage)
 		{
 			if (stage is PatcherStage patcher)
