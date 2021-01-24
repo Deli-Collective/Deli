@@ -46,6 +46,12 @@ namespace Deli.Patcher
 			return source.Major == dependant.Major && source.Minor >= dependant.Minor;
 		}
 
+		// .NET Framework 3.5's string.Join(...) is array only...
+		/// <summary>
+		///		Joins a string enumerable with a delimiter.
+		/// </summary>
+		/// <param name="this"></param>
+		/// <param name="delimiter">The string to insert between elements.</param>
 		public static string JoinStr(this IEnumerable<string> @this, string delimiter)
 		{
 			using var enumerator = @this.GetEnumerator();

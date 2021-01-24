@@ -13,11 +13,15 @@ namespace Deli.Setup
 		private readonly Dictionary<string, IDelayedAssetLoader> _delayedLoaders = new();
 		private readonly Dictionary<Type, object> _wrapperReaders = new();
 
-		public DelayedReaderCollection CoroutineReaders { get; }
+		/// <summary>
+		///		The collection of all the <see cref="IDelayedReader{T}"/>s publicly available. This does not include wrappers for <see cref="IImmediateReader{T}"/>.
+		///		For getting readers including <see cref="IImmediateReader{T}"/> wrappers, use <seealso cref="GetReader{T}"/>.
+		/// </summary>
+		public DelayedReaderCollection DelayedReaders { get; }
 
 		internal SetupStage(ManualLogSource logger, JsonSerializer serializer, JObjectImmediateReader jObjectImmediateReader, Dictionary<string, ISharedAssetLoader> sharedLoaders, ImmediateReaderCollection immediateReaders) : base(logger, serializer, jObjectImmediateReader, sharedLoaders, immediateReaders)
 		{
-			CoroutineReaders = new DelayedReaderCollection(logger);
+			DelayedReaders = new DelayedReaderCollection(logger);
 		}
 
 		public IDisposable AddAssetLoader(string name, IDelayedAssetLoader loader)
@@ -31,15 +35,19 @@ namespace Deli.Setup
 			return new ActionDisposable(() => _delayedLoaders.Remove(name));
 		}
 
+		/// <summary>
+		///		Gets a reader from <seealso cref="DelayedReaders"/>, otherwise gets a reader from <see cref="Stage.ImmediateReaders"/> and wraps it.
+		/// </summary>
+		/// <typeparam name="T">The type to deserialize.</typeparam>
 		public IDelayedReader<T> GetReader<T>()
 		{
-			if (CoroutineReaders.TryGet<T>(out var reader))
+			var type = typeof(T);
+			if (DelayedReaders.TryGet<T>(out var reader))
 			{
-				_wrapperReaders.Remove(typeof(T));
+				_wrapperReaders.Remove(type);
 				return reader;
 			}
 
-			var type = typeof(T);
 			if (_wrapperReaders.TryGetValue(type, out var obj))
 			{
 				return (IDelayedReader<T>) obj;

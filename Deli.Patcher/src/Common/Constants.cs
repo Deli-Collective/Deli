@@ -1,7 +1,13 @@
 namespace Deli
 {
+	/// <summary>
+	///		Constants used by Deli.
+	/// </summary>
 	public static class DeliConstants
 	{
+		/// <summary>
+		///		Information about Deli itself.
+		/// </summary>
 		public static class Metadata
 		{
 			/// <summary>
@@ -20,6 +26,9 @@ namespace Deli
 			public const string Version = "MACRO_VERSION";
 		}
 
+		/// <summary>
+		///		The Git information present when Deli was built.
+		/// </summary>
 		public static class Git
 		{
 			/// <summary>
@@ -41,11 +50,29 @@ namespace Deli
 			public const string Hash = "MACRO_GIT_HASH";
 		}
 
+		/// <summary>
+		///		Information pertaining to the filesystem that Deli uses.
+		/// </summary>
 		public static class Filesystem
 		{
+			/// <summary>
+			///		The directory containing all Deli related content.
+			/// </summary>
 			public const string Directory = Metadata.Name;
+
+			/// <summary>
+			///		The directory containing config files of Deli mods.
+			/// </summary>
 			public const string ConfigsDirectory = Directory + "/configs";
+
+			/// <summary>
+			///		The directory containing Deli mods.
+			/// </summary>
 			public const string ModsDirectory = Directory + "/mods";
+
+			/// <summary>
+			/// The name of the manifest file expected in mods.
+			/// </summary>
 			public const string ManifestName = "manifest.json";
 		}
 	}

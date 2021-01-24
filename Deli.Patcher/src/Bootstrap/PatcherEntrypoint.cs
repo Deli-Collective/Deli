@@ -16,8 +16,8 @@ namespace Deli.Patcher
 
     public static class PatcherEntrypoint
     {
-	    private static ManualLogSource _logger = Logger.CreateLogSource(Metadata.Name);
-		private static Dictionary<string, List<IPatcher>> _filePatchers = new();
+	    private static readonly ManualLogSource _logger = Logger.CreateLogSource(Metadata.Name);
+		private static readonly Dictionary<string, List<IPatcher>> _filePatchers = new();
 		private static IEnumerable<IPatcher>? _activePatchers;
 
 		public static IEnumerable<string> TargetDLLs

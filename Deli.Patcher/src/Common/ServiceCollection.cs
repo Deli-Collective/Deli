@@ -11,7 +11,7 @@ namespace Deli
 
 		protected Dictionary<Type, object> Services { get; } = new();
 
-		public ServiceCollection(ManualLogSource logger)
+		protected ServiceCollection(ManualLogSource logger)
 		{
 			_logger = logger;
 		}

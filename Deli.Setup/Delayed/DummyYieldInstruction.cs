@@ -1,5 +1,12 @@
+using UnityEngine;
+
 namespace Deli.Setup
 {
+	public sealed class DummyYieldInstruction : CustomYieldInstruction
+	{
+		public override bool keepWaiting { get; } = false;
+	}
+
 	public sealed class DummyYieldInstruction<T> : ResultYieldInstruction<T>
 	{
 		public override bool keepWaiting { get; } = false;

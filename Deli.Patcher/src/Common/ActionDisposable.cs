@@ -2,17 +2,25 @@ using System;
 
 namespace Deli
 {
-	public class ActionDisposable : IDisposable
+	/// <summary>
+	///		A disposable that calls an <see cref="Action"/> on disposal.
+	/// </summary>
+	public sealed class ActionDisposable : IDisposable
 	{
 		private readonly Action _callback;
 
 		private bool _disposed;
 
+		/// <summary>
+		///		Creates an instance of <see cref="ActionDisposable"/>
+		/// </summary>
+		/// <param name="callback"></param>
 		public ActionDisposable(Action callback)
 		{
 			_callback = callback;
 		}
 
+		/// <inheritdoc cref="IDisposable.Dispose"/>
 		public void Dispose()
 		{
 			if (_disposed)
