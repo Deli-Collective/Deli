@@ -36,8 +36,12 @@ namespace Deli.Setup
 			GlobalSource = null;
 		}
 
+		/// <summary>
+		///		Invoked when the <see cref="SetupStage"/> is in progress.
+		/// </summary>
 		protected abstract void RunStage(SetupStage stage);
 
+		/// <inheritdoc cref="IDeliCode.RunStage"/>
 		public virtual void RunStage(Stage stage)
 		{
 			if (stage is SetupStage setup)
