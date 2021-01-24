@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using BepInEx;
 using BepInEx.Logging;
@@ -6,7 +5,7 @@ using Deli.Patcher;
 
 namespace Deli.Setup
 {
-	[BepInPlugin(DeliMetadata.Guid, DeliMetadata.Name, DeliMetadata.Version)]
+	[BepInPlugin(DeliConstants.Guid, DeliConstants.Name, DeliConstants.Version)]
 	public class PluginEntrypoint : BaseUnityPlugin
 	{
 		private void Awake()
@@ -14,10 +13,9 @@ namespace Deli.Setup
 			PatcherEntrypoint.Handoff(Entrypoint);
 		}
 
-		private void Entrypoint(ManualLogSource logger, ImmediateReaderCollection immediateReaders)
+		private void Entrypoint(ManualLogSource logger, Dictionary<string, ISharedAssetLoader> sharedAssetLoaders, ImmediateReaderCollection immediateReaders)
 		{
-			var stage = new DeliSetupStage(logger, immediateReaders);
-			// TODO: call stuff
+			var stage = new SetupStage(logger, sharedAssetLoaders, immediateReaders);
 		}
 	}
 }

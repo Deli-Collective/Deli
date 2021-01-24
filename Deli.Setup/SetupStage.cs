@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using BepInEx.Logging;
 using Deli.Patcher;
@@ -7,40 +6,42 @@ using Deli.VFS;
 
 namespace Deli.Setup
 {
-	internal class DeliSetupStage : ISetupStage
+	public class SetupStage
 	{
 		private readonly ManualLogSource _logger;
 
-		private readonly Dictionary<string, ICoroutineAssetLoader> _loaders = new();
+		private readonly Dictionary<string, ISharedAssetLoader> _sharedLoaders;
+		private readonly Dictionary<string, IDelayedAssetLoader> _delayedLoaders = new();
 		private readonly Dictionary<Type, object> _wrapperReaders = new();
 
 		public ImmediateReaderCollection ImmediateReaders { get; }
 
-		public CoroutineReaderCollection CoroutineReaders { get; }
+		public DelayedReaderCollection CoroutineReaders { get; }
 
 		public event Action? Started;
 		public event Action? Finished;
 
-		public DeliSetupStage(ManualLogSource logger, ImmediateReaderCollection immediateReaders)
+		internal SetupStage(ManualLogSource logger, Dictionary<string, ISharedAssetLoader> sharedAssetLoaders, ImmediateReaderCollection immediateReaders)
 		{
 			_logger = logger;
+			_sharedLoaders = sharedAssetLoaders;
 
 			ImmediateReaders = immediateReaders;
-			CoroutineReaders = new CoroutineReaderCollection(logger);
+			CoroutineReaders = new DelayedReaderCollection(logger);
 		}
 
-		public IDisposable AddAssetLoader(string name, ICoroutineAssetLoader loader)
+		public IDisposable AddAssetLoader(string name, IDelayedAssetLoader loader)
 		{
-			if (_loaders.ContainsKey(name))
+			if (_delayedLoaders.ContainsKey(name))
 			{
 				throw new InvalidOperationException($"An asset loader with the same name ({name}) already exists.");
 			}
 
-			_loaders.Add(name, loader);
-			return new ActionDisposable(() => _loaders.Remove(name));
+			_delayedLoaders.Add(name, loader);
+			return new ActionDisposable(() => _delayedLoaders.Remove(name));
 		}
 
-		public ICoroutineReader<T> GetReader<T>()
+		public IDelayedReader<T> GetReader<T>()
 		{
 			if (CoroutineReaders.TryGet<T>(out var reader))
 			{
@@ -51,7 +52,7 @@ namespace Deli.Setup
 			var type = typeof(T);
 			if (_wrapperReaders.TryGetValue(type, out var obj))
 			{
-				return (ICoroutineReader<T>) obj;
+				return (IDelayedReader<T>) obj;
 			}
 
 			var immediate = ImmediateReaders.Get<T>();
@@ -61,7 +62,7 @@ namespace Deli.Setup
 			return wrapper;
 		}
 
-		private class ImmediateReaderWrapper<T> : ICoroutineReader<T>
+		private class ImmediateReaderWrapper<T> : IDelayedReader<T>
 		{
 			private readonly IImmediateReader<T> _immediate;
 
