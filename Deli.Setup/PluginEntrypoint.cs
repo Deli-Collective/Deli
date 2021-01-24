@@ -5,7 +5,7 @@ using Deli.Patcher;
 
 namespace Deli.Setup
 {
-	[BepInPlugin(DeliConstants.Guid, DeliConstants.Name, DeliConstants.Version)]
+	[BepInPlugin(DeliConstants.Metadata.Guid, DeliConstants.Metadata.Name, DeliConstants.Metadata.Version)]
 	public class PluginEntrypoint : BaseUnityPlugin
 	{
 		private void Awake()
