@@ -1,4 +1,28 @@
-﻿using System;
+﻿// https://github.com/maxhauser/semver
+// Taken from commit 8b9353a6d325ebb42059a8709c235ff27dc6903e
+/*
+Copyright (c) 2013 Max Hauser
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+ */
+
+using System;
 using System.Globalization;
 using System.Text;
 using System.Runtime.Serialization;
@@ -21,7 +45,7 @@ namespace Semver
                 @"(?>\-(?<pre>[0-9A-Za-z\-\.]+))?" +
                 @"(?>\+(?<build>[0-9A-Za-z\-\.]+))?$",
                 RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-        
+
 #pragma warning disable CA1801 // Parameter unused
         /// <summary>
         /// Deserialize a <see cref="SemVersion"/>.
@@ -464,7 +488,7 @@ namespace Semver
                 return result;
             }
         }
-        
+
         /// <summary>
         /// Populates a <see cref="SerializationInfo"/> with the data needed to serialize the target object.
         /// </summary>
