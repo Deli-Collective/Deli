@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Logging;
 using Deli.Patcher.Bootstrap;
+using Deli.Patcher.Readers;
 using Mono.Cecil;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -11,7 +12,7 @@ using Git = Deli.DeliConstants.Git;
 
 namespace Deli.Patcher
 {
-	public delegate void StageHandoff(ManualLogSource logger, Dictionary<string, ISharedAssetLoader> sharedAssetLoaders, ImmediateReaderCollection immediateReaders);
+	public delegate void StageHandoff(ManualLogSource logger, JsonSerializer serializer, JObjectImmediateReader jObjectImmediateReader, Dictionary<string, ISharedAssetLoader> sharedLoaders, ImmediateReaderCollection immediateReaders);
 
     public static class PatcherEntrypoint
     {
