@@ -1,0 +1,20 @@
+SHELL            = /bin/bash
+
+# Settings
+CONFIG          ?= Release
+FRAMEWORK       ?= net35
+VERSION         ?= $(shell git describe --tags --abbrev=0 | sed -n 's/v\([0-9\.]+\)*/\1/p')
+NUGET           ?= nuget
+NUGET_DIR        = ../$(NUGET)
+
+# DLL metadata
+GIT_DESCRIBE     = $(shell git describe --long --always --dirty)
+GIT_BRANCH       = $(shell git rev-parse --abbrev-ref HEAD)
+GIT_HASH         = $(shell git rev-parse HEAD)
+BUILD_PROPERTIES = /p:Version="$(VERSION)" /p:RepositoryBranch="$(GIT_BRANCH)" /p:RepositoryCommit="$(GIT_HASH)"
+BUILD            = dotnet build --configuration $(CONFIG) --framework $(FRAMEWORK) $(BUILD_PROPERTIES)
+
+# Packages
+MANIFEST         = manifest.json
+MANIFEST_OLD     = $(MANIFEST).old
+CONTENTS         = $(MANIFEST)
