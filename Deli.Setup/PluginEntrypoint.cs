@@ -1,23 +1,22 @@
-using System.Collections.Generic;
+using System.Collections;
 using BepInEx;
-using BepInEx.Logging;
-using Deli.Patcher;
-using Deli.Patcher.Readers;
-using Newtonsoft.Json;
+using Deli.Patcher.Bootstrap;
+using UnityEngine;
 
 namespace Deli.Setup
 {
+	public delegate Coroutine CoroutineRunner(IEnumerator method);
+
 	[BepInPlugin(DeliConstants.Metadata.Guid, DeliConstants.Metadata.Name, DeliConstants.Metadata.Version)]
 	public class PluginEntrypoint : BaseUnityPlugin
 	{
 		private void Awake()
 		{
-			PatcherEntrypoint.Handoff(Entrypoint);
-		}
+			var blob = PatcherEntrypoint.Handoff();
+			var stage = new SetupStage(blob.StageData);
+			var loader = stage.LoadMods(blob.Mods, StartCoroutine);
 
-		private void Entrypoint(ManualLogSource logger, JsonSerializer serializer, JObjectImmediateReader jObjectImmediateReader, Dictionary<string, ISharedAssetLoader> sharedLoaders, ImmediateReaderCollection immediateReaders)
-		{
-			var stage = new SetupStage(logger, serializer, jObjectImmediateReader, sharedLoaders, immediateReaders);
+			StartCoroutine(loader);
 		}
 	}
 }

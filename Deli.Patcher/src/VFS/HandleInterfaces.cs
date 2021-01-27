@@ -6,6 +6,7 @@ namespace Deli.VFS
 {
 	public interface IHandle
 	{
+		string Path { get; }
 	}
 
 	public interface INamedHandle : IHandle
@@ -28,5 +29,9 @@ namespace Deli.VFS
 	public interface IChildHandle : INamedHandle
 	{
 		IDirectoryHandle Directory { get; }
+	}
+
+	public interface IChildDirectoryHandle : IChildHandle, IDirectoryHandle
+	{
 	}
 }

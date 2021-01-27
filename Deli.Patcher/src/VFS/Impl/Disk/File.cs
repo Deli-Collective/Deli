@@ -5,6 +5,8 @@ namespace Deli.VFS.Disk
 {
 	public sealed class FileHandle : IFileHandle, IDiskChildHandle
 	{
+		public string Path { get; }
+
 		public string Name { get; }
 
 		public DirectoryHandle Directory { get; }
@@ -16,14 +18,10 @@ namespace Deli.VFS.Disk
 
 		internal FileHandle(string name, string pathOnDisk, DirectoryHandle directory)
 		{
+			Path = directory.Path + name;
 			Name = name;
 			Directory = directory;
 			PathOnDisk = pathOnDisk;
-		}
-
-		internal void Refresh()
-		{
-			// TODO: check if this file has changed, and invoke updated if so
 		}
 
 		public Stream OpenRead()

@@ -9,9 +9,12 @@ namespace Deli.VFS.Zip
 	{
 		private readonly Dictionary<string, IChildHandle> _children;
 
-		internal DirectoryHandle(Dictionary<string, IChildHandle> children)
+		public string Path { get; }
+
+		internal DirectoryHandle(Dictionary<string, IChildHandle> children, string path)
 		{
 			_children = new Dictionary<string, IChildHandle>();
+			Path = path;
 		}
 
 		public IChildHandle? this[string name] => _children.TryGetValue(name, out var child) ? child : null;
@@ -48,7 +51,7 @@ namespace Deli.VFS.Zip
 
 		private static ZipDirectoryInfo GetParent(Dictionary<string, ZipDirectoryInfo> directories, string path)
 		{
-			var parentName = Path.GetDirectoryName(path);
+			var parentName = System.IO.Path.GetDirectoryName(path);
 			if (!directories.TryGetValue(parentName, out var parent))
 			{
 				parent = AppendDirectory(directories, parentName);
@@ -62,7 +65,7 @@ namespace Deli.VFS.Zip
 			var parent = GetParent(directories, path);
 
 			var children = new Dictionary<string, IChildHandle>();
-			var handle = new ChildDirectoryHandle(Path.GetFileName(path), children, parent.Handle);
+			var handle = new ChildDirectoryHandle(System.IO.Path.GetFileName(path), children, parent.Handle);
 			var info = new ZipDirectoryInfo(handle, children);
 			parent.Children.Add(handle.Name, handle);
 
@@ -73,7 +76,7 @@ namespace Deli.VFS.Zip
 		{
 			var parent = GetParent(directories, path);
 
-			var handle = new FileHandle(entry, Path.GetFileName(path), parent.Handle);
+			var handle = new FileHandle(entry, System.IO.Path.GetFileName(path), parent.Handle);
 			parent.Children.Add(handle.Name, handle);
 
 			return handle;
@@ -110,19 +113,19 @@ namespace Deli.VFS.Zip
 			return root;
 		}
 
-		internal RootDirectoryHandle(Dictionary<string, IChildHandle> children) : base(children)
+		internal RootDirectoryHandle(Dictionary<string, IChildHandle> children) : base(children, "/")
 		{
 		}
 	}
 
-	public class ChildDirectoryHandle : DirectoryHandle, IChildHandle
+	public class ChildDirectoryHandle : DirectoryHandle, IChildDirectoryHandle
 	{
 		public string Name { get; }
 
 		public DirectoryHandle Directory { get; }
 		IDirectoryHandle IChildHandle.Directory => Directory;
 
-		internal ChildDirectoryHandle(string name, Dictionary<string, IChildHandle> children, DirectoryHandle directory) : base(children)
+		internal ChildDirectoryHandle(string name, Dictionary<string, IChildHandle> children, DirectoryHandle directory) : base(children, directory.Path + name + "/")
 		{
 			Name = name;
 			Directory = directory;

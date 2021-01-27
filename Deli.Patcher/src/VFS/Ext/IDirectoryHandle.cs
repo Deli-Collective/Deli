@@ -4,6 +4,16 @@ namespace Deli.VFS
 {
 	public static class ExtIDirectoryHandle
 	{
+		public static IFileHandle? GetFile(this IDirectoryHandle @this, string name)
+		{
+			return @this[name] as IFileHandle;
+		}
+
+		public static IChildDirectoryHandle? GetDirectory(this IDirectoryHandle @this, string name)
+		{
+			return @this[name] as IChildDirectoryHandle;
+		}
+
 		public static IEnumerable<IChildHandle> GetLeafs(this IDirectoryHandle @this)
 		{
 			foreach (var child in @this)
@@ -36,6 +46,11 @@ namespace Deli.VFS
 					}
 				}
 			}
+		}
+
+		public static IDirectoryHandle GetRoot(this IDirectoryHandle @this)
+		{
+			return @this is IChildHandle child ? child.GetRoot() : @this;
 		}
 
 		public static bool IsParentOf(this IDirectoryHandle @this, IChildHandle child)

@@ -1,51 +1,77 @@
 using System;
 using System.Collections.Generic;
-using BepInEx.Logging;
-using Deli.Patcher.Readers;
-using Newtonsoft.Json;
+using System.Linq;
+using Deli.Patcher.Common;
+using Deli.VFS;
 
 namespace Deli.Patcher
 {
 	public class PatcherStage : Stage
 	{
-		private static PatcherStage? _instance;
+		public NestedServiceCollection<Mod, string, ImmediateAssetLoader<PatcherStage>> PatcherAssetLoaders { get; } = new();
+		public NestedServiceCollection<string, Mod, Patcher> Patchers { get; } = new();
 
-		internal static void Handoff(StageHandoff callback)
+		internal PatcherStage(Blob data) : base(data)
 		{
-			if (_instance is null)
+		}
+
+		private ImmediateAssetLoader<PatcherStage>? GetLoader(Mod mod, string name)
+		{
+			if (PatcherAssetLoaders.TryGet(mod, name, out var patcher))
 			{
-				throw new InvalidOperationException("Stage has not initialized or handoff was already completed.");
+				return patcher;
 			}
 
-			callback(_instance.Logger, _instance.Serializer, _instance.JObjectImmediateReader, _instance.SharedLoaders, _instance.ImmediateReaders);
-			_instance = null;
-		}
-
-		private readonly Dictionary<string, IPatcherAssetLoader> _patcherAssetLoaders = new();
-		private readonly Dictionary<string, List<IPatcher>> _filePatchers;
-
-		internal PatcherStage(ManualLogSource logger, JsonSerializer serializer, Dictionary<string, ISharedAssetLoader> sharedLoaders, ImmediateReaderCollection immediateReaders, Dictionary<string, List<IPatcher>> filePatchers)
-			: base(logger, serializer, new JObjectImmediateReader(), sharedLoaders, immediateReaders)
-		{
-			_filePatchers = filePatchers;
-
-			_instance = this;
-		}
-
-		public IDisposable AddAssetLoader(string name, IPatcherAssetLoader loader)
-		{
-			return AddAssetLoader<IPatcherAssetLoader, PatcherStage>(name, loader, _patcherAssetLoaders);
-		}
-
-		public void AddPatcher(string fileName, IPatcher patcher)
-		{
-			if (!_filePatchers.TryGetValue(fileName, out var patchers))
+			if (SharedAssetLoaders.TryGet(mod, name, out var shared))
 			{
-				patchers = new List<IPatcher>();
-				_filePatchers.Add(fileName, patchers);
+				return shared;
 			}
 
-			patchers.Add(patcher);
+			return null;
+		}
+
+		private void LoadMod(Mod mod, Dictionary<string, Mod> lookup)
+		{
+			var assets = mod.Info.Patchers;
+			if (assets is null) return;
+
+			Logger.LogInfo("Loading patchers from " + mod);
+			foreach (var asset in assets)
+			{
+				var globber = new Globber(asset.Key);
+				var loaderId = asset.Value;
+
+				if (!lookup.TryGetValue(loaderId.Mod, out var loaderMod))
+				{
+					throw new InvalidOperationException($"Mod required for asset \"{asset.Key}\" of {mod} was not present: {loaderId.Mod}");
+				}
+
+				var loader = GetLoader(loaderMod, loaderId.Name);
+				if (loader is null)
+				{
+					throw new InvalidOperationException($"Loader required for asset \"{asset.Key}\" of {mod} was not present.");
+				}
+
+				foreach (var handle in globber.Glob(mod.Resources))
+				{
+					loader(this, mod, handle);
+				}
+			}
+		}
+
+		// IEnumerable<Mod> for when one mod doesn't cause all to fail.
+		internal IEnumerable<Mod> LoadMods(IEnumerable<Mod> mods)
+		{
+			var lookup = new Dictionary<string, Mod>();
+			foreach (var mod in mods)
+			{
+				lookup.Add(mod.Info.Guid, mod);
+
+				LoadMod(mod, lookup);
+				yield return mod;
+			}
+
+			InvokeFinished();
 		}
 	}
 }

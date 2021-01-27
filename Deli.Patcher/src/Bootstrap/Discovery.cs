@@ -15,9 +15,9 @@ namespace Deli.Patcher.Bootstrap
 	{
 		private readonly ManualLogSource _logger;
 		private readonly DirectoryInfo _mods;
-		private readonly IImmediateReader<Mod.Manifest> _manifestReader;
+		private readonly ImmediateReader<Mod.Manifest> _manifestReader;
 
-		public Discovery(ManualLogSource logger, IImmediateReader<Mod.Manifest> manifestReader)
+		public Discovery(ManualLogSource logger, ImmediateReader<Mod.Manifest> manifestReader)
 		{
 			_logger = logger;
 			_manifestReader = manifestReader;
@@ -31,8 +31,7 @@ namespace Deli.Patcher.Bootstrap
 				throw new FileNotFoundException("Manifest file was not present.", Filesystem.ManifestName);
 			}
 
-			var manifestTyped = new ImmediateTypedFileHandle<Mod.Manifest>(manifestFile, _manifestReader);
-			return manifestTyped.GetOrRead();
+			return _manifestReader(manifestFile);
 		}
 
 		private IDirectoryHandle CreateZipResources(FileInfo file)
@@ -113,9 +112,13 @@ namespace Deli.Patcher.Bootstrap
 			}
 		}
 
-		public IEnumerable<Mod> DiscoverMods()
+		public IEnumerable<Mod> Run()
 		{
-			return DiscoverMods(_mods);
+			foreach (var mod in DiscoverMods(_mods))
+			{
+				_logger.LogDebug($"Discovered mod: {mod} at {mod.Resources}");
+				yield return mod;
+			}
 		}
 	}
 }

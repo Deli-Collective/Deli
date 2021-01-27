@@ -1,156 +1,99 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using BepInEx.Logging;
-using Deli.Patcher.Bootstrap;
-using Deli.Patcher.Readers;
 using Mono.Cecil;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Metadata = Deli.DeliConstants.Metadata;
 using Git = Deli.DeliConstants.Git;
 
-namespace Deli.Patcher
+namespace Deli.Patcher.Bootstrap
 {
-	public delegate void StageHandoff(ManualLogSource logger, JsonSerializer serializer, JObjectImmediateReader jObjectImmediateReader, Dictionary<string, ISharedAssetLoader> sharedLoaders, ImmediateReaderCollection immediateReaders);
-
     public static class PatcherEntrypoint
     {
-	    private static readonly ManualLogSource _logger = Logger.CreateLogSource(Metadata.Name);
-		private static readonly Dictionary<string, List<IPatcher>> _filePatchers = new();
-		private static IEnumerable<IPatcher>? _activePatchers;
+	    // Store and access everything from this object, so we can scope the access of this static class.
+	    // Avoids memory leaking and enforces the implicit contract.
+	    private static Bootstrapper? _stateful;
+	    private static KeyValuePair<string, IEnumerable<KeyValuePair<Mod, Patcher>>>? _activeFile;
 
-		public static IEnumerable<string> TargetDLLs
+	    public static IEnumerable<string> TargetDLLs
 		{
 			get
 			{
-				foreach (var localPatchers in _filePatchers)
+				if (_stateful is null)
 				{
-					_activePatchers = localPatchers.Value;
-					yield return localPatchers.Key;
+					throw new ImplicitContractException(nameof(Initialize));
 				}
 
-				_activePatchers = null;
+				foreach (var file in _stateful.Patchers)
+				{
+					_activeFile = file;
+					yield return file.Key;
+				}
 			}
 		}
 
 		public static void Initialize()
 		{
-			_logger.LogInfo($"Deli bootstrap has begun! Version {Metadata.Version} ({Git.Branch} @ {Git.Describe})");
+			var logger = Logger.CreateLogSource(Metadata.Name);
+			logger.LogInfo($"Deli bootstrap has begun! Version {Metadata.Version} ({Git.Branch} @ {Git.Describe})");
 
-			var serializer = JsonSerializer.Create(new JsonSerializerSettings
-			{
-				Formatting = Formatting.Indented,
-				ContractResolver = new DefaultContractResolver
-				{
-					NamingStrategy = new SnakeCaseNamingStrategy()
-				}
-			});
-			var sharedLoaders = new Dictionary<string, ISharedAssetLoader>();
-			var immediateReaders = new ImmediateReaderCollection(_logger);
-			var stage = new PatcherStage(_logger, serializer, sharedLoaders, immediateReaders, _filePatchers);
-
-			var manifestReader = stage.RegisterImmediateJson<Mod.Manifest>();
-			var discovery = new Discovery(_logger, manifestReader);
-
-			foreach (var mod in Sort(discovery.DiscoverMods()))
-			{
-				var manifest = mod.Info;
-			}
-		}
-
-		private static bool CheckDependencies(Dictionary<string, Mod> lookup)
-		{
-			foreach (var mod in lookup.Values)
-			{
-				var deps = mod.Info.Dependencies;
-				if (deps is null) continue;
-
-				foreach (var dep in deps)
-				{
-					string DepToString()
-					{
-						return $"{dep.Key} @ {dep.Value}";
-					}
-
-					// Try finding the installed dependency
-					if (!lookup.TryGetValue(dep.Key, out var resolved))
-					{
-						_logger.LogError($"Mod {mod} depends on {DepToString()}, but it is not installed!");
-						return false;
-					}
-
-					// Check if the installed version satisfies the dependency request
-					if (!resolved.Info.Version.Satisfies(dep.Value))
-					{
-						_logger.LogError($"Mod {mod} depends on {DepToString()}, but version {resolved.Info.Version} is installed!");
-						return false;
-					}
-				}
-			}
-
-			return true;
-		}
-
-		private static IEnumerable<Mod> Sort(IEnumerable<Mod> mods)
-		{
-			var lookup = new Dictionary<string, Mod>();
-			{
-				var conflicts = new Dictionary<string, List<Mod>>();
-				foreach (var mod in mods)
-				{
-					var guid = mod.Info.Guid;
-					if (conflicts.TryGetValue(guid, out var conflicting))
-					{
-						conflicting.Add(mod);
-						continue;
-					}
-
-					if (lookup.ContainsKey(guid))
-					{
-						lookup.Remove(guid);
-
-						conflicting = new List<Mod> {mod};
-						conflicts.Add(guid, conflicting);
-						continue;
-					}
-
-					lookup.Add(guid, mod);
-				}
-
-				foreach (var conflict in conflicts)
-				{
-					_logger.LogError($"GUID conflict found between {conflict.Value.Select(m => m.ToString()).JoinStr(", ")} ({conflict.Key}). These mods will not be loaded.");
-				}
-			}
-
-			_logger.LogInfo($"Found {lookup.Count} mods to load");
-
-			if (!CheckDependencies(lookup))
-			{
-				_logger.LogError("One or more dependencies are not satisfied. Aborting initialization.");
-				return Enumerable.Empty<Mod>();
-			}
-
-			return lookup.Values.TSort(m => m.Info.Dependencies?.Keys.Select(dep => lookup[dep]) ?? Enumerable.Empty<Mod>());
+			_stateful = new Bootstrapper(logger);
 		}
 
 		public static void Patch(ref AssemblyDefinition assembly)
 		{
-			if (_activePatchers is null)
+			if (_stateful is null)
 			{
-				throw new InvalidOperationException("Implicit contract broken: target DLLs was not enumerated before the patch method.");
+				throw new ImplicitContractException(nameof(Initialize));
 			}
 
-			foreach (var patcher in _activePatchers)
+			if (!_activeFile.HasValue)
 			{
-				patcher.Patch(ref assembly);
+				throw new ImplicitContractException(nameof(TargetDLLs));
+			}
+
+			try
+			{
+				var activeFile = _activeFile.Value;
+				var fileName = activeFile.Key;
+
+				foreach (var pair in activeFile.Value)
+				{
+					var mod = pair.Key;
+					var patcher = pair.Value;
+
+					try
+					{
+						patcher(ref assembly);
+					}
+					catch (Exception)
+					{
+						_stateful.Logger.LogError($"An unhandled exception occured while patching {fileName} with {mod}. This will be rethrown to prevent the game from loading.");
+						throw;
+					}
+				}
+			}
+			finally
+			{
+				_activeFile = null;
 			}
 		}
 
-		public static void Handoff(StageHandoff callback)
+		public static void Finish()
 		{
-			PatcherStage.Handoff(callback);
+			_activeFile = null;
 		}
-	}
+
+		public static HandoffBlob Handoff()
+		{
+			if (_stateful is null)
+			{
+				throw new InvalidOperationException("The bootstrap stack has not been initialized, or the handoff has already been performed.");
+			}
+
+			var blob = _stateful.Blob;
+			_stateful = null;
+
+			return blob;
+		}
+    }
 }

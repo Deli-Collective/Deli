@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using BepInEx.Logging;
 using Deli.Patcher;
-using Deli.Patcher.Readers;
+using Deli.Patcher.Common;
+using Deli.VFS;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -10,67 +12,87 @@ namespace Deli
 {
 	public abstract class Stage
 	{
-		protected ManualLogSource Logger { get; }
+		public Blob Data { get; }
 
-		protected JsonSerializer Serializer { get; }
+		private ImmediateReaderCollection JsonReaders => Data.JsonReaders;
 
-		protected JObjectImmediateReader JObjectImmediateReader { get; }
+		private JsonSerializer Serializer => Data.Serializer;
 
-		protected Dictionary<string, ISharedAssetLoader> SharedLoaders { get; }
+		protected ManualLogSource Logger => Data.Logger;
 
 		/// <summary>
-		///		The collection of all the <see cref="IImmediateReader{T}"/>s publicly available.
+		///		The collection of all the <see cref="ImmediateAssetLoader{TStage}"/>s registered.
 		/// </summary>
-		public ImmediateReaderCollection ImmediateReaders { get; }
+		public NestedServiceCollection<Mod, string, ImmediateAssetLoader<Stage>> SharedAssetLoaders => Data.SharedAssetLoaders;
+
+		/// <summary>
+		///		The collection of all the <see cref="ImmediateReader{T}"/>s publicly available.
+		/// </summary>
+		public ImmediateReaderCollection ImmediateReaders => Data.ImmediateReaders;
 
 		/// <summary>
 		///		Invoked when all operations that require this stage are complete.
 		/// </summary>
 		public event Action? Finished;
 
-		protected Stage(ManualLogSource logger, JsonSerializer serializer, JObjectImmediateReader jObjectImmediateReader, Dictionary<string, ISharedAssetLoader> sharedLoaders, ImmediateReaderCollection immediateReaders)
+		protected Stage(Blob data)
 		{
-			Logger = logger;
-			Serializer = serializer;
-			JObjectImmediateReader = jObjectImmediateReader;
-			SharedLoaders = sharedLoaders;
-			ImmediateReaders = immediateReaders;
-
-			immediateReaders.Add(jObjectImmediateReader);
+			Data = data;
 		}
 
-		protected static IDisposable AddAssetLoader<TAssetLoader, TStage>(string name, TAssetLoader loader, Dictionary<string, TAssetLoader> loaders)
-			where TAssetLoader : IImmediateAssetLoader<TStage> where TStage : Stage
+		private static JObject JObjectReader(IFileHandle handle)
 		{
-			if (loaders.ContainsKey(name))
-			{
-				throw new InvalidOperationException($"An {typeof(TAssetLoader)} asset loader with the same name ({name}) already exists.");
-			}
+			using var raw = handle.OpenRead();
+			using var text = new StreamReader(raw);
+			using var json = new JsonTextReader(text);
 
-			loaders.Add(name, loader);
-			return new ActionDisposable(() => loaders.Remove(name));
+			return JObject.Load(json);
 		}
 
-		public IDisposable AddAssetLoader(string name, ISharedAssetLoader loader)
+		private T JsonReader<T>(IFileHandle handle)
 		{
-			return AddAssetLoader<ISharedAssetLoader, Stage>(name, loader, SharedLoaders);
+			return JObjectReader(handle).ToObject<T>(Serializer) ?? throw new FormatException("JSON file contained a null object.");
+		}
+
+		protected void InvokeFinished()
+		{
+			Finished?.Invoke();
 		}
 
 		/// <summary>
-		///		Creates and adds a JSON <see cref="IImmediateReader{T}"/> for the type provided.
+		///		Creates and adds a JSON <see cref="ImmediateReader{T}"/> for the type provided.
 		/// </summary>
 		/// <typeparam name="T">The JSON model.</typeparam>
-		public JsonImmediateReader<T> RegisterImmediateJson<T>()
+		public ImmediateReader<T> RegisterJson<T>()
 		{
-			if (ImmediateReaders.TryGet<T>(out var unknown) && unknown is JsonImmediateReader<T> reader)
+			if (JsonReaders.TryGet<T>(out var reader))
 			{
 				return reader;
 			}
 
-			reader = new JsonImmediateReader<T>(JObjectImmediateReader, Serializer);
+			reader = JsonReader<T>;
+			JsonReaders.Add(reader);
 			ImmediateReaders.Add(reader);
 
 			return reader;
+		}
+
+		public readonly struct Blob
+		{
+			internal ImmediateReaderCollection JsonReaders { get; }
+			internal JsonSerializer Serializer { get; }
+			internal ManualLogSource Logger { get; }
+			internal NestedServiceCollection<Mod, string, ImmediateAssetLoader<Stage>> SharedAssetLoaders { get; }
+			internal ImmediateReaderCollection ImmediateReaders { get; }
+
+			internal Blob(ImmediateReaderCollection jsonReaders, JsonSerializer serializer, ManualLogSource logger, NestedServiceCollection<Mod, string, ImmediateAssetLoader<Stage>> sharedAssetLoaders, ImmediateReaderCollection immediateReaders)
+			{
+				JsonReaders = jsonReaders;
+				Serializer = serializer;
+				Logger = logger;
+				SharedAssetLoaders = sharedAssetLoaders;
+				ImmediateReaders = immediateReaders;
+			}
 		}
 	}
 }

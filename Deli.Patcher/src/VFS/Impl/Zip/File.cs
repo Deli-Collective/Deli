@@ -8,6 +8,8 @@ namespace Deli.VFS.Zip
 	{
 		private readonly ZipEntry _entry;
 
+		public string Path { get; }
+
 		public string Name { get; }
 
 		public DirectoryHandle Directory { get; }
@@ -19,6 +21,7 @@ namespace Deli.VFS.Zip
 		{
 			_entry = entry;
 
+			Path = directory.Path + name;
 			Name = name;
 			Directory = directory;
 		}
