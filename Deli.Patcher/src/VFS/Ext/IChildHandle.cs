@@ -8,7 +8,7 @@ namespace Deli.VFS
 {
 	public static class ExtIChildHandle
 	{
-		private static IEnumerable<T> Recurse<T>(T original, Func<T, T?> mut) where T : class
+		private static IEnumerable<T> RecurseEnumerable<T>(T original, Func<T, T?> mut) where T : class
 		{
 			var buffer = original;
 			do
@@ -31,14 +31,19 @@ namespace Deli.VFS
 			return buffer;
 		}
 
+		private static TRet RecurseParents<TRet>(IChildHandle child, Func<IDirectoryHandle, Func<IDirectoryHandle, IDirectoryHandle?>, TRet> func)
+		{
+			return func(child.Directory, directory => (directory as IChildHandle)?.Directory);
+		}
+
 		public static IDirectoryHandle GetRoot(this IChildHandle @this)
 		{
-			return RecurseAtomic(@this.Directory, v => (v as IChildHandle)?.Directory);
+			return RecurseParents(@this, RecurseAtomic);
 		}
 
 		public static IEnumerable<IDirectoryHandle> GetAncestors(this IChildHandle @this)
 		{
-			return Recurse(@this.Directory, d => (d as IChildHandle)?.Directory);
+			return RecurseParents(@this, RecurseEnumerable);
 		}
 
 		public static IEnumerable<IHandle> GetPathing(this IChildHandle @this)
@@ -63,29 +68,6 @@ namespace Deli.VFS
 		public static IChildHandle? WithExtension(this IChildHandle @this, string extension)
 		{
 			return @this.WithName(Path.ChangeExtension(@this.Name, extension));
-		}
-
-		public static string GetPath(this IChildHandle @this)
-		{
-			using var enumerator = @this.GetPathing().GetEnumerator();
-
-			// Skip root and verify it was more than root
-			if (!enumerator.MoveNext() && !enumerator.MoveNext())
-			{
-				throw new InvalidOperationException("The number of nodes in the pathing of the handle is <2. Something is very wrong with this handle or its ancestors.");
-			}
-
-			var builder = new StringBuilder();
-			do
-			{
-				builder.Append('/');
-				if (enumerator.Current is INamedHandle named)
-				{
-					builder.Append(named.Name);
-				}
-			} while (enumerator.MoveNext());
-
-			return builder.ToString();
 		}
 
 		public static IChildHandle? GetSibling(this IChildHandle @this, string name)

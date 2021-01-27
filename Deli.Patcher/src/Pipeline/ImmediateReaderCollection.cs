@@ -9,21 +9,21 @@ namespace Deli.Patcher
 		{
 		}
 
-		public void Add<T>(IImmediateReader<T> reader)
+		public void Add<T>(ImmediateReader<T> reader)
 		{
 			Add(typeof(T), reader);
 		}
 
-		public IImmediateReader<T> Get<T>()
+		public ImmediateReader<T> Get<T>()
 		{
-			return (IImmediateReader<T>) Get(typeof(T));
+			return (ImmediateReader<T>) Get(typeof(T));
 		}
 
-		public bool TryGet<T>([MaybeNullWhen(false)] out IImmediateReader<T> reader)
+		public bool TryGet<T>([MaybeNullWhen(false)] out ImmediateReader<T> reader)
 		{
 			if (Services.TryGetValue(typeof(T), out var obj))
 			{
-				reader = (IImmediateReader<T>) obj;
+				reader = (ImmediateReader<T>) obj;
 				return true;
 			}
 

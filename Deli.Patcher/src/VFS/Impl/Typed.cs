@@ -8,12 +8,14 @@ namespace Deli.VFS
 	public class ImmediateTypedFileHandle<T> : IFileHandle
 	{
 		private readonly IFileHandle _handle;
-		private readonly IImmediateReader<T> _reader;
+		private readonly ImmediateReader<T> _reader;
 
 		private bool _read;
 		[AllowNull]
 		[MaybeNull]
 		private T _cached;
+
+		public string Path => _handle.Path;
 
 		public string Name => _handle.Name;
 
@@ -21,7 +23,7 @@ namespace Deli.VFS
 
 		public event Action? Updated;
 
-		public ImmediateTypedFileHandle(IFileHandle handle, IImmediateReader<T> reader)
+		public ImmediateTypedFileHandle(IFileHandle handle, ImmediateReader<T> reader)
 		{
 			_handle = handle;
 			_reader = reader;
@@ -38,7 +40,7 @@ namespace Deli.VFS
 		{
 			if (!_read)
 			{
-				_cached = _reader.Read(this);
+				_cached = _reader(this);
 				_read = true;
 			}
 

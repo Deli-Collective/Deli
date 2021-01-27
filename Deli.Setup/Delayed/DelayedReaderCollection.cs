@@ -9,21 +9,21 @@ namespace Deli.Setup
 		{
 		}
 
-		public void Add<T>(IDelayedReader<T> reader)
+		public void Add<T>(DelayedReader<T> reader)
 		{
 			Add(typeof(T), reader);
 		}
 
-		public IDelayedReader<T> Get<T>()
+		public DelayedReader<T> Get<T>()
 		{
-			return (IDelayedReader<T>) Get(typeof(T));
+			return (DelayedReader<T>) Get(typeof(T));
 		}
 
-		public bool TryGet<T>([MaybeNullWhen(false)] out IDelayedReader<T> reader)
+		public bool TryGet<T>([MaybeNullWhen(false)] out DelayedReader<T> reader)
 		{
 			if (Services.TryGetValue(typeof(T), out var obj))
 			{
-				reader = (IDelayedReader<T>) obj;
+				reader = (DelayedReader<T>) obj;
 				return true;
 			}
 

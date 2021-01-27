@@ -7,14 +7,15 @@ namespace Deli.VFS.Disk
 {
 	public abstract class DirectoryHandle : IDirectoryHandle, IDiskHandle, IEnumerable<IDiskChildHandle>
 	{
-		private readonly Dictionary<string, IDiskChildHandle> _handles;
+		private readonly Dictionary<string, IDiskChildHandle> _handles = new();
+
+		public string Path { get; }
 
 		public string PathOnDisk { get; }
 
-		protected DirectoryHandle(string pathOnDisk)
+		protected DirectoryHandle(string path, string pathOnDisk)
 		{
-			_handles = new Dictionary<string, IDiskChildHandle>();
-
+			Path = path;
 			PathOnDisk = pathOnDisk;
 
 			Refresh();
@@ -24,17 +25,18 @@ namespace Deli.VFS.Disk
 		{
 			// TODO: flush out implementation (deleted files + updated files)
 
-			foreach (var path in System.IO.Directory.GetFiles(PathOnDisk))
+			foreach (var path in Directory.GetFiles(PathOnDisk))
 			{
-				var name = Path.GetFileName(path);
+				var name = System.IO.Path.GetFileName(path);
 				var handle = new FileHandle(name, path, this);
 
 				_handles.Add(handle.Name, handle);
 			}
 
-			foreach (var path in System.IO.Directory.GetDirectories(PathOnDisk))
+			foreach (var path in Directory.GetDirectories(PathOnDisk))
 			{
-				var handle = new ChildDirectoryHandle(path, this);
+				var name = System.IO.Path.GetFileName(path);
+				var handle = new ChildDirectoryHandle(name, path, this);
 
 				_handles.Add(handle.Name, handle);
 			}
@@ -72,21 +74,21 @@ namespace Deli.VFS.Disk
 
 	public sealed class RootDirectoryHandle : DirectoryHandle
 	{
-		public RootDirectoryHandle(string pathOnDisk) : base(pathOnDisk)
+		public RootDirectoryHandle(string pathOnDisk) : base("/", pathOnDisk)
 		{
 		}
 	}
 
-	public sealed class ChildDirectoryHandle : DirectoryHandle, IDiskChildHandle
+	public sealed class ChildDirectoryHandle : DirectoryHandle, IChildDirectoryHandle, IDiskChildHandle
 	{
 		public string Name { get; }
 
 		public DirectoryHandle Directory { get; }
 		IDirectoryHandle IChildHandle.Directory => Directory;
 
-		internal ChildDirectoryHandle(string pathOnDisk, DirectoryHandle directory) : base(pathOnDisk)
+		internal ChildDirectoryHandle(string name, string pathOnDisk, DirectoryHandle directory) : base(directory.Path + name + "/", pathOnDisk)
 		{
-			Name = System.IO.Path.GetFileName(pathOnDisk);
+			Name = name;
 			Directory = directory;
 		}
 	}

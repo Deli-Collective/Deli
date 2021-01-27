@@ -98,11 +98,12 @@ namespace Deli
 			/// <summary>
 			///		The assets to load during the patcher stage.
 			/// </summary>
-			public Dictionary<string, string>? Patchers { get; private set; }
+			// TODO: change value to be
+			public Dictionary<string, AssetLoaderID>? Patchers { get; private set; }
 			/// <summary>
 			///		The assets to load during setup stage.
 			/// </summary>
-			public Dictionary<string, string>? Assets { get; private set; }
+			public Dictionary<string, AssetLoaderID>? Assets { get; private set; }
 
 			[OnDeserialized]
 			private void Validate()
