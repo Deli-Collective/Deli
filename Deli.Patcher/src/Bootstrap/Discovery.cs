@@ -21,7 +21,7 @@ namespace Deli.Patcher.Bootstrap
 		{
 			_logger = logger;
 			_manifestReader = manifestReader;
-			_mods = new DirectoryInfo(Filesystem.ModsDirectory);
+			_mods = Directory.CreateDirectory(Filesystem.ModsDirectory);
 		}
 
 		private Mod.Manifest CreateManifest(IDirectoryHandle resources)
