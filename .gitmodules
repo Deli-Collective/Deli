@@ -1,0 +1,3 @@
+[submodule "Deli.Newtonsoft.Json"]
+	path = Deli.Newtonsoft.Json
+	url = https://github.com/Deli-Counter/Deli.Newtonsoft.Json
