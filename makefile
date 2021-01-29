@@ -13,7 +13,7 @@ TEMP_PATCHERS        = $(TEMP)/BepInEx/patchers/Deli
 TEMP_PLUGINS         = $(TEMP)/BepInEx/plugins/Deli
 TEMP_DIRS            = $(TEMP_PATCHERS) $(TEMP_PLUGINS)
 
-CONTENTS_PATCHERS    = $(addsuffix .dll,$(PROJ_PATCHER) DotNetZip Newtonsoft.Json)
+CONTENTS_PATCHERS    = $(addsuffix .dll,$(PROJ_PATCHER) DotNetZip Deli.Newtonsoft.Json)
 CONTENTS_PLUGINS     = $(addsuffix .dll,$(PROJ_SETUP))
 
 .PHONY: FORCE all clean
