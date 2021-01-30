@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-namespace Deli.Patcher.Common
+namespace Deli
 {
 	public class NestedServiceCollection<TKey1, TKey2, TService> : IEnumerable<KeyValuePair<TKey1, IEnumerable<KeyValuePair<TKey2, TService>>>>
 	{

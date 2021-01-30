@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Deli
 {
@@ -13,6 +14,11 @@ namespace Deli
 			Mod = mod;
 			Name = name;
 		}
+
+		public override string ToString()
+		{
+			return Mod + ":" + Name;
+		}
 	}
 
 	public class AssetLoaderIDJsonConverter : JsonConverter<AssetLoaderID>
@@ -24,7 +30,7 @@ namespace Deli
 
 		public override AssetLoaderID ReadJson(JsonReader reader, Type objectType, AssetLoaderID existingValue, bool hasExistingValue, JsonSerializer serializer)
 		{
-			var raw = reader.ReadAsString();
+			var raw = JToken.ReadFrom(reader).ToObject<string>(serializer);
 			if (raw is null)
 			{
 				throw new FormatException("Asset loader IDs cannot be null.");

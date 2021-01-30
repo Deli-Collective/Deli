@@ -63,7 +63,7 @@ namespace Deli.VFS.Disk
 
 		IEnumerator<IChildHandle> IEnumerable<IChildHandle>.GetEnumerator()
 		{
-			return this.Cast<IChildHandle>().GetEnumerator();
+			return this.ImplicitCast<IDiskChildHandle, IChildHandle>().GetEnumerator();
 		}
 
 		public override string ToString()
