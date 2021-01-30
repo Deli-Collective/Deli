@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Deli.Patcher
+namespace Deli
 {
 	public static class Extension
 	{
@@ -76,6 +76,23 @@ namespace Deli.Patcher
 			}
 
 			return builder.ToString();
+		}
+
+		public static IEnumerable<TCast> ImplicitCast<T, TCast>(this IEnumerable<T> @this) where T : TCast
+		{
+			// Don't use LINQ cast, this will break enumerators that use this method.
+			foreach (var item in @this) yield return item;
+		}
+
+		public static IEnumerable<TCast> WhereCast<T, TCast>(this IEnumerable<T> @this) where TCast : T
+		{
+			foreach (var item in @this)
+			{
+				if (item is TCast casted)
+				{
+					yield return casted;
+				}
+			}
 		}
 	}
 }

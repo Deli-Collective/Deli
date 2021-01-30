@@ -77,36 +77,42 @@ namespace Deli
 			/// <summary>
 			///		The human-readable name of the mod.
 			/// </summary>
+			[JsonProperty]
 			public string? Name { get; private set; }
 			/// <summary>
 			///		An explanation of what the mod does.
 			/// </summary>
+			[JsonProperty]
 			public string? Description { get; private set; }
 			/// <summary>
 			///		The path to an icon file in the VFS.
 			/// </summary>
+			[JsonProperty]
 			public string? IconPath { get; private set; }
 			/// <summary>
 			///		The URL that this mod originated from, for use in checking the latest version.
 			/// </summary>
+			[JsonProperty]
 			public string? SourceUrl { get; private set; }
 
 			/// <summary>
 			///		The mods that this mod requires.
 			/// </summary>
+			[JsonProperty]
 			public Dictionary<string, Version>? Dependencies { get; private set; }
 			/// <summary>
 			///		The assets to load during the patcher stage.
 			/// </summary>
-			// TODO: change value to be
+			[JsonProperty]
 			public Dictionary<string, AssetLoaderID>? Patchers { get; private set; }
 			/// <summary>
 			///		The assets to load during setup stage.
 			/// </summary>
+			[JsonProperty]
 			public Dictionary<string, AssetLoaderID>? Assets { get; private set; }
 
 			[OnDeserialized]
-			private void Validate()
+			private void Validate(StreamingContext _)
 			{
 				// Make sure GUID is normalized
 				if (!_guidFilter.IsMatch(Guid))

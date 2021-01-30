@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Deli.Patcher.Common;
 using Deli.VFS;
 
 namespace Deli.Patcher
@@ -38,7 +36,6 @@ namespace Deli.Patcher
 			Logger.LogInfo("Loading patchers from " + mod);
 			foreach (var asset in assets)
 			{
-				var globber = new Globber(asset.Key);
 				var loaderId = asset.Value;
 
 				if (!lookup.TryGetValue(loaderId.Mod, out var loaderMod))
@@ -52,8 +49,9 @@ namespace Deli.Patcher
 					throw new InvalidOperationException($"Loader required for asset \"{asset.Key}\" of {mod} was not present.");
 				}
 
-				foreach (var handle in globber.Glob(mod.Resources))
+				foreach (var handle in Glob(mod, asset))
 				{
+					Logger.LogDebug($"{handle} > {loaderId}");
 					loader(this, mod, handle);
 				}
 			}

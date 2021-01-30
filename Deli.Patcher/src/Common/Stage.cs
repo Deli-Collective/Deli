@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using BepInEx.Logging;
 using Deli.Patcher;
-using Deli.Patcher.Common;
 using Deli.VFS;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -38,6 +37,22 @@ namespace Deli
 		protected Stage(Blob data)
 		{
 			Data = data;
+		}
+
+		protected IEnumerable<IHandle> Glob(Mod mod, KeyValuePair<string, AssetLoaderID> asset)
+		{
+			using var globbed = mod.Resources.Glob(asset.Key).GetEnumerator();
+
+			if (!globbed.MoveNext())
+			{
+				Logger.LogWarning($"Asset from {mod} of type {asset.Value} did not match any handles: {asset.Key}");
+				yield break;
+			}
+
+			do
+			{
+				yield return globbed.Current!;
+			} while (globbed.MoveNext());
 		}
 
 		private static JObject JObjectReader(IFileHandle handle)

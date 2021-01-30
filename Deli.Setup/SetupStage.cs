@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Deli.Patcher;
-using Deli.Patcher.Common;
 using Deli.VFS;
 using UnityEngine;
 
@@ -73,13 +72,12 @@ namespace Deli.Setup
 
 		private IEnumerator LoadMod(Mod mod, Dictionary<string, Mod> lookup, CoroutineRunner runner)
 		{
-			var assets = mod.Info.Patchers;
+			var assets = mod.Info.Assets;
 			if (assets is null) yield break;
 
 			Logger.LogInfo("Loading assets from " + mod);
 			foreach (var asset in assets)
 			{
-				var globber = new Globber(asset.Key);
 				var loaderId = asset.Value;
 
 				if (!lookup.TryGetValue(loaderId.Mod, out var loaderMod))
@@ -94,8 +92,9 @@ namespace Deli.Setup
 				}
 
 				var buffer = new Queue<Coroutine>();
-				foreach (var handle in globber.Glob(mod.Resources))
+				foreach (var handle in Glob(mod, asset))
 				{
+					Logger.LogDebug($"{handle} > {loaderId}");
 					var coroutine = runner(loader(this, mod, handle));
 					buffer.Enqueue(coroutine);
 				}

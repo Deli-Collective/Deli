@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Logging;
-using Deli.Patcher.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -31,6 +30,7 @@ namespace Deli.Patcher.Bootstrap
 						},
 						Converters =
 						{
+							new DeepDictionaryConverter(),
 							new AssetLoaderIDJsonConverter()
 						}
 					});
