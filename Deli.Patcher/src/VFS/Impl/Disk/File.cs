@@ -26,7 +26,7 @@ namespace Deli.VFS.Disk
 
 		public Stream OpenRead()
 		{
-			return new FileStream(PathOnDisk, FileMode.Open, FileAccess.Read, FileShare.Read, 64 * 1024, FileOptions.Asynchronous);
+			return new FileStream(PathOnDisk, FileMode.Open, FileAccess.Read, FileShare.Read, 64 * 1024, true);
 		}
 
 		public override string ToString()
