@@ -1,7 +1,10 @@
-using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using Deli.VFS;
+using Deli.VFS.Disk;
 
-namespace Deli.Patcher.Common
+namespace Deli
 {
 	public abstract class ImmediateStage<TStage> : Stage<ImmediateAssetLoader<TStage>> where TStage : ImmediateStage<TStage>
 	{
@@ -28,6 +31,37 @@ namespace Deli.Patcher.Common
 					loader(GenericThis, mod, handle);
 				}
 			}
+		}
+
+		protected static byte[] BytesReader(IFileHandle file)
+		{
+			if (file is IDiskHandle disk)
+			{
+				return File.ReadAllBytes(disk.PathOnDisk);
+			}
+
+			using var raw = file.OpenRead();
+			using var memory = new MemoryStream();
+
+			return memory.ToArray();
+		}
+
+		protected static Assembly AssemblyReader(IFileHandle file)
+		{
+			if (file is IDiskHandle disk)
+			{
+				return Assembly.LoadFile(disk.PathOnDisk);
+			}
+
+			var raw = BytesReader(file);
+			var symbols = file.WithExtension("mdb");
+
+			return symbols is not IFileHandle symbolsFile ? Assembly.Load(raw) : Assembly.Load(raw, BytesReader(symbolsFile));
+		}
+
+		protected void AssemblyLoader(Stage stage, Mod mod, IHandle handle)
+		{
+			AssemblyLoader(stage, mod, AssemblyReader(AssemblyPreloader(handle)));
 		}
 
 		protected virtual IEnumerable<Mod> LoadMods(IEnumerable<Mod> mods)

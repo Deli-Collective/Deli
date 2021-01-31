@@ -3,26 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Deli.Patcher;
 
 namespace Deli.VFS.Globbing
 {
-	public class CompositeGlobber : IGlobber
-	{
-		private readonly ICollection<IGlobber> _globs;
+	public delegate IEnumerable<IHandle> Globber(IDirectoryHandle directory);
 
-		public CompositeGlobber(ICollection<IGlobber> globs)
+	internal class CompositeGlobber
+	{
+		private readonly ICollection<Globber> _globs;
+
+		public CompositeGlobber(ICollection<Globber> globs)
 		{
 			_globs = globs;
 		}
 
-		public IEnumerable<IHandle> Matches(IDirectoryHandle directory)
+		public IEnumerable<IHandle> Globber(IDirectoryHandle directory)
 		{
 			using var enumerator = _globs.GetEnumerator();
 
 			IEnumerable<IDirectoryHandle> lastDirectories = new[] {directory};
 
-			IGlobber? glob = null;
+			Globber? glob = null;
 			if (enumerator.MoveNext())
 			{
 				while (true)
@@ -34,15 +35,16 @@ namespace Deli.VFS.Globbing
 						break;
 					}
 
-					lastDirectories = lastDirectories.SelectMany(glob.Matches).WhereCast<IHandle, IDirectoryHandle>();
+					// ReSharper disable once AccessToModifiedClosure
+					lastDirectories = lastDirectories.SelectMany(d => glob(d)).WhereCast<IHandle, IDirectoryHandle>();
 				}
 			}
 
-			return glob is null ? lastDirectories.Cast<IHandle>() : lastDirectories.SelectMany(glob.Matches);
+			return glob is null ? lastDirectories.Cast<IHandle>() : lastDirectories.SelectMany(d => glob(d));
 		}
 	}
 
-	public class NameGlobber : IGlobber
+	internal class NameGlobber
 	{
 		private static readonly Dictionary<Regex, string> _globTypes = new()
 		{
@@ -109,40 +111,26 @@ namespace Deli.VFS.Globbing
 			_regex = new Regex(builder.ToString());
 		}
 
-		public IEnumerable<IHandle> Matches(IDirectoryHandle directory)
+		public IEnumerable<IHandle> Globber(IDirectoryHandle directory)
 		{
-			foreach (var c in directory)
-			{
-				if (_regex.IsMatch(c.Name))
-				{
-					yield return c;
-				}
-			}
-
-			//return directory.Where(c => _regex.IsMatch(c.Name)).Cast<IHandle>();
+			return directory.Where(c => _regex.IsMatch(c.Name)).Cast<IHandle>();
 		}
 	}
 
-	public class GlobstarGlobber : IGlobber
+	internal static class StatelessGlobbers
 	{
-		public IEnumerable<IHandle> Matches(IDirectoryHandle directory)
+		public static IEnumerable<IHandle> Root(IDirectoryHandle directory)
+		{
+			yield return directory.GetRoot();
+		}
+
+		public static IEnumerable<IHandle> Globstar(IDirectoryHandle directory)
 		{
 			yield return directory;
 			foreach (var child in directory.GetRecursive()) yield return child;
 		}
-	}
 
-	public class RootGlobber : IGlobber
-	{
-		public IEnumerable<IHandle> Matches(IDirectoryHandle directory)
-		{
-			yield return directory.GetRoot();
-		}
-	}
-
-	public class ParentGlobber : IGlobber
-	{
-		public IEnumerable<IHandle> Matches(IDirectoryHandle directory)
+		public static IEnumerable<IHandle> Parent(IDirectoryHandle directory)
 		{
 			if (directory is not IChildDirectoryHandle child)
 			{
@@ -151,11 +139,8 @@ namespace Deli.VFS.Globbing
 
 			yield return child.Directory;
 		}
-	}
 
-	public class CurrentGlobber : IGlobber
-	{
-		public IEnumerable<IHandle> Matches(IDirectoryHandle directory)
+		public static IEnumerable<IHandle> Current(IDirectoryHandle directory)
 		{
 			yield return directory;
 		}

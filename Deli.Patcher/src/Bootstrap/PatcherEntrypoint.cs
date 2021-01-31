@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using BepInEx.Logging;
 using Mono.Cecil;
 using Metadata = Deli.DeliConstants.Metadata;
 using Git = Deli.DeliConstants.Git;
@@ -92,6 +91,13 @@ namespace Deli.Patcher.Bootstrap
 			_stateful = null;
 
 			return blob;
+		}
+
+		private class ImplicitContractException : InvalidOperationException
+		{
+			public ImplicitContractException(string requiredMember) : base($"Implicit contract was broken: {requiredMember} must be called before this member is accessed.")
+			{
+			}
 		}
     }
 }

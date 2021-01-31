@@ -20,7 +20,7 @@ namespace Deli.Setup
 			var runtime = new RuntimeStage(blob.StageData);
 
 			// Eagerly evaluate; do not leave this to runtime to enumerate or it will be too late.
-			var mods = setup.LoadMods(blob.Mods).ToList();
+			var mods = setup.LoadModsInternal(blob.Mods).ToList();
 
 			StartCoroutine(runtime.LoadMods(mods, StartCoroutine));
 		}

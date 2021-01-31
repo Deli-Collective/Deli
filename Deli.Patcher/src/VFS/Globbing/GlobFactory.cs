@@ -2,20 +2,20 @@ using System.Collections.Generic;
 
 namespace Deli.VFS.Globbing
 {
-	public static class Globber
+	public static class GlobFactory
 	{
-		private static IGlobber? FromName(string name)
+		private static Globber? FromName(string name)
 		{
 			return name switch
 			{
 				"." => null,
-				".." => new ParentGlobber(),
-				"**" => new GlobstarGlobber(),
-				var other => new NameGlobber(other)
+				".." => StatelessGlobbers.Parent,
+				"**" => StatelessGlobbers.Globstar,
+				var other => new NameGlobber(other).Globber
 			};
 		}
 
-		public static IGlobber? Create(string path)
+		public static Globber? Create(string path)
 		{
 			if (path.Length == 0)
 			{
@@ -30,11 +30,11 @@ namespace Deli.VFS.Globbing
 				return FromName(split[0]);
 			}
 
-			var globbers = new List<IGlobber>();
+			var globbers = new List<Globber>();
 
 			var first = split[0] switch
 			{
-				"" => new RootGlobber(),
+				"" => StatelessGlobbers.Root,
 				var name => FromName(name)
 			};
 			if (first is not null)
@@ -53,7 +53,7 @@ namespace Deli.VFS.Globbing
 
 			var last = split[length - 1] switch
 			{
-				"" => new CurrentGlobber(),
+				"" => StatelessGlobbers.Current,
 				var other => FromName(other)
 			};
 			if (last is not null)
@@ -61,7 +61,7 @@ namespace Deli.VFS.Globbing
 				globbers.Add(last);
 			}
 
-			return globbers.Count == 1 ? globbers[0] : new CompositeGlobber(globbers);
+			return globbers.Count == 1 ? globbers[0] : new CompositeGlobber(globbers).Globber;
 		}
 
 		public static IEnumerable<IHandle> Glob(IDirectoryHandle directory, string path)
@@ -73,7 +73,7 @@ namespace Deli.VFS.Globbing
 				yield break;
 			}
 
-			foreach (var match in glob.Matches(directory))
+			foreach (var match in glob(directory))
 			{
 				yield return match;
 			}
