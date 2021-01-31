@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using BepInEx;
 using Deli.Patcher.Bootstrap;
 using UnityEngine;
@@ -13,10 +14,15 @@ namespace Deli.Setup
 		private void Awake()
 		{
 			var blob = PatcherEntrypoint.Handoff();
-			var stage = new SetupStage(blob.StageData);
-			var loader = stage.LoadMods(blob.Mods, StartCoroutine);
+			var manager = new GameObject(DeliConstants.Metadata.Name);
 
-			StartCoroutine(loader);
+			var setup = new SetupStage(blob.StageData, manager);
+			var runtime = new RuntimeStage(blob.StageData);
+
+			// Eagerly evaluate; do not leave this to runtime to enumerate or it will be too late.
+			var mods = setup.LoadMods(blob.Mods).ToList();
+
+			StartCoroutine(runtime.LoadMods(mods, StartCoroutine));
 		}
 	}
 }

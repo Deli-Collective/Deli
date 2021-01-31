@@ -61,55 +61,65 @@ namespace Deli
 			///		The globally unique identifier (GUID, crazy) of the mod. This should never be identical to another mod.
 			/// </summary>
 			[JsonProperty(Required = Required.Always)]
-			public string Guid { get; private set; }
+			public string Guid { get; }
 			/// <summary>
 			///		The version of the mod.
 			/// </summary>
 			[JsonProperty(Required = Required.Always)]
-			public Version Version { get; private set; }
-			/// <summary>
-			///		The version of Deli this mod requires.
-			/// </summary>
-			[JsonProperty(Required = Required.Always)]
-			public Version Deli { get; private set; }
+			public Version Version { get; }
 #pragma warning restore CS8618
 
 			/// <summary>
 			///		The human-readable name of the mod.
 			/// </summary>
-			[JsonProperty]
-			public string? Name { get; private set; }
+			public string? Name { get; }
 			/// <summary>
 			///		An explanation of what the mod does.
 			/// </summary>
-			[JsonProperty]
-			public string? Description { get; private set; }
+			public string? Description { get; }
 			/// <summary>
 			///		The path to an icon file in the VFS.
 			/// </summary>
-			[JsonProperty]
-			public string? IconPath { get; private set; }
+			public string? IconPath { get; }
 			/// <summary>
 			///		The URL that this mod originated from, for use in checking the latest version.
 			/// </summary>
-			[JsonProperty]
-			public string? SourceUrl { get; private set; }
+			public string? SourceUrl { get; }
 
 			/// <summary>
 			///		The mods that this mod requires.
 			/// </summary>
-			[JsonProperty]
-			public Dictionary<string, Version>? Dependencies { get; private set; }
+			public Dictionary<string, Version>? Dependencies { get; }
 			/// <summary>
 			///		The assets to load during the patcher stage.
 			/// </summary>
-			[JsonProperty]
-			public Dictionary<string, AssetLoaderID>? Patchers { get; private set; }
+			public Dictionary<string, AssetLoaderID>? Patchers { get; }
 			/// <summary>
-			///		The assets to load during setup stage.
+			///		The assets to load during the setup stage.
 			/// </summary>
-			[JsonProperty]
-			public Dictionary<string, AssetLoaderID>? Assets { get; private set; }
+			public Dictionary<string, AssetLoaderID>? Setup { get; }
+			/// <summary>
+			///		The assets to load during runtime stage.
+			/// </summary>
+			public Dictionary<string, AssetLoaderID>? Runtime { get; }
+
+			// I hate this but we need to programmatically use this.
+			[JsonConstructor]
+			public Manifest(string guid, Version version, string? name = null, string? description = null, string? iconPath = null, string? sourceUrl = null,
+				Dictionary<string, Version>? dependencies = null, Dictionary<string, AssetLoaderID>? patchers = null, Dictionary<string, AssetLoaderID>? setup = null,
+				Dictionary<string, AssetLoaderID>? runtime = null)
+			{
+				Guid = guid;
+				Version = version;
+				Name = name;
+				Description = description;
+				IconPath = iconPath;
+				SourceUrl = sourceUrl;
+				Dependencies = dependencies;
+				Patchers = patchers;
+				Setup = setup;
+				Runtime = runtime;
+			}
 
 			[OnDeserialized]
 			private void Validate(StreamingContext _)

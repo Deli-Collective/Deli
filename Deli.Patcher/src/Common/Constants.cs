@@ -11,19 +11,24 @@ namespace Deli
 		public static class Metadata
 		{
 			/// <summary>
-			/// 	The name of the runtime plugin and patcher plugin
+			/// 	The name of the implicit mod, setup plugin, and patcher plugin
 			/// </summary>
 			public const string Name = "Deli";
 
 			/// <summary>
-			/// 	The GUID of the runtime plugin
+			/// 	The GUID of the implicit mod, setup plugin
 			/// </summary>
-			public const string Guid = "deli.deli";
+			public const string Guid = "deli";
 
 			/// <summary>
-			/// 	The version of the runtime plugin and patcher plugin
+			/// 	The version of the implicit mod and setup plugin
 			/// </summary>
 			public const string Version = "MACRO_VERSION";
+
+			/// <summary>
+			///		The URL to the source code of the implicit mod
+			/// </summary>
+			public const string SourceUrl = "https://github.com/Deli-Counter/Deli";
 		}
 
 		/// <summary>
@@ -74,6 +79,11 @@ namespace Deli
 			/// The name of the manifest file expected in mods.
 			/// </summary>
 			public const string ManifestName = "manifest.json";
+		}
+
+		public static class Assets
+		{
+			public const string AssemblyLoader = "assembly";
 		}
 	}
 }
