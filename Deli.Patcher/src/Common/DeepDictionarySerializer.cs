@@ -43,9 +43,9 @@ namespace Deli
 			return objectType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>) && i.GetGenericArguments()[0] == typeof(string));
 		}
 
-		private static Dictionary<string, TValue>? ReadJsonTyped<TValue>(JToken root, JsonSerializer serializer)
+		private static Dictionary<string, TValue?>? ReadJsonTyped<TValue>(JToken root, JsonSerializer serializer)
 		{
-			var ret = new Dictionary<string, TValue>();
+			var ret = new Dictionary<string, TValue?>();
 
 			foreach (var token in root)
 			{
@@ -54,7 +54,7 @@ namespace Deli
 					throw new InvalidOperationException("All tokens of a dictionary must be properties.");
 				}
 
-				ret.Add(property.Name, property.Value.ToObject<TValue>(serializer)!);
+				ret.Add(property.Name, property.Value.ToObject<TValue>(serializer));
 			}
 
 			return ret;
