@@ -1,11 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using Deli.Patcher.Common;
 using Deli.VFS;
+using Deli.VFS.Disk;
 
 namespace Deli.Patcher
 {
-	public class PatcherStage : Stage
+	public class PatcherStage : ImmediateStage<PatcherStage>
 	{
+		protected override string Name { get; } = "patcher";
+		protected override PatcherStage GenericThis => this;
+
 		public NestedServiceCollection<Mod, string, ImmediateAssetLoader<PatcherStage>> PatcherAssetLoaders { get; } = new();
 		public NestedServiceCollection<string, Mod, Patcher> Patchers { get; } = new();
 
@@ -13,7 +20,7 @@ namespace Deli.Patcher
 		{
 		}
 
-		private ImmediateAssetLoader<PatcherStage>? GetLoader(Mod mod, string name)
+		protected override ImmediateAssetLoader<PatcherStage>? GetLoader(Mod mod, string name)
 		{
 			if (PatcherAssetLoaders.TryGet(mod, name, out var patcher))
 			{
@@ -28,48 +35,52 @@ namespace Deli.Patcher
 			return null;
 		}
 
-		private void LoadMod(Mod mod, Dictionary<string, Mod> lookup)
+		protected override Dictionary<string, AssetLoaderID>? GetAssets(Mod.Manifest manifest)
 		{
-			var assets = mod.Info.Patchers;
-			if (assets is null) return;
+			return manifest.Patchers;
+		}
 
-			Logger.LogInfo("Loading patchers from " + mod);
-			foreach (var asset in assets)
+		private static byte[] BytesReader(IFileHandle file)
+		{
+			if (file is IDiskHandle disk)
 			{
-				var loaderId = asset.Value;
-
-				if (!lookup.TryGetValue(loaderId.Mod, out var loaderMod))
-				{
-					throw new InvalidOperationException($"Mod required for asset \"{asset.Key}\" of {mod} was not present: {loaderId.Mod}");
-				}
-
-				var loader = GetLoader(loaderMod, loaderId.Name);
-				if (loader is null)
-				{
-					throw new InvalidOperationException($"Loader required for asset \"{asset.Key}\" of {mod} was not present.");
-				}
-
-				foreach (var handle in Glob(mod, asset))
-				{
-					Logger.LogDebug($"{handle} > {loaderId}");
-					loader(this, mod, handle);
-				}
+				return File.ReadAllBytes(disk.PathOnDisk);
 			}
+
+			using var raw = file.OpenRead();
+			using var memory = new MemoryStream();
+
+			return memory.ToArray();
+		}
+
+		private static Assembly AssemblyReader(IFileHandle file)
+		{
+			if (file is IDiskHandle disk)
+			{
+				return Assembly.LoadFile(disk.PathOnDisk);
+			}
+
+			var raw = BytesReader(file);
+			var symbols = file.WithExtension("mdb");
+
+			return symbols is not IFileHandle symbolsFile ? Assembly.Load(raw) : Assembly.Load(raw, BytesReader(symbolsFile));
+		}
+
+		private void AssemblyLoader(Stage stage, Mod mod, IHandle handle)
+		{
+			AssemblyLoader(stage, mod, AssemblyReader(AssemblyPreloader(handle)));
 		}
 
 		// IEnumerable<Mod> for when one mod doesn't cause all to fail.
-		internal IEnumerable<Mod> LoadMods(IEnumerable<Mod> mods)
+		protected override IEnumerable<Mod> LoadMods(IEnumerable<Mod> mods)
 		{
-			var lookup = new Dictionary<string, Mod>();
-			foreach (var mod in mods)
-			{
-				lookup.Add(mod.Info.Guid, mod);
+			ImmediateReaders.Add(BytesReader);
+			ImmediateReaders.Add(AssemblyReader);
+			SharedAssetLoaders[Mod, DeliConstants.Assets.AssemblyLoader] = AssemblyLoader;
 
-				LoadMod(mod, lookup);
-				yield return mod;
-			}
-
-			InvokeFinished();
+			return base.LoadMods(mods);
 		}
+
+		internal IEnumerable<Mod> LoadModsInternal(IEnumerable<Mod> mods) => LoadMods(mods);
 	}
 }

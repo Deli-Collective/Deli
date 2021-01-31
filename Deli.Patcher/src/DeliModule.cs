@@ -25,6 +25,11 @@ namespace Deli.Patcher
 		protected ManualLogSource Logger => Source.Logger;
 
 		/// <summary>
+		///		Invoked when the <see cref="PatcherStage"/> is in progress.
+		/// </summary>
+		protected event StageRunner<PatcherStage>? Patch;
+
+		/// <summary>
 		///		Creates an instance of <see cref="DeliModule"/>.
 		/// </summary>
 		/// <param name="source">The mod this module originated from.</param>
@@ -33,17 +38,12 @@ namespace Deli.Patcher
 			Source = source;
 		}
 
-		/// <summary>
-		///		Invoked when the <see cref="PatcherStage"/> is in progress.
-		/// </summary>
-		protected abstract void RunStage(PatcherStage stage);
-
 		/// <inheritdoc cref="IDeliCode.RunStage"/>
 		public virtual void RunStage(Stage stage)
 		{
 			if (stage is PatcherStage patcher)
 			{
-				RunStage(patcher);
+				Patch?.Invoke(patcher);
 			}
 		}
 	}

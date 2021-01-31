@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Logging;
+using Deli.VFS.Disk;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -8,11 +10,11 @@ namespace Deli.Patcher.Bootstrap
 {
 	internal class Bootstrapper
 	{
-		internal readonly ManualLogSource Logger;
-
 		private Stage.Blob? _stageData;
 		private PatcherStage? _stage;
 		private List<Mod>? _mods;
+
+		public ManualLogSource Logger => Mod.Logger;
 
 		private Stage.Blob StageData
 		{
@@ -36,7 +38,7 @@ namespace Deli.Patcher.Bootstrap
 					});
 					var sharedLoaders = new NestedServiceCollection<Mod, string, ImmediateAssetLoader<Stage>>();
 					var immediateReaders = new ImmediateReaderCollection(Logger);
-					var data = new Stage.Blob(jsonReaders, serializer, Logger, sharedLoaders, immediateReaders);
+					var data = new Stage.Blob(Mod, jsonReaders, serializer, sharedLoaders, immediateReaders);
 
 					return data;
 				}
@@ -51,7 +53,7 @@ namespace Deli.Patcher.Bootstrap
 		{
 			get
 			{
-				List<Mod> Init()
+				IEnumerable<Mod> Init()
 				{
 					var manifestReader = Stage.RegisterJson<Mod.Manifest>();
 					var discovery = new Discovery(Logger, manifestReader);
@@ -59,16 +61,19 @@ namespace Deli.Patcher.Bootstrap
 
 					var mods = discovery.Run();
 					mods = sorter.Run(mods);
-					mods = Stage.LoadMods(mods);
+					mods = Stage.LoadModsInternal(mods);
 
-					return mods.ToList();
+					yield return Mod;
+					foreach (var mod in mods) yield return mod;
 				}
 
-				return _mods ??= Init();
+				return _mods ??= Init().ToList();
 			}
 		}
 
-		internal NestedServiceCollection<string, Mod, Patcher> Patchers
+		public Mod Mod { get;  }
+
+		public NestedServiceCollection<string, Mod, Patcher> Patchers
 		{
 			get
 			{
@@ -80,11 +85,12 @@ namespace Deli.Patcher.Bootstrap
 			}
 		}
 
-		internal HandoffBlob Blob => new HandoffBlob(StageData, Mods);
+		public HandoffBlob Blob => new(StageData, Mods);
 
-		public Bootstrapper(ManualLogSource logger)
+		public Bootstrapper()
 		{
-			Logger = logger;
+			var manifest = new Mod.Manifest(DeliConstants.Metadata.Guid, new Version(DeliConstants.Metadata.Version), name: DeliConstants.Metadata.Name, sourceUrl: DeliConstants.Metadata.SourceUrl);
+			Mod = new Mod(manifest, new RootDirectoryHandle(DeliConstants.Filesystem.Directory));
 		}
 	}
 }
