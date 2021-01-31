@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Logging;
@@ -22,22 +23,17 @@ namespace Deli.Patcher.Bootstrap
 
 				foreach (var dep in deps)
 				{
-					string DepToString()
-					{
-						return $"{dep.Key} @ {dep.Value}";
-					}
-
 					// Try finding the installed dependency
 					if (!lookup.TryGetValue(dep.Key, out var resolved))
 					{
-						_logger.LogError($"Mod {mod} depends on {DepToString()}, but it is not installed!");
+						_logger.LogError($"Mod {mod} depends on {dep.Key} @ {dep.Value}, but it is not installed");
 						return false;
 					}
 
 					// Check if the installed version satisfies the dependency request
 					if (!resolved.Info.Version.Satisfies(dep.Value))
 					{
-						_logger.LogError($"Mod {mod} depends on {DepToString()}, but version {resolved.Info.Version} is installed!");
+						_logger.LogError($"Mod {mod} depends on {resolved.Info.Name ?? resolved.Info.Guid} @ {dep.Value}, but version {resolved.Info.Version} is installed");
 						return false;
 					}
 				}
@@ -86,8 +82,8 @@ namespace Deli.Patcher.Bootstrap
 
 			if (!CheckDependencies(lookup))
 			{
-				_logger.LogError("One or more dependencies are not satisfied. Aborting initialization.");
-				return Enumerable.Empty<Mod>();
+				// Used to log, but now throws so the user knows something is wrong
+				throw new InvalidOperationException("One or more dependencies are not satisfied.");
 			}
 
 			return lookup.Values.TSort(m => m.Info.Dependencies?.Keys.Select(dep => lookup[dep]) ?? Enumerable.Empty<Mod>());
