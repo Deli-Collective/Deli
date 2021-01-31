@@ -34,8 +34,14 @@ namespace Deli.Patcher.Bootstrap
 			return _manifestReader(manifestFile);
 		}
 
-		private IDirectoryHandle CreateZipResources(FileInfo file)
+		private static IDirectoryHandle CreateZipResources(FileInfo file)
 		{
+			if (file.Length == 0)
+			{
+				// ZipFile already throws an exception, but it can't hurt to do this early with a concise message.
+				throw new IOException("Zip file was 0 bytes long.");
+			}
+
 			var raw = file.OpenRead();
 			var zip = ZipFile.Read(raw);
 			var resources = VZip.RootDirectoryHandle.Create(zip);
@@ -67,7 +73,7 @@ namespace Deli.Patcher.Bootstrap
 					}
 					catch (Exception e)
 					{
-						_logger.LogError("Failed to create mod from directory mod. The full exception is below." + Environment.NewLine + e);
+						_logger.LogError("Failed to create mod from directory mod at " + dir + Environment.NewLine + e);
 
 						// Don't continue, as this directory was intended to be a mod.
 						yield break;
@@ -99,7 +105,7 @@ namespace Deli.Patcher.Bootstrap
 				}
 				catch (Exception e)
 				{
-					_logger.LogError("Failed to create mod from zip mod. The full exception is below." + Environment.NewLine + e);
+					_logger.LogError("Failed to create mod from zip mod at " + file + Environment.NewLine + e);
 					continue;
 				}
 
