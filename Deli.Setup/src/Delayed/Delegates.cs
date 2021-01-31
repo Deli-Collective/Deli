@@ -1,3 +1,4 @@
+using System.Collections;
 using Deli.VFS;
 
 namespace Deli.Setup
@@ -7,4 +8,9 @@ namespace Deli.Setup
 	/// </summary>
 	/// <typeparam name="T">The type to deserialize to.</typeparam>
 	public delegate ResultYieldInstruction<T> DelayedReader<T>(IFileHandle file);
+
+	/// <summary>
+	///		An asset loader that operates over multiple frames.
+	/// </summary>
+	public delegate IEnumerator DelayedAssetLoader(RuntimeStage stage, Mod mod, IHandle handle);
 }

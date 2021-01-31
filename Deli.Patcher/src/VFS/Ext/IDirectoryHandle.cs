@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
-using Deli.Patcher;
 using Deli.VFS.Globbing;
 
 namespace Deli.VFS
@@ -77,7 +75,7 @@ namespace Deli.VFS
 
 		public static IEnumerable<IHandle> Glob(this IDirectoryHandle @this, string path)
 		{
-			return Globber.Glob(@this, path);
+			return GlobFactory.Glob(@this, path);
 		}
 
 		public static IDirectoryHandle GetRoot(this IDirectoryHandle @this)

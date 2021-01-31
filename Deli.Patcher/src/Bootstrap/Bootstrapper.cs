@@ -32,7 +32,7 @@ namespace Deli.Patcher.Bootstrap
 						},
 						Converters =
 						{
-							new DeepDictionaryConverter(),
+							new DeepDictionaryJsonConverter(),
 							new AssetLoaderIDJsonConverter()
 						}
 					});

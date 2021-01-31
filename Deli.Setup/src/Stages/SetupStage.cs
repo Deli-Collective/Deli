@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Deli.Patcher;
-using Deli.Patcher.Common;
 using UnityEngine;
 
 namespace Deli.Setup
@@ -60,6 +58,13 @@ namespace Deli.Setup
 			return manifest.Setup;
 		}
 
-		internal new IEnumerable<Mod> LoadMods(IEnumerable<Mod> mods) => base.LoadMods(mods);
+		protected override IEnumerable<Mod> LoadMods(IEnumerable<Mod> mods)
+		{
+			SharedAssetLoaders[Mod, DeliConstants.Assets.AssemblyLoader] = AssemblyLoader;
+
+			return base.LoadMods(mods);
+		}
+
+		internal IEnumerable<Mod> LoadModsInternal(IEnumerable<Mod> mods) => LoadMods(mods);
 	}
 }

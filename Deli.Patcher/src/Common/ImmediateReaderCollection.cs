@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using BepInEx.Logging;
 
-namespace Deli.Patcher
+namespace Deli
 {
 	public class ImmediateReaderCollection : ServiceCollection
 	{
