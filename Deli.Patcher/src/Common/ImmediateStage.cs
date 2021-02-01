@@ -75,6 +75,11 @@ namespace Deli
 				yield return mod;
 			}
 
+			foreach (var module in Modules)
+			{
+				module.RunStage(this);
+			}
+
 			InvokeFinished();
 		}
 	}

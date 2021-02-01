@@ -2,9 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Deli.VFS;
 using Deli.VFS.Disk;
+using Newtonsoft.Json;
+using Semver;
 using UnityEngine;
 
 namespace Deli.Setup
@@ -22,6 +26,8 @@ namespace Deli.Setup
 		///		For getting readers including <see cref="ImmediateReader{T}"/> wrappers, use <seealso cref="GetReader{T}"/>.
 		/// </summary>
 		public DelayedReaderCollection DelayedReaders { get; }
+
+		public VersionCheckerCollection VersionCheckers { get; } = new();
 
 		internal RuntimeStage(Blob data) : base(data)
 		{
@@ -133,12 +139,119 @@ namespace Deli.Setup
 			yield return AssemblyReader(AssemblyPreloader(handle)).CallbackWith(assembly => AssemblyLoader(stage, mod, assembly));
 		}
 
-		internal IEnumerator LoadMods(IEnumerable<Mod> mods, CoroutineRunner runner)
+		private VersionCache? ReadCache(FileInfo file)
 		{
-			DelayedReaders.Add(BytesReader);
-			DelayedReaders.Add(AssemblyReader);
-			DelayedAssetLoaders[Mod, DeliConstants.Assets.AssemblyLoader] = AssemblyLoader;
+			using var raw = file.OpenRead();
+			using var text = new StreamReader(raw);
+			using var json = new JsonTextReader(text);
 
+			var content = Serializer.Deserialize<Dictionary<string, Timestamped<SemVersion?>>?>(json);
+
+			return content is null ? null : new VersionCache(content);
+		}
+
+		private Dictionary<string, VersionCache> ReadCaches()
+		{
+			var result = new Dictionary<string, VersionCache>();
+
+			var dir = Directory.CreateDirectory(DeliConstants.Filesystem.CacheDirectory);
+			foreach (var file in dir.GetFiles("*.json"))
+			{
+				var cache = ReadCache(file);
+				if (cache is null) continue;
+
+				var domain = Path.GetFileNameWithoutExtension(file.Name);
+				result.Add(domain, cache);
+			}
+
+			return result;
+		}
+
+		private ResultYieldInstruction<SemVersion?>? CheckVersion(string domain, string path, Dictionary<string, VersionCache> caches)
+		{
+			if (!caches.TryGetValue(domain, out var cache))
+			{
+				cache = new VersionCache(new Dictionary<string, Timestamped<SemVersion?>>());
+				caches.Add(domain, cache);
+			}
+			else
+			{
+				var cached = cache[path];
+				if (cached is not null)
+				{
+					return new DummyYieldInstruction<SemVersion?>(cached.Value.Content);
+				}
+			}
+
+			if (!VersionCheckers.TryGet(domain, out var checker)) return null;
+
+			var nowPresend = DateTime.UtcNow;
+			return checker(path).CallbackWith(version =>
+			{
+				cache[path] = new Timestamped<SemVersion?>(nowPresend, version);
+				return version;
+			});
+		}
+
+		private IEnumerator CheckVersions(IEnumerable<Mod> mods, CoroutineRunner runner, Dictionary<string, VersionCache> caches)
+		{
+			var domainFilter = new Regex(@"^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)(?:\/)?(.*?)(?:\/)?$", RegexOptions.IgnoreCase);
+			var buffer = new Queue<Coroutine>();
+			foreach (var mod in mods)
+			{
+				var source = mod.Info.SourceUrl;
+				if (source is null) continue;
+
+				var domainMatch = domainFilter.Match(source);
+				if (!domainMatch.Success)
+				{
+					Logger.LogWarning($"Source URL of {mod} is invalid");
+					continue;
+				}
+
+				var groups = domainMatch.Groups;
+				var domain = groups[1].Value;
+				var path = groups[2].Value;
+
+				var send = CheckVersion(domain, path, caches)?.CallbackWith(remoteVersion =>
+				{
+					if (remoteVersion is null)
+					{
+						Logger.LogWarning($"No versions of {mod} found at \"{source}\"");
+						return;
+					}
+
+					var localVersion = mod.Info.Version;
+					switch (localVersion.CompareByPrecedence(remoteVersion))
+					{
+						case -1:
+							Logger.LogWarning($"There is a newer version of {mod} available: ({localVersion}) -> ({remoteVersion})");
+							break;
+						case 0:
+							Logger.LogInfo($"{mod} is up to date: ({remoteVersion})");
+							break;
+						case 1:
+							Logger.LogWarning($"You are ahead of the latest version of {mod}: ({localVersion}) <- ({remoteVersion})");
+							break;
+
+						default: throw new ArgumentOutOfRangeException();
+					}
+				});
+
+				if (send is not null)
+				{
+					buffer.Enqueue(runner(send));
+				}
+			}
+
+			foreach (var coroutine in buffer)
+			{
+				yield return coroutine;
+			}
+		}
+
+		private IEnumerator LoadModsInternal(IEnumerable<Mod> mods, CoroutineRunner runner)
+		{
 			var lookup = new Dictionary<string, Mod>();
 			foreach (var mod in mods)
 			{
@@ -146,8 +259,28 @@ namespace Deli.Setup
 
 				yield return LoadMod(mod, lookup, runner);
 			}
+		}
+
+		internal IEnumerator LoadMods(IEnumerable<Mod> mods, CoroutineRunner runner)
+		{
+			DelayedReaders.Add(BytesReader);
+			DelayedReaders.Add(AssemblyReader);
+			DelayedAssetLoaders[Mod, DeliConstants.Assets.AssemblyLoader] = AssemblyLoader;
+
+			var listed = mods.ToList();
+			yield return LoadModsInternal(listed, runner);
+
+			foreach (var module in Modules)
+			{
+				module.RunStage(this);
+			}
 
 			InvokeFinished();
+
+			var caches = ReadCaches();
+			yield return CheckVersions(listed, runner, caches);
+
+			Logger.LogInfo("Finished checking all mod versions.");
 		}
 	}
 }

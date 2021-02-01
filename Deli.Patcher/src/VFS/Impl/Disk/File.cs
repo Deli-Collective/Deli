@@ -5,9 +5,9 @@ namespace Deli.VFS.Disk
 {
 	public sealed class FileHandle : IFileHandle, IDiskChildHandle
 	{
-		private DateTime _lastWrite;
+		private DateTime _lastWriteUtc;
 
-		private DateTime DiskLastWrite => File.GetLastWriteTimeUtc(PathOnDisk);
+		private DateTime DiskLastWriteUtc => File.GetLastWriteTimeUtc(PathOnDisk);
 
 		public string Path { get; }
 
@@ -27,19 +27,19 @@ namespace Deli.VFS.Disk
 			Directory = directory;
 			PathOnDisk = pathOnDisk;
 
-			_lastWrite = DiskLastWrite;
+			_lastWriteUtc = DiskLastWriteUtc;
 		}
 
 		public void Refresh()
 		{
 			this.ThrowIfDead();
 
-			var disk = DiskLastWrite;
-			if (_lastWrite < disk)
+			var disk = DiskLastWriteUtc;
+			if (_lastWriteUtc < disk)
 			{
 				Updated?.Invoke();
 			}
-			_lastWrite = disk;
+			_lastWriteUtc = disk;
 		}
 
 		public Stream OpenRead()

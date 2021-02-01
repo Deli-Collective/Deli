@@ -6,6 +6,7 @@ using BepInEx.Logging;
 using Deli.VFS;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Semver;
 
 namespace Deli
 {
@@ -66,7 +67,7 @@ namespace Deli
 			///		The version of the mod.
 			/// </summary>
 			[JsonProperty(Required = Required.Always)]
-			public Version Version { get; }
+			public SemVersion Version { get; }
 #pragma warning restore CS8618
 
 			/// <summary>
@@ -89,7 +90,7 @@ namespace Deli
 			/// <summary>
 			///		The mods that this mod requires.
 			/// </summary>
-			public Dictionary<string, Version>? Dependencies { get; }
+			public Dictionary<string, SemVersion>? Dependencies { get; }
 			/// <summary>
 			///		The assets to load during the patcher stage.
 			/// </summary>
@@ -105,8 +106,8 @@ namespace Deli
 
 			// I hate this but we need to programmatically use this.
 			[JsonConstructor]
-			public Manifest(string guid, Version version, string? name = null, string? description = null, string? iconPath = null, string? sourceUrl = null,
-				Dictionary<string, Version>? dependencies = null, Dictionary<string, AssetLoaderID>? patchers = null, Dictionary<string, AssetLoaderID>? setup = null,
+			public Manifest(string guid, SemVersion version, string? name = null, string? description = null, string? iconPath = null, string? sourceUrl = null,
+				Dictionary<string, SemVersion>? dependencies = null, Dictionary<string, AssetLoaderID>? patchers = null, Dictionary<string, AssetLoaderID>? setup = null,
 				Dictionary<string, AssetLoaderID>? runtime = null)
 			{
 				Guid = guid;

@@ -36,16 +36,6 @@ namespace Deli
 			}
 		}
 
-		/// <summary>
-		///		Checks if the provided dependant version string is satisfied by the source
-		///		version
-		/// </summary>
-		public static bool Satisfies(this Version source, Version dependant)
-		{
-			// It is satisfied if the Major version is the same and the minor version is equal or higher.
-			return source.Major == dependant.Major && source.Minor >= dependant.Minor;
-		}
-
 		// .NET Framework 3.5's string.Join(...) is array only...
 		/// <summary>
 		///		Joins a string enumerable with a delimiter.

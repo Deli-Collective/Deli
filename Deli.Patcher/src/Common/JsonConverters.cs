@@ -4,19 +4,34 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Semver;
 
 namespace Deli
 {
+	public class SemVersionJsonConverter : JsonConverter<SemVersion?>
+	{
+		public override void WriteJson(JsonWriter writer, SemVersion? value, JsonSerializer serializer)
+		{
+			serializer.Serialize(writer, value?.ToString());
+		}
+
+		public override SemVersion? ReadJson(JsonReader reader, Type objectType, SemVersion? existingValue, bool hasExistingValue, JsonSerializer serializer)
+		{
+			var raw = serializer.Deserialize<string?>(reader);
+			return raw is null ? null : SemVersion.Parse(raw);
+		}
+	}
+
 	public class AssetLoaderIDJsonConverter : JsonConverter<AssetLoaderID>
 	{
 		public override void WriteJson(JsonWriter writer, AssetLoaderID value, JsonSerializer serializer)
 		{
-			writer.WriteValue(value.Mod + ":" + value.Name);
+			serializer.Serialize(writer, value.Mod + ":" + value.Name);
 		}
 
 		public override AssetLoaderID ReadJson(JsonReader reader, Type objectType, AssetLoaderID existingValue, bool hasExistingValue, JsonSerializer serializer)
 		{
-			var raw = JToken.ReadFrom(reader).ToObject<string>(serializer);
+			var raw = serializer.Deserialize<string?>(reader);
 			if (raw is null)
 			{
 				throw new FormatException("Asset loader IDs cannot be null.");

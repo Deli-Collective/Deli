@@ -16,7 +16,7 @@ namespace Deli
 
 		private ImmediateReaderCollection JsonReaders => Data.JsonReaders;
 
-		private JsonSerializer Serializer => Data.Serializer;
+		protected JsonSerializer Serializer => Data.Serializer;
 
 		protected Mod Mod => Data.Mod;
 
@@ -92,7 +92,7 @@ namespace Deli
 			if (type.IsAbstract || !typeof(DeliModule).IsAssignableFrom(type)) return;
 
 			var module = (DeliModule) Activator.CreateInstance(type, mod);
-			module.RunStage(stage);
+			Modules.Add(module);
 		}
 
 		protected virtual void AssemblyLoader(Stage stage, Mod mod, Assembly assembly)
