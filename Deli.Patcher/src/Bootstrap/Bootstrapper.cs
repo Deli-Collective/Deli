@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Logging;
 using Deli.VFS.Disk;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Semver;
 
 namespace Deli.Patcher.Bootstrap
 {
@@ -33,7 +33,8 @@ namespace Deli.Patcher.Bootstrap
 						Converters =
 						{
 							new DeepDictionaryJsonConverter(),
-							new AssetLoaderIDJsonConverter()
+							new AssetLoaderIDJsonConverter(),
+							new SemVersionJsonConverter()
 						}
 					});
 					var sharedLoaders = new NestedServiceCollection<Mod, string, ImmediateAssetLoader<Stage>>();
@@ -89,7 +90,7 @@ namespace Deli.Patcher.Bootstrap
 
 		public Bootstrapper()
 		{
-			var manifest = new Mod.Manifest(DeliConstants.Metadata.Guid, new Version(DeliConstants.Metadata.Version), name: DeliConstants.Metadata.Name, sourceUrl: DeliConstants.Metadata.SourceUrl);
+			var manifest = new Mod.Manifest(DeliConstants.Metadata.Guid, SemVersion.Parse(DeliConstants.Metadata.Version), name: DeliConstants.Metadata.Name, sourceUrl: DeliConstants.Metadata.SourceUrl);
 			Mod = new Mod(manifest, new RootDirectoryHandle(DeliConstants.Filesystem.Directory));
 		}
 	}

@@ -31,7 +31,7 @@ namespace Deli.Patcher.Bootstrap
 					}
 
 					// Check if the installed version satisfies the dependency request
-					if (!resolved.Info.Version.Satisfies(dep.Value))
+					if (resolved.Info.Version.CompareByPrecedence(dep.Value) == -1)
 					{
 						_logger.LogError($"Mod {mod} depends on {resolved.Info.Name ?? resolved.Info.Guid} @ {dep.Value}, but version {resolved.Info.Version} is installed");
 						return false;

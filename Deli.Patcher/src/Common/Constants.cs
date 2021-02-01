@@ -16,7 +16,7 @@ namespace Deli
 			public const string Name = "Deli";
 
 			/// <summary>
-			/// 	The GUID of the implicit mod, setup plugin
+			/// 	The GUID of the implicit mod and setup plugin
 			/// </summary>
 			public const string Guid = "deli";
 
@@ -26,9 +26,14 @@ namespace Deli
 			public const string Version = "MACRO_VERSION";
 
 			/// <summary>
-			///		The URL to the source code of the implicit mod
+			///		The URL to the source code
 			/// </summary>
-			public const string SourceUrl = "https://github.com/Deli-Counter/Deli";
+			public const string SourceUrl = "https://github.com/" + SourcePath;
+
+			/// <summary>
+			///		The path (from GitHub) to the source code
+			/// </summary>
+			public const string SourcePath = "Deli-Collective/Deli";
 		}
 
 		/// <summary>
@@ -64,6 +69,11 @@ namespace Deli
 			///		The directory containing all Deli related content.
 			/// </summary>
 			public const string Directory = Metadata.Name;
+
+			/// <summary>
+			///		The directory containing cachable files of Deli. These can be deleted with insignificant repercussions.
+			/// </summary>
+			public const string CacheDirectory = Directory + "/cache";
 
 			/// <summary>
 			///		The directory containing config files of Deli mods.
