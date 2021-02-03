@@ -14,7 +14,7 @@ namespace Deli.Setup
 			get => _cacheDuration;
 			set
 			{
-				if (_cacheDuration <= TimeSpan.Zero)
+				if (value <= TimeSpan.Zero)
 				{
 					throw new ArgumentOutOfRangeException(nameof(value), value, "Duration must be positive.");
 				}
