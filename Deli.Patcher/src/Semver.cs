@@ -44,7 +44,7 @@ namespace Semver
                 @"(?>\.(?<patch>\d+))?" +
                 @"(?>\-(?<pre>[0-9A-Za-z\-\.]+))?" +
                 @"(?>\+(?<build>[0-9A-Za-z\-\.]+))?$",
-                RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+                RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
 
 #pragma warning disable CA1801 // Parameter unused
         /// <summary>
