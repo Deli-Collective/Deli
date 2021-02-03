@@ -29,10 +29,12 @@ namespace Deli.Setup
 
 		private ResultYieldInstruction<UnityWebRequest> Request(string path, string method, Dictionary<string, string>? headers = null)
 		{
-			UnityWebRequest? request = null;
-			return (RateLimit?.Use() ?? new DummyYieldInstruction()).ContinueWith(() =>
+			return (RateLimit?.Use() ?? new DummyYieldInstruction()).CallbackWith(() =>
 			{
-				request = new UnityWebRequest(Url + path, method);
+				var request = new UnityWebRequest(Url + path, method)
+				{
+					downloadHandler = new DownloadHandlerBuffer()
+				};
 
 				ApplyHeaders(request, RequestHeaders);
 				if (headers is not null)
@@ -40,13 +42,11 @@ namespace Deli.Setup
 					ApplyHeaders(request, headers);
 				}
 
-				return request.Send();
-			}).CallbackWith(() =>
+				return request;
+			}).ContinueWith(request => request.Send()).CallbackWith(request =>
 			{
-				var requestNonNull = request!;
-
-				RateLimit?.Update(requestNonNull);
-				return requestNonNull;
+				RateLimit?.Update(request);
+				return request;
 			});
 		}
 

@@ -16,7 +16,7 @@ namespace Deli.Setup
 		}
 
 		private static CustomYieldInstruction ContinueWith<TWrapper, TContWrapper>(this TWrapper @this, Func<TContWrapper> continuation)
-			where TWrapper : IYieldWrapper where TContWrapper : IYieldWrapper
+			where TWrapper : IYieldWrapper where TContWrapper : struct, IYieldWrapper
 		{
 			return new VoidContinuation<TWrapper, TContWrapper>(@this, continuation);
 		}
@@ -76,35 +76,6 @@ namespace Deli.Setup
 			return new CustomYieldWrapper(@this).ContinueWith(continuation);
 		}
 
-		private interface IYieldWrapper
-		{
-			bool KeepWaiting { get; }
-		}
-
-		private readonly struct AsyncOperationWrapper : IYieldWrapper
-		{
-			private readonly AsyncOperation _op;
-
-			public bool KeepWaiting => !_op.isDone;
-
-			public AsyncOperationWrapper(AsyncOperation op)
-			{
-				_op = op;
-			}
-		}
-
-		private readonly struct CustomYieldWrapper : IYieldWrapper
-		{
-			private readonly CustomYieldInstruction _inst;
-
-			public bool KeepWaiting => _inst.keepWaiting;
-
-			public CustomYieldWrapper(CustomYieldInstruction inst)
-			{
-				_inst = inst;
-			}
-		}
-
 		private class VoidCallback<TWrapper> : CustomYieldInstruction where TWrapper : IYieldWrapper
 		{
 			private readonly TWrapper _wrapper;
@@ -142,10 +113,24 @@ namespace Deli.Setup
 			private readonly TWrapper _wrapper;
 			private readonly Func<TResult> _callback;
 
+			private bool _evaluated;
+			private TResult? _result;
+
 			public override bool keepWaiting => _wrapper.KeepWaiting;
 
-			private TResult? _result;
-			public override TResult Result => _result ??= _callback();
+			public override TResult Result
+			{
+				get
+				{
+					if (!_evaluated)
+					{
+						_result = _callback();
+						_evaluated = true;
+					}
+
+					return _result!;
+				}
+			}
 
 			public ResultCallback(TWrapper wrapper, Func<TResult> callback)
 			{
@@ -154,7 +139,7 @@ namespace Deli.Setup
 			}
 		}
 
-		private class VoidContinuation<TWrapper, TContWrapper> : CustomYieldInstruction where TWrapper : IYieldWrapper where TContWrapper : IYieldWrapper
+		private class VoidContinuation<TWrapper, TContWrapper> : CustomYieldInstruction where TWrapper : IYieldWrapper where TContWrapper : struct, IYieldWrapper
 		{
 			private readonly TWrapper _wrapper;
 			private readonly Func<TContWrapper> _contFactory;
@@ -165,7 +150,7 @@ namespace Deli.Setup
 			{
 				get
 				{
-					if (_cont is null)
+					if (!_cont.HasValue)
 					{
 						if (_wrapper.KeepWaiting)
 						{
@@ -175,7 +160,7 @@ namespace Deli.Setup
 						_cont = _contFactory();
 					}
 
-					return _cont.KeepWaiting;
+					return _cont.Value.KeepWaiting;
 				}
 			}
 
