@@ -154,8 +154,7 @@ namespace Deli.Setup
 		{
 			var result = new Dictionary<string, VersionCache>();
 
-			var dir = Directory.CreateDirectory(DeliConstants.Filesystem.CacheDirectory);
-			foreach (var file in dir.GetFiles("*.json"))
+			foreach (var file in Directory.CreateDirectory(DeliConstants.Filesystem.CacheDirectory).GetFiles("*.json"))
 			{
 				var cache = ReadCache(file);
 				if (cache is null) continue;
@@ -165,6 +164,18 @@ namespace Deli.Setup
 			}
 
 			return result;
+		}
+
+		private void WriteCaches(Dictionary<string,VersionCache> caches)
+		{
+			foreach (var cache in caches)
+			{
+				using var raw = new FileStream(DeliConstants.Filesystem.CacheDirectory + "/" + cache.Key + ".json", FileMode.Create, FileAccess.Write, FileShare.None);
+				using var text = new StreamWriter(raw);
+				using var json = new JsonTextWriter(text);
+
+				Serializer.Serialize(json, cache.Value.Cached);
+			}
 		}
 
 		private ResultYieldInstruction<SemVersion?>? CheckVersion(string domain, string path, Dictionary<string, VersionCache> caches)
@@ -225,13 +236,13 @@ namespace Deli.Setup
 					switch (localVersion.CompareByPrecedence(remoteVersion))
 					{
 						case -1:
-							Logger.LogWarning($"There is a newer version of {mod} available: ({localVersion}) -> ({remoteVersion})");
+							Logger.LogWarning($"There is a newer version of {mod} available: ({remoteVersion})");
 							break;
 						case 0:
-							Logger.LogInfo($"{mod} is up to date: ({remoteVersion})");
+							Logger.LogInfo($"{mod} is up to date");
 							break;
 						case 1:
-							Logger.LogWarning($"You are ahead of the latest version of {mod}: ({localVersion}) <- ({remoteVersion})");
+							Logger.LogWarning($"You are ahead of the latest version of {mod}: ({remoteVersion})");
 							break;
 
 						default: throw new ArgumentOutOfRangeException();
@@ -266,6 +277,7 @@ namespace Deli.Setup
 			DelayedReaders.Add(BytesReader);
 			DelayedReaders.Add(AssemblyReader);
 			DelayedAssetLoaders[Mod, DeliConstants.Assets.AssemblyLoader] = AssemblyLoader;
+			Setup.VersionCheckers.AddAll(VersionCheckers);
 
 			var listed = mods.ToList();
 			yield return LoadModsInternal(listed, runner);
@@ -278,7 +290,8 @@ namespace Deli.Setup
 			InvokeFinished();
 
 			var caches = ReadCaches();
-			yield return CheckVersions(listed, runner, caches);
+			yield return runner(CheckVersions(listed, runner, caches));
+			WriteCaches(caches);
 
 			Logger.LogInfo("Finished checking all mod versions.");
 		}

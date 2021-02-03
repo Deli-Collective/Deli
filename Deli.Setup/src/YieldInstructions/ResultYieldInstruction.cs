@@ -25,9 +25,14 @@ namespace Deli.Setup
 			return new ResultCallback<TNext>(this, callback);
 		}
 
+		public ResultYieldInstruction<TResult> ContinueWith(Func<TResult, AsyncOperation> continuation)
+		{
+			return new VoidContinuation<AsyncOperationWrapper>(this, r => new AsyncOperationWrapper(continuation(r)));
+		}
+
 		public ResultYieldInstruction<TResult> ContinueWith(Func<TResult, CustomYieldInstruction> continuation)
 		{
-			return new VoidContinuation(this, continuation);
+			return new VoidContinuation<CustomYieldWrapper>(this, r => new CustomYieldWrapper(continuation(r)));
 		}
 
 		public ResultYieldInstruction<TNext> ContinueWith<TNext>(Func<TResult, ResultYieldInstruction<TNext>> continuation)
@@ -76,8 +81,21 @@ namespace Deli.Setup
 
 			public override bool keepWaiting => _inst.keepWaiting;
 
+			private bool _evaluated;
 			private TNext? _result;
-			public override TNext Result => _result ??= _callback(_inst.Result);
+			public override TNext Result
+			{
+				get
+				{
+					if (!_evaluated)
+					{
+						_result = _callback(_inst.Result);
+						_evaluated = true;
+					}
+
+					return _result!;
+				}
+			}
 
 			public ResultCallback(ResultYieldInstruction<TResult> inst, Func<TResult, TNext> callback)
 			{
@@ -86,18 +104,18 @@ namespace Deli.Setup
 			}
 		}
 
-		private class VoidContinuation : ResultYieldInstruction<TResult>
+		private class VoidContinuation<TCont> : ResultYieldInstruction<TResult> where TCont : struct, IYieldWrapper
 		{
 			private readonly ResultYieldInstruction<TResult> _inst;
-			private readonly Func<TResult, CustomYieldInstruction> _contFactory;
+			private readonly Func<TResult, TCont> _contFactory;
 
-			private CustomYieldInstruction? _cont;
+			private TCont? _cont;
 
 			public override bool keepWaiting
 			{
 				get
 				{
-					if (_cont is null)
+					if (!_cont.HasValue)
 					{
 						if (_inst.keepWaiting)
 						{
@@ -107,13 +125,13 @@ namespace Deli.Setup
 						_cont = _contFactory(_inst.Result);
 					}
 
-					return _cont.keepWaiting;
+					return _cont.Value.KeepWaiting;
 				}
 			}
 
 			public override TResult Result => _inst.Result;
 
-			public VoidContinuation(ResultYieldInstruction<TResult> inst, Func<TResult, CustomYieldInstruction> contFactory)
+			public VoidContinuation(ResultYieldInstruction<TResult> inst, Func<TResult, TCont> contFactory)
 			{
 				_inst = inst;
 				_contFactory = contFactory;

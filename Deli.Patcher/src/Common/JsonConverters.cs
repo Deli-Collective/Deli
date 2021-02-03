@@ -100,9 +100,15 @@ namespace Deli
 			return ret;
 		}
 
-		private static void WriteJsonTyped<TValue>(JsonWriter writer, object value, JsonSerializer serializer)
+		private static void WriteJsonTyped<TValue>(JsonWriter writer, object? value, JsonSerializer serializer)
 		{
-			var dict = (IDictionary<string, TValue>) value;
+			var dict = value as IDictionary<string, TValue>;
+
+			if (dict is null)
+			{
+				writer.WriteNull();
+				return;
+			}
 
 			writer.WriteStartObject();
 			foreach (var pair in dict)
@@ -124,7 +130,8 @@ namespace Deli
 			var dictType = value.GetType();
 			if (!_caches.TryGetValue(dictType, out var cache))
 			{
-				_caches.Add(dictType, new TypeCache(dictType));
+				cache = new TypeCache(dictType);
+				_caches.Add(dictType, cache);
 			}
 
 			cache.Writer(writer, value, serializer);
