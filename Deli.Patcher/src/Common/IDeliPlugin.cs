@@ -3,7 +3,7 @@ namespace Deli
 	/// <summary>
 	///		A piece of code from a mod that runs at a certain stage and any subsequent stages.
 	/// </summary>
-	public interface IDeliCode
+	public interface IDeliPlugin
 	{
 		/// <summary>
 		///		Invoked when a stage is in progress.

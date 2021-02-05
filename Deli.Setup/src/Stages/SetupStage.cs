@@ -52,7 +52,7 @@ namespace Deli.Setup
 				}
 				catch
 				{
-					Logger.LogFatal($"{mod} threw an exception upon running a behaviour for the first time.");
+					Logger.LogFatal(Locale.PluginException(mod, "behaviour"));
 					throw;
 				}
 			}

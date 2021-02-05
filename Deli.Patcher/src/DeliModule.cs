@@ -5,9 +5,9 @@ using Deli.VFS;
 namespace Deli.Patcher
 {
 	/// <summary>
-	///		A piece of code from a mod that runs during <see cref="PatcherStage"/> and any subsequent stages.
+	///		A plugin from a mod that runs during <see cref="PatcherStage"/> and any subsequent stages.
 	/// </summary>
-	public abstract class DeliModule : IDeliCode
+	public abstract class DeliModule : IDeliPlugin
 	{
 		/// <summary>
 		///		The mod this module originated from.
@@ -37,10 +37,10 @@ namespace Deli.Patcher
 			Source = source;
 		}
 
-		/// <inheritdoc cref="IDeliCode.Run"/>
+		/// <inheritdoc cref="IDeliPlugin.Run"/>
 		public virtual void Run(Stage stage) => Events.Run(stage);
 
-		protected class StageEvents : IDeliCode
+		protected class StageEvents : IDeliPlugin
 		{
 			/// <summary>
 			///		Invoked when the <see cref="PatcherStage"/> is in progress.

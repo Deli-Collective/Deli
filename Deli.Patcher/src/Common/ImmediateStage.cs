@@ -21,10 +21,10 @@ namespace Deli
 			var assets = GetAssets(mod.Info);
 			if (assets is null) return;
 
-			Logger.LogDebug($"Loading assets from {mod}...");
+			Logger.LogDebug(Locale.LoadingAssets(mod));
 			foreach (var asset in assets)
 			{
-				var loader = GetLoader(mod, lookup, asset);
+				var loader = GetLoader(mod, lookup, asset, out var loaderMod);
 
 				foreach (var handle in Glob(mod, asset))
 				{
@@ -34,7 +34,7 @@ namespace Deli
 					}
 					catch
 					{
-						Logger.LogFatal($"{asset.Value} threw an exception while loading an asset from {mod}: {handle}");
+						Logger.LogFatal(Locale.LoaderException(asset.Value, loaderMod, mod, handle));
 						throw;
 					}
 				}

@@ -7,10 +7,10 @@ using UnityEngine;
 namespace Deli.Setup
 {
 	/// <summary>
-	///		A piece of code from a mod that runs during <see cref="RuntimeStage"/> and any subsequent stages.
+	///		A plugin from a mod that runs during <see cref="RuntimeStage"/> and any subsequent stages.
 	///		Also inherits from <see cref="MonoBehaviour"/>
 	/// </summary>
-	public abstract class DeliBehaviour : MonoBehaviour, IDeliCode
+	public abstract class DeliBehaviour : MonoBehaviour, IDeliPlugin
 	{
 		internal static Mod? GlobalSource;
 
@@ -38,10 +38,10 @@ namespace Deli.Setup
 			Source = GlobalSource ?? throw new InvalidOperationException("A source was not ready for this behaviour. Was the behavior initialized outside of Deli?");
 		}
 
-		/// <inheritdoc cref="IDeliCode.Run"/>
+		/// <inheritdoc cref="IDeliPlugin.Run"/>
 		public virtual void Run(Stage stage) => Events.Run(stage);
 
-		protected class StageEvents : IDeliCode
+		protected class StageEvents : IDeliPlugin
 		{
 			/// <summary>
 			///		Invoked when the <see cref="SetupStage"/> is in progress.
@@ -53,7 +53,7 @@ namespace Deli.Setup
 			/// </summary>
 			protected event StageRunner<RuntimeStage>? Runtime;
 
-			/// <inheritdoc cref="IDeliCode.Run"/>
+			/// <inheritdoc cref="IDeliPlugin.Run"/>
 			public void Run(Stage stage)
 			{
 				switch (stage)
