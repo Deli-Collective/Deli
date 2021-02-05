@@ -121,7 +121,7 @@ namespace Deli.Setup
 			Logger.LogDebug($"Loading assets from {mod}...");
 			foreach (var asset in assets)
 			{
-				var loader = GetLoader(mod, lookup, asset);
+				var loader = GetLoader(mod, lookup, asset, out var loaderMod);
 
 				var buffer = new Queue<Coroutine>();
 				foreach (var handle in Glob(mod, asset))
@@ -137,7 +137,7 @@ namespace Deli.Setup
 							catch
 							{
 								// Not fatal; throwing in a coroutine only kills the coroutine. We'll still rethrow for the stacktrace, though.
-								Logger.LogError($"{asset.Value} threw an exception while loading an asset from {mod}: {handle}");
+								Logger.LogError(Locale.LoaderException(asset.Value, loaderMod, mod, handle));
 								throw;
 							}
 						}
@@ -302,9 +302,10 @@ namespace Deli.Setup
 
 		private void RunBehaviours(Mod mod)
 		{
+			const string pluginType = "behaviour";
 			if (!_modBehaviours.TryGetValue(mod, out var behaviours)) return;
 
-			Logger.LogDebug($"Loading stage into {mod} behaviours...");
+			Logger.LogDebug(Locale.LoadingPlugin(mod, pluginType));
 			foreach (var behaviour in behaviours)
 			{
 				try
@@ -313,7 +314,7 @@ namespace Deli.Setup
 				}
 				catch
 				{
-					Logger.LogFatal($"{mod} threw an exception upon running a behaviour.");
+					Logger.LogFatal(Locale.PluginException(mod, pluginType));
 					throw;
 				}
 			}

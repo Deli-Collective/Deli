@@ -26,6 +26,8 @@ namespace Deli
 
 		protected abstract string Name { get; }
 
+		protected LocaleFormatter Locale { get; }
+
 		/// <summary>
 		///		The collection of all the <see cref="ImmediateAssetLoader{TStage}"/>s registered.
 		/// </summary>
@@ -39,6 +41,7 @@ namespace Deli
 		protected Stage(Blob data)
 		{
 			Data = data;
+			Locale = new(this);
 		}
 
 		protected IEnumerable<IHandle> Glob(Mod mod, KeyValuePair<string, AssetLoaderID> asset)
@@ -107,7 +110,7 @@ namespace Deli
 			}
 			catch
 			{
-				Logger.LogFatal($"{mod} threw an exception upon running a module for the first time.");
+				Logger.LogFatal(Locale.PluginException(mod, "module"));
 				throw;
 			}
 		}
@@ -122,9 +125,10 @@ namespace Deli
 
 		protected void RunModules(Mod mod)
 		{
+			const string pluginType = "module";
 			if (!ModModules.TryGetValue(mod, out var modules)) return;
 
-			Logger.LogDebug($"Loading stage into {mod} modules...");
+			Logger.LogDebug(Locale.LoadingPlugin(mod, pluginType));
 			foreach (var module in modules)
 			{
 				try
@@ -133,7 +137,7 @@ namespace Deli
 				}
 				catch
 				{
-					Logger.LogFatal($"{mod} threw an exception upon running a module.");
+					Logger.LogFatal(Locale.PluginException(mod, pluginType));
 					throw;
 				}
 			}
@@ -183,6 +187,22 @@ namespace Deli
 				ModModules = modModules;
 			}
 		}
+
+		protected class LocaleFormatter
+		{
+			private readonly Stage _stage;
+
+			public LocaleFormatter(Stage stage)
+			{
+				_stage = stage;
+			}
+
+			public string LoadingPlugin(Mod mod, string pluginType) => $"Loading {mod} {pluginType}s into {_stage.Name}...";
+			public string LoadingAssets(Mod mod) => $"Loading {_stage.Name} assets from {mod}...";
+
+			public string LoaderException(AssetLoaderID loader, Mod mod, Mod targetMod, IHandle targetHandle) => $"{loader} from {mod} threw an exception while loading a {_stage.Name} asset from {targetMod}: {targetHandle}";
+			public string PluginException(Mod mod, string pluginType) => $"A {pluginType} from {mod} threw an exception during {_stage.Name} stage.";
+		}
 	}
 
 	public abstract class Stage<TLoader> : Stage where TLoader : Delegate
@@ -193,11 +213,11 @@ namespace Deli
 
 		protected abstract TLoader? GetLoader(Mod mod, string name);
 
-		protected TLoader GetLoader(Mod mod, Dictionary<string, Mod> lookup, KeyValuePair<string, AssetLoaderID> asset)
+		protected TLoader GetLoader(Mod mod, Dictionary<string, Mod> lookup, KeyValuePair<string, AssetLoaderID> asset, out Mod loaderMod)
 		{
 			var loaderID = asset.Value;
 
-			if (!lookup.TryGetValue(loaderID.Mod, out var loaderMod))
+			if (!lookup.TryGetValue(loaderID.Mod, out loaderMod))
 			{
 				throw new InvalidOperationException($"Mod required for {Name} asset \"{asset.Key}\" of {mod} was not present: {loaderID.Mod}");
 			}
