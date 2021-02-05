@@ -26,14 +26,14 @@ namespace Deli.Patcher.Bootstrap
 					// Try finding the installed dependency
 					if (!lookup.TryGetValue(dep.Key, out var resolved))
 					{
-						_logger.LogError($"Mod {mod} depends on {dep.Key} @ {dep.Value}, but it is not installed");
+						_logger.LogFatal($"Mod {mod} depends on {dep.Key} @ {dep.Value}, but it is not installed");
 						return false;
 					}
 
 					// Check if the installed version satisfies the dependency request
 					if (resolved.Info.Version.CompareByPrecedence(dep.Value) == -1)
 					{
-						_logger.LogError($"Mod {mod} depends on {resolved.Info.Name ?? resolved.Info.Guid} @ {dep.Value}, but version {resolved.Info.Version} is installed");
+						_logger.LogFatal($"Mod {mod} depends on {resolved.Info.Name ?? resolved.Info.Guid} @ {dep.Value}, but version {resolved.Info.Version} is installed");
 						return false;
 					}
 				}

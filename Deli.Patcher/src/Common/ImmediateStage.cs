@@ -21,14 +21,22 @@ namespace Deli
 			var assets = GetAssets(mod.Info);
 			if (assets is null) return;
 
-			Logger.LogInfo($"Loading {Name} assets from {mod}");
+			Logger.LogDebug($"Loading assets from {mod}...");
 			foreach (var asset in assets)
 			{
 				var loader = GetLoader(mod, lookup, asset);
 
 				foreach (var handle in Glob(mod, asset))
 				{
-					loader(GenericThis, mod, handle);
+					try
+					{
+						loader(GenericThis, mod, handle);
+					}
+					catch
+					{
+						Logger.LogFatal($"{asset.Value} threw an exception while loading an asset from {mod}: {handle}");
+						throw;
+					}
 				}
 			}
 		}
@@ -64,23 +72,20 @@ namespace Deli
 			AssemblyLoader(stage, mod, AssemblyReader(AssemblyPreloader(handle)));
 		}
 
-		protected virtual IEnumerable<Mod> LoadMods(IEnumerable<Mod> mods)
+		protected virtual IEnumerable<Mod> Run(IEnumerable<Mod> mods)
 		{
+			PreRun();
+
 			var lookup = new Dictionary<string, Mod>();
 			foreach (var mod in mods)
 			{
 				lookup.Add(mod.Info.Guid, mod);
 
+				RunModules(mod);
 				LoadMod(mod, lookup);
+
 				yield return mod;
 			}
-
-			foreach (var module in Modules)
-			{
-				module.RunStage(this);
-			}
-
-			InvokeFinished();
 		}
 	}
 }

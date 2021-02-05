@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using BepInEx;
 using Deli.Patcher.Bootstrap;
@@ -16,13 +17,14 @@ namespace Deli.Setup
 			var blob = PatcherEntrypoint.Handoff();
 			var manager = new GameObject(DeliConstants.Metadata.Name);
 
-			var setup = new SetupStage(blob.StageData, manager);
-			var runtime = new RuntimeStage(blob.StageData);
+			var behaviours = new Dictionary<Mod, List<DeliBehaviour>>();
+			var setup = new SetupStage(blob.StageData, manager, behaviours);
+			var runtime = new RuntimeStage(blob.StageData, behaviours);
 
 			// Eagerly evaluate; do not leave this to runtime to enumerate or it will be too late.
-			var mods = setup.LoadModsInternal(blob.Mods).ToList();
+			var mods = setup.RunInternal(blob.Mods).ToList();
 
-			StartCoroutine(runtime.LoadMods(mods, StartCoroutine));
+			StartCoroutine(runtime.Run(mods, StartCoroutine));
 		}
 	}
 }

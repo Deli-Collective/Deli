@@ -22,7 +22,9 @@ namespace Deli
 
 		protected ManualLogSource Logger => Mod.Logger;
 
-		protected List<DeliModule> Modules { get; } = new();
+		protected Dictionary<Mod, List<DeliModule>> ModModules => Data.ModModules;
+
+		protected abstract string Name { get; }
 
 		/// <summary>
 		///		The collection of all the <see cref="ImmediateAssetLoader{TStage}"/>s registered.
@@ -34,11 +36,6 @@ namespace Deli
 		/// </summary>
 		public ImmediateReaderCollection ImmediateReaders => Data.ImmediateReaders;
 
-		/// <summary>
-		///		Invoked when all operations that require this stage are complete.
-		/// </summary>
-		public event Action? Finished;
-
 		protected Stage(Blob data)
 		{
 			Data = data;
@@ -46,11 +43,15 @@ namespace Deli
 
 		protected IEnumerable<IHandle> Glob(Mod mod, KeyValuePair<string, AssetLoaderID> asset)
 		{
-			using var globbed = mod.Resources.Glob(asset.Key).GetEnumerator();
+			var glob = asset.Key;
+			var loader = asset.Value;
+
+			Logger.LogDebug($"Enumerating glob: {glob}");
+			using var globbed = mod.Resources.Glob(glob).GetEnumerator();
 
 			if (!globbed.MoveNext())
 			{
-				Logger.LogWarning($"Asset from {mod} of type {asset.Value} did not match any handles: {asset.Key}");
+				Logger.LogWarning($"Asset glob from {mod} of type {loader} did not match any handles: {glob}");
 				yield break;
 			}
 
@@ -58,7 +59,7 @@ namespace Deli
 			{
 				var handle = globbed.Current!;
 
-				Logger.LogDebug($"{handle} > {asset.Value}");
+				Logger.LogDebug($"{handle} > {loader}");
 				yield return handle;
 			} while (globbed.MoveNext());
 		}
@@ -77,7 +78,7 @@ namespace Deli
 			return JObjectReader(handle).ToObject<T>(Serializer) ?? throw new FormatException("JSON file contained a null object.");
 		}
 
-		protected IFileHandle AssemblyPreloader(IHandle handle)
+		protected static IFileHandle AssemblyPreloader(IHandle handle)
 		{
 			if (handle is not IFileHandle file)
 			{
@@ -92,7 +93,23 @@ namespace Deli
 			if (type.IsAbstract || !typeof(DeliModule).IsAssignableFrom(type)) return;
 
 			var module = (DeliModule) Activator.CreateInstance(type, mod);
-			Modules.Add(module);
+
+			if (!ModModules.TryGetValue(mod, out var modules))
+			{
+				modules = new List<DeliModule>();
+				ModModules.Add(mod, modules);
+			}
+			modules.Add(module);
+
+			try
+			{
+				module.Run(stage);
+			}
+			catch
+			{
+				Logger.LogFatal($"{mod} threw an exception upon running a module for the first time.");
+				throw;
+			}
 		}
 
 		protected virtual void AssemblyLoader(Stage stage, Mod mod, Assembly assembly)
@@ -103,9 +120,28 @@ namespace Deli
 			}
 		}
 
-		protected void InvokeFinished()
+		protected void RunModules(Mod mod)
 		{
-			Finished?.Invoke();
+			if (!ModModules.TryGetValue(mod, out var modules)) return;
+
+			Logger.LogDebug($"Loading stage into {mod} modules...");
+			foreach (var module in modules)
+			{
+				try
+				{
+					module.Run(this);
+				}
+				catch
+				{
+					Logger.LogFatal($"{mod} threw an exception upon running a module.");
+					throw;
+				}
+			}
+		}
+
+		protected void PreRun()
+		{
+			Logger.LogDebug($"Running the {Name} stage...");
 		}
 
 		/// <summary>
@@ -133,23 +169,24 @@ namespace Deli
 			internal JsonSerializer Serializer { get; }
 			internal NestedServiceCollection<Mod, string, ImmediateAssetLoader<Stage>> SharedAssetLoaders { get; }
 			internal ImmediateReaderCollection ImmediateReaders { get; }
+			internal Dictionary<Mod, List<DeliModule>> ModModules { get; }
 
 			internal Blob(Mod mod, ImmediateReaderCollection jsonReaders, JsonSerializer serializer,
-				NestedServiceCollection<Mod, string, ImmediateAssetLoader<Stage>> sharedAssetLoaders, ImmediateReaderCollection immediateReaders)
+				NestedServiceCollection<Mod, string, ImmediateAssetLoader<Stage>> sharedAssetLoaders, ImmediateReaderCollection immediateReaders,
+				Dictionary<Mod, List<DeliModule>> modModules)
 			{
 				Mod = mod;
 				JsonReaders = jsonReaders;
 				Serializer = serializer;
 				SharedAssetLoaders = sharedAssetLoaders;
 				ImmediateReaders = immediateReaders;
+				ModModules = modModules;
 			}
 		}
 	}
 
 	public abstract class Stage<TLoader> : Stage where TLoader : Delegate
 	{
-		protected abstract string Name { get; }
-
 		protected Stage(Blob data) : base(data)
 		{
 		}
