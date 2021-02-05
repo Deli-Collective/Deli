@@ -115,7 +115,7 @@ namespace Deli.Setup
 
 		private IEnumerator LoadMod(Mod mod, Dictionary<string, Mod> lookup, CoroutineRunner runner)
 		{
-			var assets = mod.Info.Runtime;
+			var assets = mod.Info.Assets?.Runtime;
 			if (assets is null) yield break;
 
 			Logger.LogDebug($"Loading assets from {mod}...");

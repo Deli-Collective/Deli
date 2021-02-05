@@ -29,9 +29,9 @@ namespace Deli.Patcher
 			return null;
 		}
 
-		protected override Dictionary<string, AssetLoaderID>? GetAssets(Mod.Manifest manifest)
+		protected override Dictionary<string, AssetLoaderID>? GetAssets(Mod.AssetTable table)
 		{
-			return manifest.Patchers;
+			return table.Patcher;
 		}
 
 		// IEnumerable<Mod> for when one mod doesn't cause all to fail.

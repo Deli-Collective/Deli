@@ -73,9 +73,9 @@ namespace Deli.Setup
 			return null;
 		}
 
-		protected override Dictionary<string, AssetLoaderID>? GetAssets(Mod.Manifest manifest)
+		protected override Dictionary<string, AssetLoaderID>? GetAssets(Mod.AssetTable table)
 		{
-			return manifest.Setup;
+			return table.Setup;
 		}
 
 		protected override IEnumerable<Mod> Run(IEnumerable<Mod> mods)

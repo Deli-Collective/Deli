@@ -92,23 +92,15 @@ namespace Deli
 			/// </summary>
 			public Dictionary<string, SemVersion>? Dependencies { get; }
 			/// <summary>
-			///		The assets to load during the patcher stage.
+			///		The assets to load during each stage.
 			/// </summary>
-			public Dictionary<string, AssetLoaderID>? Patchers { get; }
-			/// <summary>
-			///		The assets to load during the setup stage.
-			/// </summary>
-			public Dictionary<string, AssetLoaderID>? Setup { get; }
-			/// <summary>
-			///		The assets to load during runtime stage.
-			/// </summary>
-			public Dictionary<string, AssetLoaderID>? Runtime { get; }
+			public AssetTable? Assets { get; }
+
 
 			// I hate this but we need to programmatically use this.
 			[JsonConstructor]
 			public Manifest(string guid, SemVersion version, string? name = null, string? description = null, string? iconPath = null, string? sourceUrl = null,
-				Dictionary<string, SemVersion>? dependencies = null, Dictionary<string, AssetLoaderID>? patchers = null, Dictionary<string, AssetLoaderID>? setup = null,
-				Dictionary<string, AssetLoaderID>? runtime = null)
+				Dictionary<string, SemVersion>? dependencies = null, AssetTable? assets = null)
 			{
 				Guid = guid;
 				Version = version;
@@ -117,9 +109,7 @@ namespace Deli
 				IconPath = iconPath;
 				SourceUrl = sourceUrl;
 				Dependencies = dependencies;
-				Patchers = patchers;
-				Setup = setup;
-				Runtime = runtime;
+				Assets = assets;
 			}
 
 			[OnDeserialized]
@@ -135,6 +125,30 @@ namespace Deli
 			public override string ToString()
 			{
 				return $"[{Name ?? Guid} {Version}]";
+			}
+		}
+
+		public class AssetTable
+		{
+			/// <summary>
+			///		The assets to load during the patcher stage.
+			/// </summary>
+			public Dictionary<string, AssetLoaderID> Patcher { get; }
+			/// <summary>
+			///		The assets to load during the setup stage.
+			/// </summary>
+			public Dictionary<string, AssetLoaderID>? Setup { get; }
+			/// <summary>
+			///		The assets to load during runtime stage.
+			/// </summary>
+			public Dictionary<string, AssetLoaderID>? Runtime { get; }
+
+			[JsonConstructor]
+			public AssetTable(Dictionary<string, AssetLoaderID> patcher, Dictionary<string, AssetLoaderID> setup, Dictionary<string, AssetLoaderID> runtime)
+			{
+				Patcher = patcher;
+				Setup = setup;
+				Runtime = runtime;
 			}
 		}
     }

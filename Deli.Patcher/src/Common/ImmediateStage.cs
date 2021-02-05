@@ -14,11 +14,14 @@ namespace Deli
 		{
 		}
 
-		protected abstract Dictionary<string, AssetLoaderID>? GetAssets(Mod.Manifest manifest);
+		protected abstract Dictionary<string, AssetLoaderID>? GetAssets(Mod.AssetTable table);
 
 		private void LoadMod(Mod mod, Dictionary<string, Mod> lookup)
 		{
-			var assets = GetAssets(mod.Info);
+			var table = mod.Info.Assets;
+			if (table is null) return;
+
+			var assets = GetAssets(table);
 			if (assets is null) return;
 
 			Logger.LogDebug(Locale.LoadingAssets(mod));
