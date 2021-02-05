@@ -39,9 +39,9 @@ namespace Deli.Patcher.Bootstrap
 					});
 					var sharedLoaders = new NestedServiceCollection<Mod, string, ImmediateAssetLoader<Stage>>();
 					var immediateReaders = new ImmediateReaderCollection(Logger);
-					var data = new Stage.Blob(Mod, jsonReaders, serializer, sharedLoaders, immediateReaders);
+					var modModules = new Dictionary<Mod, List<DeliModule>>();
 
-					return data;
+					return new Stage.Blob(Mod, jsonReaders, serializer, sharedLoaders, immediateReaders, modModules);
 				}
 
 				return _stageData ??= Init();
@@ -62,7 +62,7 @@ namespace Deli.Patcher.Bootstrap
 
 					var mods = discovery.Run();
 					mods = sorter.Run(mods);
-					mods = Stage.LoadModsInternal(mods);
+					mods = Stage.RunInternal(mods);
 
 					yield return Mod;
 					foreach (var mod in mods) yield return mod;

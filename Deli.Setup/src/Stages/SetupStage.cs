@@ -7,15 +7,17 @@ namespace Deli.Setup
 	public class SetupStage : ImmediateStage<SetupStage>
 	{
 		private readonly GameObject _manager;
+		private readonly Dictionary<Mod, List<DeliBehaviour>> _modBehaviours;
 
 		protected override string Name { get; } = "setup";
 		protected override SetupStage GenericThis => this;
 
 		public NestedServiceCollection<Mod, string, ImmediateAssetLoader<SetupStage>> SetupAssetLoaders { get; } = new();
 
-		public SetupStage(Blob data, GameObject manager) : base(data)
+		public SetupStage(Blob data, GameObject manager, Dictionary<Mod, List<DeliBehaviour>> modBehaviours) : base(data)
 		{
 			_manager = manager;
+			_modBehaviours = modBehaviours;
 		}
 
 		protected override void TypeLoader(Stage stage, Mod mod, Type type)
@@ -26,14 +28,32 @@ namespace Deli.Setup
 			{
 				ref var source = ref DeliBehaviour.GlobalSource;
 
+				DeliBehaviour behaviour;
 				source = mod;
 				try
 				{
-					_manager.AddComponent(type);
+					behaviour = (DeliBehaviour) _manager.AddComponent(type);
 				}
 				finally
 				{
 					source = null;
+				}
+
+				if (!_modBehaviours.TryGetValue(mod, out var behaviours))
+				{
+					behaviours = new List<DeliBehaviour>();
+					_modBehaviours.Add(mod, behaviours);
+				}
+				behaviours.Add(behaviour);
+
+				try
+				{
+					behaviour.Run(stage);
+				}
+				catch
+				{
+					Logger.LogFatal($"{mod} threw an exception upon running a behaviour for the first time.");
+					throw;
 				}
 			}
 		}
@@ -58,13 +78,13 @@ namespace Deli.Setup
 			return manifest.Setup;
 		}
 
-		protected override IEnumerable<Mod> LoadMods(IEnumerable<Mod> mods)
+		protected override IEnumerable<Mod> Run(IEnumerable<Mod> mods)
 		{
 			SharedAssetLoaders[Mod, DeliConstants.Assets.AssemblyLoader] = AssemblyLoader;
 
-			return base.LoadMods(mods);
+			return base.Run(mods);
 		}
 
-		internal IEnumerable<Mod> LoadModsInternal(IEnumerable<Mod> mods) => LoadMods(mods);
+		internal IEnumerable<Mod> RunInternal(IEnumerable<Mod> mods) => Run(mods);
 	}
 }

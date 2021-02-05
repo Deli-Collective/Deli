@@ -29,31 +29,42 @@ namespace Deli.Setup
 		protected ManualLogSource Logger => Source.Logger;
 
 		/// <summary>
-		///		Invoked when the <see cref="SetupStage"/> is in progress.
+		///		Invoked when stages are in progress.
 		/// </summary>
-		protected event StageRunner<SetupStage>? Setup;
-
-		/// <summary>
-		///		Invoked when the <see cref="RuntimeStage"/> is in progress.
-		/// </summary>
-		protected event StageRunner<RuntimeStage>? Runtime;
+		protected StageEvents Events { get; } = new();
 
 		protected DeliBehaviour()
 		{
 			Source = GlobalSource ?? throw new InvalidOperationException("A source was not ready for this behaviour. Was the behavior initialized outside of Deli?");
 		}
 
-		/// <inheritdoc cref="IDeliCode.RunStage"/>
-		public virtual void RunStage(Stage stage)
+		/// <inheritdoc cref="IDeliCode.Run"/>
+		public virtual void Run(Stage stage) => Events.Run(stage);
+
+		protected class StageEvents : IDeliCode
 		{
-			switch (stage)
+			/// <summary>
+			///		Invoked when the <see cref="SetupStage"/> is in progress.
+			/// </summary>
+			protected event StageRunner<SetupStage>? Setup;
+
+			/// <summary>
+			///		Invoked when the <see cref="RuntimeStage"/> is in progress.
+			/// </summary>
+			protected event StageRunner<RuntimeStage>? Runtime;
+
+			/// <inheritdoc cref="IDeliCode.Run"/>
+			public void Run(Stage stage)
 			{
-				case SetupStage setup:
-					Setup?.Invoke(setup);
-					break;
-				case RuntimeStage runtime:
-					Runtime?.Invoke(runtime);
-					break;
+				switch (stage)
+				{
+					case SetupStage setup:
+						Setup?.Invoke(setup);
+						break;
+					case RuntimeStage runtime:
+						Runtime?.Invoke(runtime);
+						break;
+				}
 			}
 		}
 	}

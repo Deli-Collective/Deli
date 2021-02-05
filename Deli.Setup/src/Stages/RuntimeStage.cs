@@ -15,6 +15,7 @@ namespace Deli.Setup
 {
 	public class RuntimeStage : Stage<DelayedAssetLoader>
 	{
+		private readonly Dictionary<Mod, List<DeliBehaviour>> _modBehaviours;
 		private readonly Dictionary<Type, object> _wrapperReaders = new();
 
 		protected override string Name { get; } = "runtime";
@@ -29,8 +30,9 @@ namespace Deli.Setup
 
 		public VersionCheckerCollection VersionCheckers { get; } = new();
 
-		internal RuntimeStage(Blob data) : base(data)
+		internal RuntimeStage(Blob data, Dictionary<Mod, List<DeliBehaviour>> modBehaviours) : base(data)
 		{
+			_modBehaviours = modBehaviours;
 			DelayedReaders = new DelayedReaderCollection(Logger);
 		}
 
@@ -116,14 +118,37 @@ namespace Deli.Setup
 			var assets = mod.Info.Runtime;
 			if (assets is null) yield break;
 
-			Logger.LogInfo("Loading assets from " + mod);
+			Logger.LogDebug($"Loading assets from {mod}...");
 			foreach (var asset in assets)
 			{
 				var loader = GetLoader(mod, lookup, asset);
+
 				var buffer = new Queue<Coroutine>();
 				foreach (var handle in Glob(mod, asset))
 				{
-					var coroutine = runner(loader(this, mod, handle));
+					IEnumerator TryLoad(IEnumerator loaderDelayed)
+					{
+						bool MoveNext()
+						{
+							try
+							{
+								return loaderDelayed.MoveNext();
+							}
+							catch
+							{
+								// Not fatal; throwing in a coroutine only kills the coroutine. We'll still rethrow for the stacktrace, though.
+								Logger.LogError($"{asset.Value} threw an exception while loading an asset from {mod}: {handle}");
+								throw;
+							}
+						}
+
+						while (MoveNext())
+						{
+							yield return loaderDelayed.Current;
+						}
+					}
+
+					var coroutine = runner(TryLoad(loader(this, mod, handle)));
 					buffer.Enqueue(coroutine);
 				}
 
@@ -228,7 +253,7 @@ namespace Deli.Setup
 				{
 					if (remoteVersion is null)
 					{
-						Logger.LogWarning($"No versions of {mod} found at \"{source}\"");
+						Logger.LogWarning($"No versions of {mod} found at its source URL: {source}");
 						return;
 					}
 
@@ -261,33 +286,52 @@ namespace Deli.Setup
 			}
 		}
 
-		private IEnumerator LoadModsInternal(IEnumerable<Mod> mods, CoroutineRunner runner)
+		private IEnumerator RunCore(IEnumerable<Mod> mods, CoroutineRunner runner)
 		{
 			var lookup = new Dictionary<string, Mod>();
 			foreach (var mod in mods)
 			{
 				lookup.Add(mod.Info.Guid, mod);
 
+				RunModules(mod);
+				RunBehaviours(mod);
+
 				yield return LoadMod(mod, lookup, runner);
 			}
 		}
 
-		internal IEnumerator LoadMods(IEnumerable<Mod> mods, CoroutineRunner runner)
+		private void RunBehaviours(Mod mod)
 		{
+			if (!_modBehaviours.TryGetValue(mod, out var behaviours)) return;
+
+			Logger.LogDebug($"Loading stage into {mod} behaviours...");
+			foreach (var behaviour in behaviours)
+			{
+				try
+				{
+					behaviour.Run(this);
+				}
+				catch
+				{
+					Logger.LogFatal($"{mod} threw an exception upon running a behaviour.");
+					throw;
+				}
+			}
+		}
+
+		internal IEnumerator Run(IEnumerable<Mod> mods, CoroutineRunner runner)
+		{
+			PreRun();
+
 			DelayedReaders.Add(BytesReader);
 			DelayedReaders.Add(AssemblyReader);
 			DelayedAssetLoaders[Mod, DeliConstants.Assets.AssemblyLoader] = AssemblyLoader;
 			Setup.VersionCheckers.AddAll(VersionCheckers);
 
 			var listed = mods.ToList();
-			yield return LoadModsInternal(listed, runner);
+			yield return RunCore(listed, runner);
 
-			foreach (var module in Modules)
-			{
-				module.RunStage(this);
-			}
-
-			InvokeFinished();
+			Logger.LogInfo("Finished Deli stage loading.");
 
 			var caches = ReadCaches();
 			yield return runner(CheckVersions(listed, runner, caches));

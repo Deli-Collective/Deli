@@ -73,7 +73,7 @@ namespace Deli.Patcher.Bootstrap
 					}
 					catch (Exception e)
 					{
-						_logger.LogError("Failed to create mod from directory mod at " + dir + Environment.NewLine + e);
+						_logger.LogError($"Failed to create mod from directory mod at {dir}{Environment.NewLine}{e}");
 
 						// Don't continue, as this directory was intended to be a mod.
 						yield break;
@@ -92,20 +92,9 @@ namespace Deli.Patcher.Bootstrap
 					var resources = CreateZipResources(file);
 					mod = CreateMod(resources);
 				}
-				catch (FileNotFoundException e)
-				{
-					if (e.FileName != Filesystem.ManifestName)
-					{
-						// Not our doing.
-						throw;
-					}
-
-					_logger.LogError("A manifest file was not present in the zip mod at " + file);
-					continue;
-				}
 				catch (Exception e)
 				{
-					_logger.LogError("Failed to create mod from zip mod at " + file + Environment.NewLine + e);
+					_logger.LogError($"Failed to create mod from zip mod at {file}{Environment.NewLine}{e}");
 					continue;
 				}
 
@@ -122,7 +111,7 @@ namespace Deli.Patcher.Bootstrap
 		{
 			foreach (var mod in DiscoverMods(_mods))
 			{
-				_logger.LogDebug($"Discovered mod: {mod} at {mod.Resources}");
+				_logger.LogDebug($"Discovered {mod} at {mod.Resources}");
 				yield return mod;
 			}
 		}

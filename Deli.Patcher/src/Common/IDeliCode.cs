@@ -9,6 +9,6 @@ namespace Deli
 		///		Invoked when a stage is in progress.
 		/// </summary>
 		/// <param name="stage">The current stage.</param>
-		void RunStage(Stage stage);
+		void Run(Stage stage);
 	}
 }

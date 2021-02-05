@@ -35,15 +35,15 @@ namespace Deli.Patcher
 		}
 
 		// IEnumerable<Mod> for when one mod doesn't cause all to fail.
-		protected override IEnumerable<Mod> LoadMods(IEnumerable<Mod> mods)
+		protected override IEnumerable<Mod> Run(IEnumerable<Mod> mods)
 		{
 			ImmediateReaders.Add(BytesReader);
 			ImmediateReaders.Add(AssemblyReader);
 			PatcherAssetLoaders[Mod, DeliConstants.Assets.AssemblyLoader] = AssemblyLoader;
 
-			return base.LoadMods(mods);
+			return base.Run(mods);
 		}
 
-		internal IEnumerable<Mod> LoadModsInternal(IEnumerable<Mod> mods) => LoadMods(mods);
+		internal IEnumerable<Mod> RunInternal(IEnumerable<Mod> mods) => Run(mods);
 	}
 }

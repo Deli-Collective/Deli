@@ -64,7 +64,7 @@ namespace Deli.Patcher.Bootstrap
 					}
 					catch (Exception)
 					{
-						_stateful.Logger.LogError($"An unhandled exception occured while patching {fileName} with {mod}. This will be rethrown to prevent the game from loading.");
+						_stateful.Logger.LogFatal($"{mod} threw an exception when patching {fileName}");
 						throw;
 					}
 				}
