@@ -18,6 +18,8 @@ namespace Deli.Setup
 		{
 			_manager = manager;
 			_modBehaviours = modBehaviours;
+
+			SharedAssetLoaders[Mod, DeliConstants.Assets.AssemblyLoader] = AssemblyLoader;
 		}
 
 		protected override void TypeLoader(Stage stage, Mod mod, Type type)
@@ -76,13 +78,6 @@ namespace Deli.Setup
 		protected override Dictionary<string, AssetLoaderID>? GetAssets(Mod.AssetTable table)
 		{
 			return table.Setup;
-		}
-
-		protected override IEnumerable<Mod> Run(IEnumerable<Mod> mods)
-		{
-			SharedAssetLoaders[Mod, DeliConstants.Assets.AssemblyLoader] = AssemblyLoader;
-
-			return base.Run(mods);
 		}
 
 		internal IEnumerable<Mod> RunInternal(IEnumerable<Mod> mods) => Run(mods);
