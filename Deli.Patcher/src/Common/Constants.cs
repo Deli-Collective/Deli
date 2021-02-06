@@ -1,3 +1,5 @@
+using Semver;
+
 namespace Deli
 {
 	/// <summary>
@@ -34,6 +36,11 @@ namespace Deli
 			///		The path (from GitHub) to the source code
 			/// </summary>
 			public const string SourcePath = "Deli-Collective/Deli";
+
+			/// <summary>
+			///		<seealso cref="Version"/>, but already parsed
+			/// </summary>
+			public static readonly SemVersion SemVersion = SemVersion.Parse(Version);
 		}
 
 		/// <summary>

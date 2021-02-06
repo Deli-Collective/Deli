@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Semver;
 
 namespace Deli
 {
-	public static class Extension
+	public static class Extensions
 	{
 		public static IEnumerable<T> TSort<T>(this IEnumerable<T> source, Func<T, IEnumerable<T>> dependencies, bool throwOnCycle = false)
 		{
@@ -83,6 +84,16 @@ namespace Deli
 					yield return casted;
 				}
 			}
+		}
+
+		public static bool Satisfies(this SemVersion @this, SemVersion requirement)
+		{
+			if (requirement.Major == 0)
+			{
+				return @this.Major == 0 && @this.Minor == requirement.Minor;
+			}
+
+			return @this.Major == requirement.Major && @this.Minor > requirement.Minor;
 		}
 	}
 }

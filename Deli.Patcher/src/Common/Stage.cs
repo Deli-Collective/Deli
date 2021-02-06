@@ -7,6 +7,7 @@ using Deli.Patcher;
 using Deli.VFS;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Semver;
 
 namespace Deli
 {
@@ -67,7 +68,7 @@ namespace Deli
 			} while (globbed.MoveNext());
 		}
 
-		private static JToken JTokenReader(IFileHandle handle)
+		protected static JToken JTokenReader(IFileHandle handle)
 		{
 			using var raw = handle.OpenRead();
 			using var text = new StreamReader(raw);
@@ -76,7 +77,38 @@ namespace Deli
 			return JToken.Load(json);
 		}
 
-		private T JsonReader<T>(IFileHandle handle)
+		protected Mod.Manifest ModManifestReader(IFileHandle handle)
+		{
+			var token = JTokenReader(handle);
+			if (token is not JObject obj)
+			{
+				throw new FormatException("The contents of a manifest file must be a JSON object.");
+			}
+
+			// Do early version checking before deserializing the whole object.
+			const string propertyName = "require";
+			var property = obj[propertyName];
+			if (property is null)
+			{
+				throw new FormatException("Manifest must have a '" + propertyName + "' property that describes the version of Deli required.");
+			}
+
+			var require = property.ToObject<SemVersion?>();
+			if (require is null)
+			{
+				throw new FormatException("The required Deli version must not be null.");
+			}
+
+			var deli = DeliConstants.Metadata.SemVersion;
+			if (!deli.Satisfies(require))
+			{
+				throw new FormatException($"This mod is incompatible with the current version of Deli (required: {require}; current: {deli})");
+			}
+
+			return obj.ToObject<Mod.Manifest>(Serializer)!;
+		}
+
+		protected T JsonReader<T>(IFileHandle handle)
 		{
 			var token = JTokenReader(handle);
 			if (token is JValue {Value: null})

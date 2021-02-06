@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using Deli.VFS;
+using Newtonsoft.Json.Linq;
 
 namespace Deli.Patcher
 {
@@ -34,9 +37,17 @@ namespace Deli.Patcher
 			return table.Patcher;
 		}
 
+		private static JObject JObjectReader(IFileHandle file)
+		{
+			return JTokenReader(file) as JObject ?? throw new FormatException("Expected a JSON object");
+		}
+
 		// IEnumerable<Mod> for when one mod doesn't cause all to fail.
 		protected override IEnumerable<Mod> Run(IEnumerable<Mod> mods)
 		{
+			ImmediateReaders.Add(JTokenReader);
+			ImmediateReaders.Add(JObjectReader);
+			ImmediateReaders.Add(ModManifestReader);
 			ImmediateReaders.Add(BytesReader);
 			ImmediateReaders.Add(AssemblyReader);
 			PatcherAssetLoaders[Mod, DeliConstants.Assets.AssemblyLoader] = AssemblyLoader;
