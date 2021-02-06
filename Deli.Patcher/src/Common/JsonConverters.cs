@@ -8,7 +8,7 @@ using Semver;
 
 namespace Deli
 {
-	public class SemVersionJsonConverter : JsonConverter<SemVersion?>
+	internal class SemVersionJsonConverter : JsonConverter<SemVersion?>
 	{
 		public override void WriteJson(JsonWriter writer, SemVersion? value, JsonSerializer serializer)
 		{
@@ -22,7 +22,7 @@ namespace Deli
 		}
 	}
 
-	public class AssetLoaderIDJsonConverter : JsonConverter<AssetLoaderID>
+	internal class AssetLoaderIDJsonConverter : JsonConverter<AssetLoaderID>
 	{
 		public override void WriteJson(JsonWriter writer, AssetLoaderID value, JsonSerializer serializer)
 		{
@@ -47,7 +47,7 @@ namespace Deli
 		}
 	}
 
-	public class DeepDictionaryJsonConverter : JsonConverter
+	internal class DeepDictionaryJsonConverter : JsonConverter
 	{
 		private delegate object? Reader(JToken root, JsonSerializer serializer);
 		private delegate void Writer(JsonWriter writer, object value, JsonSerializer serializer);
