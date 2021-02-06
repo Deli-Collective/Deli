@@ -7,7 +7,7 @@ namespace Deli.Setup
 	///		A deserializer that is performed over multiple frames.
 	/// </summary>
 	/// <typeparam name="T">The type to deserialize to.</typeparam>
-	public delegate ResultYieldInstruction<T> DelayedReader<T>(IFileHandle file);
+	public delegate ResultYieldInstruction<T> DelayedReader<T>(IFileHandle file) where T : notnull;
 
 	/// <summary>
 	///		An asset loader that operates over multiple frames.
