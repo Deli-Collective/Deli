@@ -140,7 +140,6 @@ namespace Deli
 		public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
 		{
 			var root = JToken.ReadFrom(reader);
-
 			if (root is JValue {Value: null})
 			{
 				return null;
