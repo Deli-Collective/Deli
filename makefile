@@ -16,15 +16,24 @@ TEMP_DIRS            = $(TEMP_PATCHERS) $(TEMP_PLUGINS)
 CONTENTS_PATCHERS    = $(addsuffix .dll,$(PROJ_PATCHER) DotNetZip Deli.Newtonsoft.Json)
 CONTENTS_PLUGINS     = $(addsuffix .dll,$(PROJ_SETUP))
 
-.PHONY: FORCE all clean
+.PHONY: build all clean
 
 all: clean $(ZIP)
-FORCE:
 
-$(PROJS): FORCE
-	"$(MAKE)" -C "$@" NAME="$@" PACKAGE="$@.deli"
+build:
+	for p in $(PROJS); do \
+		"$(MAKE)" -C "$$p" precompile NAME="$$p" || true; \
+	done
+	$(BUILD)
+	for p in $(PROJS); do \
+		"$(MAKE)" -C "$$p" postcompile NAME="$$p" || true; \
+	done
 
-$(ZIP): $(PROJS)
+$(ZIP): build
+	for p in $(PROJS); do \
+		"$(MAKE)" -C "$$p" pack NAME="$$p" || true; \
+	done
+	
 	for d in $(TEMP_DIRS); do \
 		mkdir -p $$d; \
 	done
