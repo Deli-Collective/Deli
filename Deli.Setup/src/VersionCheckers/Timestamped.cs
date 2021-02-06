@@ -1,5 +1,5 @@
 using System;
-using Newtonsoft.Json;
+using Deli.Newtonsoft.Json;
 
 namespace Deli.Setup
 {

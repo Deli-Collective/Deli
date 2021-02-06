@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Deli.VFS;
 using Deli.VFS.Disk;
-using Newtonsoft.Json;
+using Deli.Newtonsoft.Json;
 using Semver;
 using UnityEngine;
 

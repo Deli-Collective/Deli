@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Logging;
 using Deli.VFS.Disk;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using Deli.Newtonsoft.Json;
+using Deli.Newtonsoft.Json.Serialization;
 using static Deli.DeliConstants;
 
 namespace Deli.Patcher.Bootstrap

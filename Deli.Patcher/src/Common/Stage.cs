@@ -5,8 +5,8 @@ using System.Reflection;
 using BepInEx.Logging;
 using Deli.Patcher;
 using Deli.VFS;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Deli.Newtonsoft.Json;
+using Deli.Newtonsoft.Json.Linq;
 using Semver;
 
 namespace Deli
