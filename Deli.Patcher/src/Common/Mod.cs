@@ -67,6 +67,11 @@ namespace Deli
 			/// </summary>
 			[JsonProperty(Required = Required.Always)]
 			public SemVersion Version { get; }
+			/// <summary>
+			///		The version of Deli the mod requires.
+			/// </summary>
+			[JsonProperty(Required = Required.Always)]
+			public SemVersion Require { get; }
 
 			/// <summary>
 			///		The human-readable name of the mod.
@@ -97,11 +102,12 @@ namespace Deli
 
 			// I hate this but we need to programmatically use this.
 			[JsonConstructor]
-			public Manifest(string guid, SemVersion version, string? name = null, string? description = null, string? iconPath = null, string? sourceUrl = null,
+			public Manifest(string guid, SemVersion version, SemVersion require, string? name = null, string? description = null, string? iconPath = null, string? sourceUrl = null,
 				Dictionary<string, SemVersion>? dependencies = null, AssetTable? assets = null)
 			{
 				Guid = guid;
 				Version = version;
+				Require = require;
 				Name = name;
 				Description = description;
 				IconPath = iconPath;

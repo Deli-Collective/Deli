@@ -4,7 +4,7 @@ using BepInEx.Logging;
 using Deli.VFS.Disk;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Semver;
+using static Deli.DeliConstants;
 
 namespace Deli.Patcher.Bootstrap
 {
@@ -56,7 +56,7 @@ namespace Deli.Patcher.Bootstrap
 			{
 				IEnumerable<Mod> Init()
 				{
-					var manifestReader = Stage.RegisterJson<Mod.Manifest>();
+					var manifestReader = Stage.ImmediateReaders.Get<Mod.Manifest>();
 					var discovery = new Discovery(Logger, manifestReader);
 					var sorter = new Sorter(Logger);
 
@@ -90,8 +90,8 @@ namespace Deli.Patcher.Bootstrap
 
 		public Bootstrapper()
 		{
-			var manifest = new Mod.Manifest(DeliConstants.Metadata.Guid, SemVersion.Parse(DeliConstants.Metadata.Version), name: DeliConstants.Metadata.Name, sourceUrl: DeliConstants.Metadata.SourceUrl);
-			Mod = new Mod(manifest, new RootDirectoryHandle(DeliConstants.Filesystem.Directory));
+			var manifest = new Mod.Manifest(Metadata.Guid, Metadata.SemVersion,Metadata.SemVersion, name: Metadata.Name, sourceUrl: Metadata.SourceUrl);
+			Mod = new Mod(manifest, new RootDirectoryHandle(Filesystem.Directory));
 		}
 	}
 }
