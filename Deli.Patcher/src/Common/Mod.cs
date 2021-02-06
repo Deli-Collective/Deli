@@ -5,7 +5,7 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using Deli.VFS;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
+using Deli.Newtonsoft.Json;
 using Semver;
 
 namespace Deli
