@@ -67,18 +67,25 @@ namespace Deli
 			} while (globbed.MoveNext());
 		}
 
-		private static JObject JObjectReader(IFileHandle handle)
+		private static JToken JTokenReader(IFileHandle handle)
 		{
 			using var raw = handle.OpenRead();
 			using var text = new StreamReader(raw);
 			using var json = new JsonTextReader(text);
 
-			return JObject.Load(json);
+			return JToken.Load(json);
 		}
 
 		private T JsonReader<T>(IFileHandle handle)
 		{
-			return JObjectReader(handle).ToObject<T>(Serializer) ?? throw new FormatException("JSON file contained a null object.");
+			var token = JTokenReader(handle);
+			if (token is JValue {Value: null})
+			{
+				Logger.LogError("JSON contents of file are null: " + handle);
+				throw new FormatException("File contained a null JSON object.");
+			}
+
+			return token.ToObject<T>(Serializer)!;
 		}
 
 		protected static IFileHandle AssemblyPreloader(IHandle handle)
