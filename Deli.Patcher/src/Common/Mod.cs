@@ -133,7 +133,7 @@ namespace Deli
 			/// <summary>
 			///		The assets to load during the patcher stage.
 			/// </summary>
-			public Dictionary<string, AssetLoaderID> Patcher { get; }
+			public Dictionary<string, AssetLoaderID>? Patcher { get; }
 			/// <summary>
 			///		The assets to load during the setup stage.
 			/// </summary>
@@ -144,7 +144,7 @@ namespace Deli
 			public Dictionary<string, AssetLoaderID>? Runtime { get; }
 
 			[JsonConstructor]
-			public AssetTable(Dictionary<string, AssetLoaderID> patcher, Dictionary<string, AssetLoaderID> setup, Dictionary<string, AssetLoaderID> runtime)
+			public AssetTable(Dictionary<string, AssetLoaderID>? patcher, Dictionary<string, AssetLoaderID>? setup, Dictionary<string, AssetLoaderID>? runtime)
 			{
 				Patcher = patcher;
 				Setup = setup;
