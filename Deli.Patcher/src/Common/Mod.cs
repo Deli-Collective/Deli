@@ -57,7 +57,6 @@ namespace Deli
 		{
 			private static readonly Regex _guidFilter = new Regex(@"^[a-z0-9\._]+$");
 
-#pragma warning disable CS8618
 			/// <summary>
 			///		The globally unique identifier (GUID, crazy) of the mod. This should never be identical to another mod.
 			/// </summary>
@@ -68,7 +67,6 @@ namespace Deli
 			/// </summary>
 			[JsonProperty(Required = Required.Always)]
 			public SemVersion Version { get; }
-#pragma warning restore CS8618
 
 			/// <summary>
 			///		The human-readable name of the mod.
