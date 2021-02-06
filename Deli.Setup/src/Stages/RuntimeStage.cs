@@ -20,7 +20,7 @@ namespace Deli.Setup
 
 		protected override string Name { get; } = "runtime";
 
-		public NestedServiceCollection<Mod, string, DelayedAssetLoader> DelayedAssetLoaders { get; } = new();
+		public NestedServiceCollection<Mod, string, DelayedAssetLoader> DelayedAssetLoaders { get; }
 
 		/// <summary>
 		///		The collection of all the <see cref="DelayedReader{T}"/>s publicly available. This does not include wrappers for <see cref="ImmediateReader{T}"/>.
@@ -28,12 +28,21 @@ namespace Deli.Setup
 		/// </summary>
 		public DelayedReaderCollection DelayedReaders { get; }
 
-		public VersionCheckerCollection VersionCheckers { get; } = new();
+		public VersionCheckerCollection VersionCheckers { get; }
 
 		internal RuntimeStage(Blob data, Dictionary<Mod, List<DeliBehaviour>> modBehaviours) : base(data)
 		{
 			_modBehaviours = modBehaviours;
-			DelayedReaders = new DelayedReaderCollection(Logger);
+			DelayedReaders = new DelayedReaderCollection(Logger)
+			{
+				BytesReader,
+				AssemblyReader
+			};
+			DelayedAssetLoaders = new NestedServiceCollection<Mod, string, DelayedAssetLoader>
+			{
+				[Mod, DeliConstants.Assets.AssemblyLoader] = AssemblyLoader
+			};
+			VersionCheckers = Setup.VersionCheckers.DefaultCollection();
 		}
 
 		protected override DelayedAssetLoader? GetLoader(Mod mod, string name)
@@ -323,11 +332,6 @@ namespace Deli.Setup
 		internal IEnumerator Run(IEnumerable<Mod> mods, CoroutineRunner runner)
 		{
 			PreRun();
-
-			DelayedReaders.Add(BytesReader);
-			DelayedReaders.Add(AssemblyReader);
-			DelayedAssetLoaders[Mod, DeliConstants.Assets.AssemblyLoader] = AssemblyLoader;
-			Setup.VersionCheckers.AddAll(VersionCheckers);
 
 			var listed = mods.ToList();
 			yield return RunCore(listed, runner);

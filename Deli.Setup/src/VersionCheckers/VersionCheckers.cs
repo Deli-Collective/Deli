@@ -10,12 +10,15 @@ namespace Deli.Setup
 
 	internal static class VersionCheckers
 	{
-		public static void AddAll(VersionCheckerCollection checkers)
+		public static VersionCheckerCollection DefaultCollection()
 		{
-			checkers["github.com"] = GitHub.Checker;
+			return new()
+			{
+				["github.com"] = GitHub.Checker
+			};
 		}
 
-		public static class GitHub
+		private static class GitHub
 		{
 			private static readonly JsonRestClient _client;
 

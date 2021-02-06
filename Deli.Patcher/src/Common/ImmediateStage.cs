@@ -75,7 +75,7 @@ namespace Deli
 			AssemblyLoader(stage, mod, AssemblyReader(AssemblyPreloader(handle)));
 		}
 
-		protected virtual IEnumerable<Mod> Run(IEnumerable<Mod> mods)
+		protected IEnumerable<Mod> Run(IEnumerable<Mod> mods)
 		{
 			PreRun();
 

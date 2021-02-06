@@ -15,6 +15,12 @@ namespace Deli.Patcher
 
 		internal PatcherStage(Blob data) : base(data)
 		{
+			ImmediateReaders.Add(JTokenReader);
+			ImmediateReaders.Add(JObjectReader);
+			ImmediateReaders.Add(ModManifestReader);
+			ImmediateReaders.Add(BytesReader);
+			ImmediateReaders.Add(AssemblyReader);
+			PatcherAssetLoaders[Mod, DeliConstants.Assets.AssemblyLoader] = AssemblyLoader;
 		}
 
 		protected override ImmediateAssetLoader<PatcherStage>? GetLoader(Mod mod, string name)
@@ -40,19 +46,6 @@ namespace Deli.Patcher
 		private static JObject JObjectReader(IFileHandle file)
 		{
 			return JTokenReader(file) as JObject ?? throw new FormatException("Expected a JSON object");
-		}
-
-		// IEnumerable<Mod> for when one mod doesn't cause all to fail.
-		protected override IEnumerable<Mod> Run(IEnumerable<Mod> mods)
-		{
-			ImmediateReaders.Add(JTokenReader);
-			ImmediateReaders.Add(JObjectReader);
-			ImmediateReaders.Add(ModManifestReader);
-			ImmediateReaders.Add(BytesReader);
-			ImmediateReaders.Add(AssemblyReader);
-			PatcherAssetLoaders[Mod, DeliConstants.Assets.AssemblyLoader] = AssemblyLoader;
-
-			return base.Run(mods);
 		}
 
 		internal IEnumerable<Mod> RunInternal(IEnumerable<Mod> mods) => Run(mods);
