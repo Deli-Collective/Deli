@@ -13,7 +13,7 @@ namespace Deli.Bootstrap
 		public static class Metadata
 		{
 			/// <summary>
-			/// 	The name of the implicit mod, setup plugin, and patcher plugin
+			/// 	The name of this project
 			/// </summary>
 			public const string Name = "Deli";
 
@@ -23,9 +23,23 @@ namespace Deli.Bootstrap
 			public const string Guid = "deli";
 
 			/// <summary>
-			/// 	The version of the implicit mod and setup plugin
+			/// 	The textual semversion that this was built from
 			/// </summary>
 			public const string Version = "MACRO_VERSION";
+
+			/// <summary>
+			///		A short except of what Deli is
+			/// </summary>
+			public const string Description = "Deli Eliminates Loader Intricacies; a mod loader built on top of BepInEx that can be extended to load any format of content.";
+
+			/// <summary>
+			///		The maintainers of Deli
+			/// </summary>
+			public static string[] Authors => new[]
+			{
+				"nrgill28",
+				"AshHat"
+			};
 
 			/// <summary>
 			///		The URL to the source code

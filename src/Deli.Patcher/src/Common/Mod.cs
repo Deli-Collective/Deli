@@ -83,6 +83,10 @@ namespace Deli
 			/// </summary>
 			public string? Description { get; }
 			/// <summary>
+			///		The maintainers of the mod.
+			/// </summary>
+			public string[]? Authors { get; }
+			/// <summary>
 			///		The path to an icon file in the VFS.
 			/// </summary>
 			public string? IconPath { get; }
@@ -103,14 +107,15 @@ namespace Deli
 
 			// I hate this but we need to programmatically use this.
 			[JsonConstructor]
-			public Manifest(string guid, SemVersion version, SemVersion require, string? name = null, string? description = null, string? iconPath = null, string? sourceUrl = null,
-				Dictionary<string, SemVersion>? dependencies = null, AssetTable? assets = null)
+			public Manifest(string guid, SemVersion version, SemVersion require, string? name = null, string? description = null, string[]? authors = null,string? iconPath = null,
+				string? sourceUrl = null, Dictionary<string, SemVersion>? dependencies = null, AssetTable? assets = null)
 			{
 				Guid = guid;
 				Version = version;
 				Require = require;
 				Name = name;
 				Description = description;
+				Authors = authors;
 				IconPath = iconPath;
 				SourceUrl = sourceUrl;
 				Dependencies = dependencies;
