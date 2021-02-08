@@ -92,7 +92,7 @@ namespace Deli.Bootstrap
 
 		public Bootstrapper()
 		{
-			var manifest = new Mod.Manifest(Metadata.Guid, Metadata.SemVersion,Metadata.SemVersion, name: Metadata.Name, sourceUrl: Metadata.SourceUrl);
+			var manifest = new Mod.Manifest(Metadata.Guid, Metadata.SemVersion,Metadata.SemVersion, Metadata.Name, Metadata.Description, Metadata.Authors, Metadata.SourceUrl);
 			Mod = new Mod(manifest, new RootDirectoryHandle(Filesystem.Directory));
 		}
 	}
