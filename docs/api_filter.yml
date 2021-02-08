@@ -1,0 +1,10 @@
+apiRules:
+  - exclude:
+      uidRegex: ^Deli.Newtonsoft.Json
+      type: Namespace
+  - exclude:
+      uidRegex: ^Deli.Bootstrap$
+      type: Namespace
+  - exclude:
+      uidRegex: ^Deli.Setup.PluginEntrypoint$
+      type: Class
