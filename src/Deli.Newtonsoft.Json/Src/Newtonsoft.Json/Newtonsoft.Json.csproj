@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net35</TargetFramework>
+    <LangVersion>8.0</LangVersion>
+    <!-- version numbers will be updated by build -->
+    <AssemblyVersion>12.0.0.0</AssemblyVersion>
+    <FileVersion>12.0.3</FileVersion>
+    <Authors>James Newton-King</Authors>
+    <Company>Newtonsoft</Company>
+    <Product>Json.NET</Product>
+    <Description>Json.NET is a popular high-performance JSON framework for .NET</Description>
+    <Copyright>Copyright © James Newton-King 2008</Copyright>
+    <Summary>Json.NET is a popular high-performance JSON framework for .NET</Summary>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Title>Json.NET</Title>
+    <RootNamespace>Deli.Newtonsoft.Json</RootNamespace>
+    <AssemblyName>Deli.Newtonsoft.Json</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Nullable>enable</Nullable>
+    <MinClientVersion>2.12</MinClientVersion>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <CodeAnalysisRuleset>Newtonsoft.Json.ruleset</CodeAnalysisRuleset>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="**\*.orig" />
+    <None Include="..\..\LICENSE.md" Pack="true" PackagePath="LICENSE.md" />
+    <None Include="$(PackageIconFullPath)" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="$(MicrosoftCodeAnalysisFxCopAnalyzersPackageVersion)" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="$(MicrosoftSourceLinkGitHubPackageVersion)" PrivateAssets="All" />
+    <!-- Compiler to support nullable in non-preview VS2019 -->
+    <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="$(MicrosoftNetCompilersToolsetPackageVersion)" PrivateAssets="All" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='net35'">
+    <PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1" PrivateAssets="All" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(TargetFramework)'=='net35'">
+    <AssemblyTitle>Json.NET .NET 3.5</AssemblyTitle>
+    <DefineConstants>NET35;HAVE_APP_DOMAIN;HAVE_BINARY_FORMATTER;HAVE_BINARY_SERIALIZATION;HAVE_BINARY_EXCEPTION_SERIALIZATION;HAVE_CAS;HAVE_CHAR_TO_STRING_WITH_CULTURE;HAVE_CHAR_TO_LOWER_WITH_CULTURE;HAVE_DATE_TIME_OFFSET;HAVE_EMPTY_TYPES;HAVE_FAST_REVERSE;HAVE_FULL_REFLECTION;HAVE_HASH_SET;HAVE_ICLONEABLE;HAVE_ICONVERTIBLE;HAVE_LINQ;HAVE_MEMORY_BARRIER;HAVE_NON_SERIALIZED_ATTRIBUTE;HAVE_REFLECTION_EMIT;HAVE_STREAM_READER_WRITER_CLOSE;HAVE_TIME_ZONE_INFO;HAVE_TRACE_WRITER;HAVE_UNICODE_SURROGATE_DETECTION;$(AdditionalConstants)</DefineConstants>
+  </PropertyGroup>
+</Project>
