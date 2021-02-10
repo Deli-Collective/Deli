@@ -30,6 +30,12 @@ namespace Deli.Runtime.Yielding
 			return new VoidContinuation<AsyncOperationWrapper>(this, r => new AsyncOperationWrapper(continuation(r)));
 		}
 
+		public ResultYieldInstruction<TNext> ContinueWith<TOperation, TNext>(Func<TResult, TOperation> continuation, Func<TOperation, TNext> result)
+			where TOperation : AsyncOperation
+		{
+			return CallbackWith(continuation).ContinueWith(x => x).CallbackWith(result);
+		}
+
 		public ResultYieldInstruction<TResult> ContinueWith(Func<TResult, CustomYieldInstruction> continuation)
 		{
 			return new VoidContinuation<CustomYieldWrapper>(this, r => new CustomYieldWrapper(continuation(r)));

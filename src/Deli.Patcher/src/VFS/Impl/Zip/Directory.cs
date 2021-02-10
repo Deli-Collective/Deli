@@ -12,7 +12,8 @@ namespace Deli.VFS.Zip
 
 		internal DirectoryHandle(Dictionary<string, IChildHandle> children, string path)
 		{
-			_children = new Dictionary<string, IChildHandle>();
+			_children = children;
+
 			Path = path;
 		}
 

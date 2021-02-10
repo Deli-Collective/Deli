@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using Deli.VFS;
-using Deli.VFS.Disk;
 
 namespace Deli.Immediate
 {
@@ -44,35 +42,10 @@ namespace Deli.Immediate
 			}
 		}
 
-		protected static byte[] BytesReader(IFileHandle file)
-		{
-			if (file is IDiskHandle disk)
-			{
-				return File.ReadAllBytes(disk.PathOnDisk);
-			}
-
-			using var raw = file.OpenRead();
-			using var memory = new MemoryStream();
-
-			return memory.ToArray();
-		}
-
-		protected static Assembly AssemblyReader(IFileHandle file)
-		{
-			if (file is IDiskHandle disk)
-			{
-				return Assembly.LoadFile(disk.PathOnDisk);
-			}
-
-			var raw = BytesReader(file);
-			var symbols = file.WithExtension("mdb");
-
-			return symbols is not IFileHandle symbolsFile ? Assembly.Load(raw) : Assembly.Load(raw, BytesReader(symbolsFile));
-		}
-
 		protected void AssemblyLoader(Stage stage, Mod mod, IHandle handle)
 		{
-			AssemblyLoader(stage, mod, AssemblyReader(AssemblyPreloader(handle)));
+			var assembly = ImmediateReaders.Get<Assembly>()(AssemblyPreloader(handle));
+			AssemblyLoader(stage, mod, assembly);
 		}
 
 		protected IEnumerable<Mod> Run(IEnumerable<Mod> mods)

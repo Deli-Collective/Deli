@@ -10,9 +10,9 @@ namespace Deli.Runtime.Yielding
 			return new VoidCallback<TWrapper>(@this, callback);
 		}
 
-		private static ResultYieldInstruction<T> CallbackWith<TWrapper, T>(this TWrapper @this, Func<T> callback) where TWrapper : IYieldWrapper
+		private static ResultYieldInstruction<TResult> CallbackWith<TWrapper, TResult>(this TWrapper @this, Func<TResult> callback) where TWrapper : IYieldWrapper
 		{
-			return new ResultCallback<TWrapper, T>(@this, callback);
+			return new ResultCallback<TWrapper, TResult>(@this, callback);
 		}
 
 		private static CustomYieldInstruction ContinueWith<TWrapper, TContWrapper>(this TWrapper @this, Func<TContWrapper> continuation)
@@ -21,9 +21,15 @@ namespace Deli.Runtime.Yielding
 			return new VoidContinuation<TWrapper, TContWrapper>(@this, continuation);
 		}
 
-		private static ResultYieldInstruction<T> ContinueWith<TWrapper, T>(this TWrapper @this, Func<ResultYieldInstruction<T>> continuation) where TWrapper : IYieldWrapper
+		private static ResultYieldInstruction<TResult> ContinueWith<TWrapper, TOperation, TResult>(this TWrapper @this, Func<TOperation> continuation, Func<TOperation, TResult> result)
+			where TWrapper : IYieldWrapper where TOperation : AsyncOperation
 		{
-			return new ResultContinuation<TWrapper, T>(@this, continuation);
+			return @this.CallbackWith(continuation).ContinueWith(x => x).CallbackWith(result);
+		}
+
+		private static ResultYieldInstruction<TResult> ContinueWith<TWrapper, TResult>(this TWrapper @this, Func<ResultYieldInstruction<TResult>> continuation) where TWrapper : IYieldWrapper
+		{
+			return new ResultContinuation<TWrapper, TResult>(@this, continuation);
 		}
 
 		public static CustomYieldInstruction CallbackWith(this AsyncOperation @this, Action callback)
@@ -31,7 +37,7 @@ namespace Deli.Runtime.Yielding
 			return new AsyncOperationWrapper(@this).CallbackWith(callback);
 		}
 
-		public static ResultYieldInstruction<T> CallbackWith<T>(this AsyncOperation @this, Func<T> callback)
+		public static ResultYieldInstruction<TResult> CallbackWith<TResult>(this AsyncOperation @this, Func<TResult> callback)
 		{
 			return new AsyncOperationWrapper(@this).CallbackWith(callback);
 		}
@@ -46,9 +52,15 @@ namespace Deli.Runtime.Yielding
 			return new AsyncOperationWrapper(@this).ContinueWith(() => new CustomYieldWrapper(continuation()));
 		}
 
-		public static ResultYieldInstruction<T> ContinueWith<T>(this AsyncOperation @this, Func<ResultYieldInstruction<T>> continuation)
+		public static ResultYieldInstruction<TResult> ContinueWith<TResult>(this AsyncOperation @this, Func<ResultYieldInstruction<TResult>> continuation)
 		{
 			return new AsyncOperationWrapper(@this).ContinueWith(continuation);
+		}
+
+		public static ResultYieldInstruction<TResult> ContinueWith<TOperation, TResult>(this AsyncOperation @this, Func<TOperation> continuation, Func<TOperation, TResult> result)
+			where TOperation : AsyncOperation
+		{
+			return new AsyncOperationWrapper(@this).ContinueWith(continuation, result);
 		}
 
 		public static CustomYieldInstruction CallbackWith(this CustomYieldInstruction @this, Action callback)
@@ -56,7 +68,7 @@ namespace Deli.Runtime.Yielding
 			return new CustomYieldWrapper(@this).CallbackWith(callback);
 		}
 
-		public static ResultYieldInstruction<T> CallbackWith<T>(this CustomYieldInstruction @this, Func<T> callback)
+		public static ResultYieldInstruction<TResult> CallbackWith<TResult>(this CustomYieldInstruction @this, Func<TResult> callback)
 		{
 			return new CustomYieldWrapper(@this).CallbackWith(callback);
 		}
@@ -66,12 +78,18 @@ namespace Deli.Runtime.Yielding
 			return new CustomYieldWrapper(@this).ContinueWith(() => new AsyncOperationWrapper(continuation()));
 		}
 
+		public static ResultYieldInstruction<TResult> ContinueWith<TOperation, TResult>(this CustomYieldInstruction @this, Func<TOperation> continuation, Func<TOperation, TResult> result)
+			where TOperation : AsyncOperation
+		{
+			return new CustomYieldWrapper(@this).ContinueWith(continuation, result);
+		}
+
 		public static CustomYieldInstruction ContinueWith(this CustomYieldInstruction @this, Func<CustomYieldInstruction> continuation)
 		{
 			return new CustomYieldWrapper(@this).ContinueWith(() => new CustomYieldWrapper(continuation()));
 		}
 
-		public static ResultYieldInstruction<T> ContinueWith<T>(this CustomYieldInstruction @this, Func<ResultYieldInstruction<T>> continuation)
+		public static ResultYieldInstruction<TResult> ContinueWith<TResult>(this CustomYieldInstruction @this, Func<ResultYieldInstruction<TResult>> continuation)
 		{
 			return new CustomYieldWrapper(@this).ContinueWith(continuation);
 		}

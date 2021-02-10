@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using BepInEx.Logging;
 using Deli.Immediate;
@@ -69,22 +69,9 @@ namespace Deli
 			} while (globbed.MoveNext());
 		}
 
-		protected static JToken JTokenReader(IFileHandle handle)
+		protected Mod.Manifest ModManifestOf(IFileHandle file)
 		{
-			using var raw = handle.OpenRead();
-			using var text = new StreamReader(raw);
-			using var json = new JsonTextReader(text);
-
-			return JToken.Load(json);
-		}
-
-		protected Mod.Manifest ModManifestReader(IFileHandle handle)
-		{
-			var token = JTokenReader(handle);
-			if (token is not JObject obj)
-			{
-				throw new FormatException("The contents of a manifest file must be a JSON object.");
-			}
+			var obj = ImmediateReaders.Get<JObject>()(file);
 
 			// Do early version checking before deserializing the whole object.
 			const string propertyName = "require";
@@ -109,16 +96,12 @@ namespace Deli
 			return obj.ToObject<Mod.Manifest>(Serializer)!;
 		}
 
-		protected T JsonReader<T>(IFileHandle handle)
+		[return: MaybeNull]
+		protected T JsonOf<T>(IFileHandle file)
 		{
-			var token = JTokenReader(handle);
-			if (token is JValue {Value: null})
-			{
-				Logger.LogError("JSON contents of file are null: " + handle);
-				throw new FormatException("File contained a null JSON object.");
-			}
+			var token = ImmediateReaders.Get<JToken>()(file);
 
-			return token.ToObject<T>(Serializer)!;
+			return token.ToObject<T>(Serializer);
 		}
 
 		protected static IFileHandle AssemblyPreloader(IHandle handle)
@@ -192,14 +175,14 @@ namespace Deli
 		///		Creates and adds a JSON <see cref="ImmediateReader{T}"/> for the type provided.
 		/// </summary>
 		/// <typeparam name="T">The JSON model.</typeparam>
-		public ImmediateReader<T> RegisterJson<T>()
+		public ImmediateReader<T> RegisterJson<T>() where T : notnull
 		{
 			if (JsonReaders.TryGet<T>(out var reader))
 			{
 				return reader;
 			}
 
-			reader = JsonReader<T>;
+			reader = JsonOf<T>;
 			JsonReaders.Add(reader);
 			ImmediateReaders.Add(reader);
 

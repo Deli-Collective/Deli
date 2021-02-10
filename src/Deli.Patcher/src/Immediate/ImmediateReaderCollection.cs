@@ -9,17 +9,17 @@ namespace Deli.Immediate
 		{
 		}
 
-		public void Add<T>(ImmediateReader<T> reader)
+		public void Add<T>(ImmediateReader<T> reader) where T : notnull
 		{
 			Add(typeof(T), reader);
 		}
 
-		public ImmediateReader<T> Get<T>()
+		public ImmediateReader<T> Get<T>() where T : notnull
 		{
 			return (ImmediateReader<T>) Get(typeof(T));
 		}
 
-		public bool TryGet<T>([MaybeNullWhen(false)] out ImmediateReader<T> reader)
+		public bool TryGet<T>([MaybeNullWhen(false)] out ImmediateReader<T> reader) where T : notnull
 		{
 			if (Services.TryGetValue(typeof(T), out var obj))
 			{

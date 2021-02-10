@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
 using Deli.Bootstrap;
 using Deli.Immediate;
-using Deli.VFS;
-using Deli.Newtonsoft.Json.Linq;
 
 namespace Deli.Patcher
 {
@@ -17,11 +14,7 @@ namespace Deli.Patcher
 
 		internal PatcherStage(Blob data) : base(data)
 		{
-			ImmediateReaders.Add(JTokenReader);
-			ImmediateReaders.Add(JObjectReader);
-			ImmediateReaders.Add(ModManifestReader);
-			ImmediateReaders.Add(BytesReader);
-			ImmediateReaders.Add(AssemblyReader);
+			ImmediateReaders.Add(ModManifestOf);
 			PatcherAssetLoaders[Mod, Constants.Assets.AssemblyLoader] = AssemblyLoader;
 		}
 
@@ -43,11 +36,6 @@ namespace Deli.Patcher
 		protected override Dictionary<string, AssetLoaderID>? GetAssets(Mod.AssetTable table)
 		{
 			return table.Patcher;
-		}
-
-		private static JObject JObjectReader(IFileHandle file)
-		{
-			return JTokenReader(file) as JObject ?? throw new FormatException("Expected a JSON object");
 		}
 
 		internal IEnumerable<Mod> RunInternal(IEnumerable<Mod> mods) => Run(mods);
