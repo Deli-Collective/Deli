@@ -3,7 +3,7 @@ using Deli.VFS;
 
 namespace Deli.Runtime
 {
-	public class DelayedTypedFileHandle<T> : TypedFileHandle<DelayedReader<T>, ResultYieldInstruction<T>>
+	public class DelayedTypedFileHandle<T> : TypedFileHandle<DelayedReader<T>, ResultYieldInstruction<T>> where T : notnull
 	{
 		public DelayedTypedFileHandle(IFileHandle handle, DelayedReader<T> reader) : base(handle, reader)
 		{

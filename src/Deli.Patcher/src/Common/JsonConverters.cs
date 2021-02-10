@@ -83,7 +83,7 @@ namespace Deli
 			return objectType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>) && i.GetGenericArguments()[0] == typeof(string));
 		}
 
-		private static Dictionary<string, TValue?>? ReadJsonTyped<TValue>(JToken root, JsonSerializer serializer)
+		private static Dictionary<string, TValue?> ReadJsonTyped<TValue>(JToken root, JsonSerializer serializer)
 		{
 			var ret = new Dictionary<string, TValue?>();
 

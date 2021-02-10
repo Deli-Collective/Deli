@@ -3,11 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using Deli.Immediate;
 using Deli.VFS;
-using Deli.VFS.Disk;
 using Deli.Newtonsoft.Json;
 using Deli.Runtime.Yielding;
 using Deli.Setup;
@@ -24,7 +22,7 @@ namespace Deli.Runtime
 
 		protected override string Name { get; } = "runtime";
 
-		public NestedServiceCollection<Mod, string, DelayedAssetLoader> DelayedAssetLoaders { get; }
+		public NestedServiceCollection<Mod, string, DelayedAssetLoader> DelayedAssetLoaders { get; } = new();
 
 		/// <summary>
 		///		The collection of all the <see cref="DelayedReader{T}"/>s publicly available. This does not include wrappers for <see cref="ImmediateReader{T}"/>.
@@ -37,15 +35,8 @@ namespace Deli.Runtime
 		internal RuntimeStage(Blob data, Dictionary<Mod, List<DeliBehaviour>> modBehaviours) : base(data)
 		{
 			_modBehaviours = modBehaviours;
-			DelayedReaders = new DelayedReaderCollection(Logger)
-			{
-				BytesReader,
-				AssemblyReader
-			};
-			DelayedAssetLoaders = new NestedServiceCollection<Mod, string, DelayedAssetLoader>
-			{
-				[Mod, Bootstrap.Constants.Assets.AssemblyLoader] = AssemblyLoader
-			};
+
+			DelayedReaders = Readers.DefaultCollection(Logger);
 			VersionCheckers = Runtime.VersionCheckers.DefaultCollection();
 		}
 
@@ -74,7 +65,7 @@ namespace Deli.Runtime
 		///		Gets a reader from <seealso cref="DelayedReaders"/>, otherwise gets a reader from <see cref="Stage.ImmediateReaders"/> and wraps it.
 		/// </summary>
 		/// <typeparam name="T">The type to deserialize.</typeparam>
-		public DelayedReader<T> GetReader<T>()
+		public DelayedReader<T> GetReader<T>() where T : notnull
 		{
 			var type = typeof(T);
 			if (DelayedReaders.TryGet<T>(out var reader))
@@ -93,37 +84,6 @@ namespace Deli.Runtime
 			_wrapperReaders.Add(typeof(T), wrapper);
 
 			return wrapper;
-		}
-
-		private static ResultYieldInstruction<byte[]> BytesReader(IFileHandle file)
-		{
-			var stream = file.OpenRead();
-			var buffer = new byte[stream.Length];
-
-			return new AsyncYieldInstruction<Stream>(stream, (self, callback, state) => self.BeginRead(buffer, 0, buffer.Length, callback, state),
-				(self, result) => self.EndRead(result)).CallbackWith(() =>
-			{
-				stream.Dispose();
-				return buffer;
-			});
-		}
-
-		private static ResultYieldInstruction<Assembly> AssemblyReader(IFileHandle file)
-		{
-			if (file is IDiskHandle disk)
-			{
-				return new DummyYieldInstruction<Assembly>(Assembly.LoadFile(disk.PathOnDisk));
-			}
-
-			var raw = BytesReader(file);
-
-			if (file.WithExtension("mdb") is not IFileHandle symbols)
-			{
-				return raw.CallbackWith(Assembly.Load);
-			}
-
-			var symbolsRaw = BytesReader(symbols);
-			return raw.ContinueWith(() => symbolsRaw).CallbackWith(() => Assembly.Load(raw.Result, symbolsRaw.Result));
 		}
 
 		private IEnumerator LoadMod(Mod mod, Dictionary<string, Mod> lookup, CoroutineRunner runner)
@@ -170,11 +130,6 @@ namespace Deli.Runtime
 					yield return buffer.Dequeue();
 				}
 			}
-		}
-
-		private IEnumerator AssemblyLoader(RuntimeStage stage, Mod mod, IHandle handle)
-		{
-			yield return AssemblyReader(AssemblyPreloader(handle)).CallbackWith(assembly => AssemblyLoader(stage, mod, assembly));
 		}
 
 		private VersionCache? ReadCache(FileInfo file)

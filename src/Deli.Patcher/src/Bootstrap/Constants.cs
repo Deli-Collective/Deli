@@ -3,12 +3,12 @@ using Semver;
 namespace Deli.Bootstrap
 {
 	/// <summary>
-	///		Constants used by Deli.
+	///		Constants used by Deli
 	/// </summary>
 	public static class Constants
 	{
 		/// <summary>
-		///		Information about Deli itself.
+		///		Information about Deli itself
 		/// </summary>
 		public static class Metadata
 		{

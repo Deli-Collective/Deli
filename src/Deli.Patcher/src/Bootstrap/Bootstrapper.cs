@@ -40,7 +40,7 @@ namespace Deli.Bootstrap
 						}
 					});
 					var sharedLoaders = new NestedServiceCollection<Mod, string, ImmediateAssetLoader<Stage>>();
-					var immediateReaders = new ImmediateReaderCollection(Logger);
+					var immediateReaders = Readers.DefaultCollection(Logger);
 					var modModules = new Dictionary<Mod, List<DeliModule>>();
 
 					return new Stage.Blob(Mod, jsonReaders, serializer, sharedLoaders, immediateReaders, modModules);

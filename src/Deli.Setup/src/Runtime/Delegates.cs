@@ -1,5 +1,4 @@
 using System.Collections;
-using Deli.Setup;
 using Deli.Runtime.Yielding;
 using Deli.VFS;
 
