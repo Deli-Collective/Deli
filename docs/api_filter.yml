@@ -1,10 +1,35 @@
 apiRules:
   - exclude:
-      uidRegex: ^Deli.Newtonsoft.Json
+      uidRegex: ^Deli\.Newtonsoft\.Json
       type: Namespace
   - exclude:
-      uidRegex: ^Deli.Bootstrap$
+      uidRegex: ^Deli\.Bootstrap$
       type: Namespace
+      
   - exclude:
-      uidRegex: ^Deli.Setup.PluginEntrypoint$
-      type: Class
+      uidRegex: ^Deli\.Stage\.(?:Blob|LocaleFormatter)$
+      type: Type
+  - exclude:
+      uidRegex: ^Deli\.Stage\.(?:Locale|Logger|Mod|ModModules|Serializer)
+      type: Property
+  - exclude:
+      uidRegex: ^Deli\.Stage\.(?:AssemblyLoader|AssemblyPreloader|Glob|JsonOf|ModManifestOf|PreRun|RunModules)
+      type: Method
+      
+  - exclude:
+      uidRegex: ^Deli\.Setup\.PluginEntrypoint$
+      type: Type
+      
+  - exclude:
+      uidRegex: ^(?:Deli\.Stage|Deli\.Patcher\.PatcherStage|Deli\.Setup\.SetupStage|Deli\.Runtime\.RuntimeStage)\.Name$
+      type: Property
+  - exclude:
+      uidRegex: ^(?:Deli\.Stage.+|Deli\.Patcher\.PatcherStage|Deli\.Setup\.SetupStage|Deli\.Runtime\.RuntimeStage)\.(?:GetLoader|TypeLoader)
+      type: Method
+      
+  - exclude:
+      uidRegex: ^(?:Deli\.Immediate\.ImmediateStage`1|Deli\.Patcher\.PatcherStage|Deli\.Setup\.SetupStage)\.GenericThis$
+      type: Property
+  - exclude:
+      uidRegex: ^(?:Deli\.Immediate\.ImmediateStage`1|Deli\.Patcher\.PatcherStage|Deli\.Setup\.SetupStage)\.(?:AssemblyLoader|GetAssets|Run)
+      type: Method

@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Deli.Setup
 {
 	/// <summary>
-	///		A plugin from a mod that runs during <see cref="RuntimeStage"/> and any subsequent stages.
+	///		A plugin from a mod that runs during <see cref="SetupStage"/> and any subsequent stages.
 	///		Also inherits from <see cref="MonoBehaviour"/>
 	/// </summary>
 	public abstract class DeliBehaviour : MonoBehaviour, IDeliPlugin
