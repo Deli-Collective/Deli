@@ -2,6 +2,7 @@ using System.IO;
 using BepInEx.Logging;
 using Deli.Runtime.Yielding;
 using Deli.VFS;
+using Deli.VFS.Disk;
 using UnityEngine;
 
 namespace Deli.Runtime
@@ -30,6 +31,12 @@ namespace Deli.Runtime
 
 		private static ResultYieldInstruction<AssetBundle> AssetBundleOf(IFileHandle file)
 		{
+			if (file is IDiskHandle disk)
+			{
+				return new AsyncOperationYieldInstruction<AssetBundleCreateRequest, AssetBundle>(AssetBundle.LoadFromFileAsync(disk.PathOnDisk),
+					operation => operation.assetBundle);
+			}
+
 			return BytesOf(file).ContinueWith(AssetBundle.LoadFromMemoryAsync, r => r.assetBundle);
 		}
 

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Deli.Runtime.Yielding
 {
 	/// <summary>
-	///		A method which begins an async operation
+	///		A method which begins an async pattern
 	/// </summary>
 	/// <param name="self">The object which implements the pattern</param>
 	/// <param name="callback">The callback to pass to the begin method of the pattern</param>
@@ -13,7 +13,7 @@ namespace Deli.Runtime.Yielding
 	public delegate IAsyncResult BeginAsync<in TSelf>(TSelf self, AsyncCallback callback, object state);
 
 	/// <summary>
-	///		A method which ends a void async operation
+	///		A method which ends a void async pattern
 	/// </summary>
 	/// <param name="self">The object which implements the pattern</param>
 	/// <param name="result">The result to pass to the end method of the pattern</param>
@@ -21,7 +21,7 @@ namespace Deli.Runtime.Yielding
 	public delegate void EndAsync<in TSelf>(TSelf self, IAsyncResult result);
 
 	/// <summary>
-	///		A method which ends a non-void async operation
+	///		A method which ends a non-void async pattern
 	/// </summary>
 	/// <param name="self">The object which implements the pattern</param>
 	/// <param name="result">The result to pass to the end method of the pattern</param>
@@ -30,9 +30,9 @@ namespace Deli.Runtime.Yielding
 	public delegate TResult EndAsync<in TSelf, out TResult>(TSelf self, IAsyncResult result);
 
 	/// <summary>
-	///		A yield instruction which awaits a void .NET async operation (begin/end pattern)
+	///		A yield instruction which awaits a void async pattern (begin/end pattern)
 	/// </summary>
-	/// <typeparam name="TSelf">The type of the object which performs the async operation</typeparam>
+	/// <typeparam name="TSelf">The type of the object which performs the pattern</typeparam>
 	public class AsyncYieldInstruction<TSelf> : CustomYieldInstruction
 	{
 		private readonly TSelf _self;
@@ -45,9 +45,9 @@ namespace Deli.Runtime.Yielding
 		/// <summary>
 		///		Creates an instance of <see cref="AsyncYieldInstruction{TSelf}"/>
 		/// </summary>
-		/// <param name="self">The object which performs the async operation</param>
-		/// <param name="begin">The method to begin the async operation</param>
-		/// <param name="end">The method to end the void async operation</param>
+		/// <param name="self">The object which performs the pattern</param>
+		/// <param name="begin">The method to begin the pattern</param>
+		/// <param name="end">The method to end the void pattern</param>
 		public AsyncYieldInstruction(TSelf self, BeginAsync<TSelf> begin, EndAsync<TSelf> end)
 		{
 			_self = self;
@@ -63,10 +63,10 @@ namespace Deli.Runtime.Yielding
 	}
 
 	/// <summary>
-	///		A yield instruction which awaits a non-void .NET async operation (begin/end pattern)
+	///		A yield instruction which awaits a non-void async pattern (begin/end pattern)
 	/// </summary>
-	/// <typeparam name="TSelf">The type of the object which performs the async operation</typeparam>
-	/// <typeparam name="TResult">The type of the return value of the async operation</typeparam>
+	/// <typeparam name="TSelf">The type of the object which performs the pattern</typeparam>
+	/// <typeparam name="TResult">The type of the return value of the pattern</typeparam>
 	public class AsyncYieldInstruction<TSelf, TResult> : ResultYieldInstruction<TResult>
 	{
 		private readonly TSelf _self;
@@ -76,16 +76,28 @@ namespace Deli.Runtime.Yielding
 		/// <inheritdoc cref="CustomYieldInstruction.keepWaiting"/>
 		public override bool keepWaiting => !_async.IsCompleted;
 
+		private bool _evaluated;
 		private TResult? _result;
 		/// <inheritdoc cref="ResultYieldInstruction{TResult}.Result"/>
-		public override TResult Result => _result ?? throw new InvalidOperationException("Async operation has not yet been completed.");
+		public override TResult Result
+		{
+			get
+			{
+				if (!_evaluated)
+				{
+					throw new InvalidOperationException("Async operation is incomplete.");
+				}
+
+				return _result!;
+			}
+		}
 
 		/// <summary>
 		///		Creates an instance of <see cref="AsyncYieldInstruction{TSelf,TResult}"/>
 		/// </summary>
-		/// <param name="self">The object which performs the async operation</param>
-		/// <param name="begin">The method to begin the async operation</param>
-		/// <param name="end">The method to end the non-void async operation</param>
+		/// <param name="self">The object which performs the pattern</param>
+		/// <param name="begin">The method to begin the pattern</param>
+		/// <param name="end">The method to end the non-void pattern</param>
 		public AsyncYieldInstruction(TSelf self, BeginAsync<TSelf> begin, EndAsync<TSelf, TResult> end)
 		{
 			_self = self;
@@ -97,6 +109,7 @@ namespace Deli.Runtime.Yielding
 		private void Callback(IAsyncResult result)
 		{
 			_result = _end(_self, result);
+			_evaluated = true;
 		}
 	}
 }
