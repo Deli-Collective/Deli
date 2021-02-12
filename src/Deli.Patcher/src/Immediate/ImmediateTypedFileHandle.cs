@@ -1,6 +1,6 @@
-using Deli.Immediate;
+using Deli.VFS;
 
-namespace Deli.VFS
+namespace Deli.Immediate
 {
 	/// <summary>
 	///		A file handle which supports immediate deserialization to a generic type
