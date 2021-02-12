@@ -8,8 +8,6 @@ namespace Deli.VFS
 	/// </summary>
 	public static class ExtIDirectoryHandle
 	{
-		private static readonly GlobberFactory DefaultGlobberFactory = new();
-
 		/// <summary>
 		///		Gets the root directory of the VFS that the handle resides in. This could be the provided handle.
 		/// </summary>
@@ -109,18 +107,6 @@ namespace Deli.VFS
 					yield return file;
 				}
 			}
-		}
-
-		/// <summary>
-		///		Enumerates over all the handles that match the path.
-		///		For more finite control over the globs allowed, use and configure a <see cref="GlobberFactory"/>.
-		///		If you are calling multiple times with the same path, use <see cref="GlobberFactory.Create"/> to create a reusable, efficient glob method.
-		/// </summary>
-		/// <param name="this"></param>
-		/// <param name="path">The path which may contain globs and path separators</param>
-		public static IEnumerable<IHandle> Glob(this IDirectoryHandle @this, string path)
-		{
-			return DefaultGlobberFactory.Glob(@this, path);
 		}
 	}
 }

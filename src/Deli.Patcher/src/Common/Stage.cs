@@ -8,6 +8,7 @@ using Deli.Patcher;
 using Deli.VFS;
 using Deli.Newtonsoft.Json;
 using Deli.Newtonsoft.Json.Linq;
+using Deli.VFS.Globbing;
 using Semver;
 
 namespace Deli
