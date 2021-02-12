@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 
 namespace Deli.VFS
 {
@@ -22,6 +23,23 @@ namespace Deli.VFS
 		public static IEnumerable<IDirectoryHandle> GetAncestors(this IChildHandle @this)
 		{
 			return @this.Directory.RecurseEnumerable(c => (c as IChildHandle)?.Directory);
+		}
+
+		/// <summary>
+		///		Returns the stem of the handle name
+		/// </summary>
+		public static string GetStem(this IChildHandle @this)
+		{
+			return Path.GetFileNameWithoutExtension(@this.Name);
+		}
+
+		/// <summary>
+		///		Returns the extension of the handle name. If it does not have an extension, returns <see langword="null"/>.
+		/// </summary>
+		public static string? GetExtension(this IChildHandle @this)
+		{
+			var extension = Path.GetExtension(@this.Name);
+			return extension?.Length > 0 ? extension.Substring(1) : null;
 		}
 
 		/// <summary>

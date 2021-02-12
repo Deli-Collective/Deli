@@ -185,12 +185,12 @@ namespace Deli.VFS.Disk
 	/// </summary>
 	public sealed class ChildDirectoryHandle : DirectoryHandle, IChildDirectoryHandle, IDiskChildHandle
 	{
-		/// <inheritdoc cref="INamedHandle.Name"/>
-		public string Name { get; }
-
 		/// <inheritdoc cref="IChildHandle.Directory"/>
 		public DirectoryHandle Directory { get; }
 		IDirectoryHandle IChildHandle.Directory => Directory;
+
+		/// <inheritdoc cref="IChildHandle.Name"/>
+		public string Name { get; }
 
 		internal ChildDirectoryHandle(string name, string pathOnDisk, DirectoryHandle directory) : base(directory.Path + name + "/", pathOnDisk)
 		{

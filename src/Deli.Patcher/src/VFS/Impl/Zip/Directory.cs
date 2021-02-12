@@ -146,12 +146,12 @@ namespace Deli.VFS.Zip
 	/// </summary>
 	public class ChildDirectoryHandle : DirectoryHandle, IChildDirectoryHandle
 	{
-		/// <inheritdoc cref="INamedHandle.Name"/>
-		public string Name { get; }
-
 		/// <inheritdoc cref="IChildHandle.Directory"/>
 		public DirectoryHandle Directory { get; }
 		IDirectoryHandle IChildHandle.Directory => Directory;
+
+		/// <inheritdoc cref="IChildHandle.Name"/>
+		public string Name { get; }
 
 		internal ChildDirectoryHandle(string name, Dictionary<string, IChildHandle> children, DirectoryHandle directory) : base(children, directory.Path + name + "/")
 		{
