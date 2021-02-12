@@ -49,14 +49,18 @@ namespace Deli
 			Logger = BepInEx.Logging.Logger.CreateLogSource(info.Name ?? info.Guid);
 		}
 
+	    /// <inheritdoc cref="object.ToString"/>
 		public override string ToString()
 		{
 			return Info.ToString();
 		}
 
+	    /// <summary>
+	    ///		Represents the manifest file of a mod
+	    /// </summary>
 		public class Manifest
 		{
-			private static readonly Regex _guidFilter = new Regex(@"^[a-z0-9\._]+$");
+			private static readonly Regex GuidFilter = new Regex(@"^[a-z0-9\._]+$");
 
 			/// <summary>
 			///		The globally unique identifier (GUID, crazy) of the mod. This should never be identical to another mod.
@@ -104,8 +108,10 @@ namespace Deli
 			/// </summary>
 			public AssetTable? Assets { get; }
 
-
-			// I hate this but we need to programmatically use this.
+			// I hate this but we need to programmatically use this
+			/// <summary>
+			///		Creates an instance of <see cref="Mod"/>
+			/// </summary>
 			[JsonConstructor]
 			public Manifest(string guid, SemVersion version, SemVersion require, string? name = null, string? description = null, string[]? authors = null,string? iconPath = null,
 				string? sourceUrl = null, Dictionary<string, SemVersion>? dependencies = null, AssetTable? assets = null)
@@ -126,18 +132,22 @@ namespace Deli
 			private void Validate(StreamingContext _)
 			{
 				// Make sure GUID is normalized
-				if (!_guidFilter.IsMatch(Guid))
+				if (!GuidFilter.IsMatch(Guid))
 				{
 					throw new FormatException("GUID should be lowercase alphanumeric, with '.' allowed.");
 				}
 			}
 
+			/// <inheritdoc cref="object.ToString"/>
 			public override string ToString()
 			{
 				return $"[{Name ?? Guid} {Version}]";
 			}
 		}
 
+	    /// <summary>
+	    ///		Represents the assets contained within a <see cref="Manifest"/>
+	    /// </summary>
 		public class AssetTable
 		{
 			/// <summary>
@@ -153,6 +163,9 @@ namespace Deli
 			/// </summary>
 			public Dictionary<string, AssetLoaderID>? Runtime { get; }
 
+			/// <summary>
+			///		Creates an instance of <see cref="AssetTable"/>
+			/// </summary>
 			[JsonConstructor]
 			public AssetTable(Dictionary<string, AssetLoaderID>? patcher, Dictionary<string, AssetLoaderID>? setup, Dictionary<string, AssetLoaderID>? runtime)
 			{

@@ -22,12 +22,12 @@ namespace Deli.Runtime
 
 		private static class GitHub
 		{
-			private static readonly JsonRestClient _client;
+			private static readonly JsonRestClient Client;
 
 			static GitHub()
 			{
 				var headers = XRateLimit.HeaderInfo.Prefixed("X-RateLimit-", "Limit", "Remaining", "Reset");
-				_client = new JsonRestClient("https://api.github.com/")
+				Client = new JsonRestClient("https://api.github.com/")
 				{
 					RateLimit = new XRateLimit(headers),
 					RequestHeaders =
@@ -46,7 +46,7 @@ namespace Deli.Runtime
 					throw new ArgumentException("Path must be to a repository ({owner}/{repo})", nameof(path));
 				}
 
-				return _client.Get($"repos/{split[0]}/{split[1]}/releases/latest").CallbackWith(payload =>
+				return Client.Get($"repos/{split[0]}/{split[1]}/releases/latest").CallbackWith(payload =>
 				{
 					var version = payload?["tag_name"]?.ToObject<string>();
 					if (version is null)

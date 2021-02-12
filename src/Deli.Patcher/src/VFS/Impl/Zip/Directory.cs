@@ -1,14 +1,28 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Ionic.Zip;
 
 namespace Deli.VFS.Zip
 {
+	/// <summary>
+	///		A directory that exists within a zip file
+	/// </summary>
 	public abstract class DirectoryHandle : IDirectoryHandle
 	{
 		private readonly Dictionary<string, IChildHandle> _children;
 
+		/// <inheritdoc cref="IHandle.IsAlive"/>
+		public bool IsAlive { get; } = true;
+
+		/// <inheritdoc cref="IHandle.Path"/>
 		public string Path { get; }
+
+		/// <inheritdoc cref="IHandle.Updated"/>
+		public event Action? Updated;
+
+		/// <inheritdoc cref="IHandle.Deleted"/>
+		public event Action? Deleted;
 
 		internal DirectoryHandle(Dictionary<string, IChildHandle> children, string path)
 		{
@@ -17,8 +31,12 @@ namespace Deli.VFS.Zip
 			Path = path;
 		}
 
+		/// <inheritdoc cref="IDirectoryHandle.this"/>
 		public IChildHandle? this[string name] => _children.TryGetValue(name, out var child) ? child : null;
 
+		/// <summary>
+		///		Enumerates over the child handles
+		/// </summary>
 		public Dictionary<string, IChildHandle>.ValueCollection.Enumerator GetEnumerator()
 		{
 			return _children.Values.GetEnumerator();
@@ -35,6 +53,9 @@ namespace Deli.VFS.Zip
 		}
 	}
 
+	/// <summary>
+	///		A root directory that exists within a zip file
+	/// </summary>
 	public sealed class RootDirectoryHandle : DirectoryHandle
 	{
 		private readonly struct ZipDirectoryInfo
@@ -72,16 +93,18 @@ namespace Deli.VFS.Zip
 			return info;
 		}
 
-		private static FileHandle AppendFile(Dictionary<string, ZipDirectoryInfo> directories, string path, ZipEntry entry)
+		private static void AppendFile(Dictionary<string, ZipDirectoryInfo> directories, string path, ZipEntry entry)
 		{
 			var parent = GetParent(directories, path);
 
 			var handle = new FileHandle(entry, System.IO.Path.GetFileName(path), parent.Handle);
 			parent.Children.Add(handle.Name, handle);
-
-			return handle;
 		}
 
+		/// <summary>
+		///		Creates a VFS from a <see cref="ZipFile"/>
+		/// </summary>
+		/// <param name="zip">The zip containing files and directories</param>
 		public static RootDirectoryHandle Create(ZipFile zip)
 		{
 			var rootChildren = new Dictionary<string, IChildHandle>();
@@ -113,15 +136,20 @@ namespace Deli.VFS.Zip
 			return root;
 		}
 
-		internal RootDirectoryHandle(Dictionary<string, IChildHandle> children) : base(children, "/")
+		private RootDirectoryHandle(Dictionary<string, IChildHandle> children) : base(children, "/")
 		{
 		}
 	}
 
+	/// <summary>
+	///		A child directory that exists within a zip file
+	/// </summary>
 	public class ChildDirectoryHandle : DirectoryHandle, IChildDirectoryHandle
 	{
+		/// <inheritdoc cref="INamedHandle.Name"/>
 		public string Name { get; }
 
+		/// <inheritdoc cref="IChildHandle.Directory"/>
 		public DirectoryHandle Directory { get; }
 		IDirectoryHandle IChildHandle.Directory => Directory;
 

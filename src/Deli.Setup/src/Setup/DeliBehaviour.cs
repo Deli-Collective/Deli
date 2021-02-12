@@ -34,6 +34,9 @@ namespace Deli.Setup
 		/// </summary>
 		protected StageEvents Events { get; } = new();
 
+		/// <summary>
+		///		Creates an instance of <see cref="DeliBehaviour"/>
+		/// </summary>
 		protected DeliBehaviour()
 		{
 			Source = GlobalSource ?? throw new InvalidOperationException("A source was not ready for this behaviour. Was the behavior initialized outside of Deli?");
@@ -42,6 +45,9 @@ namespace Deli.Setup
 		/// <inheritdoc cref="IDeliPlugin.Run"/>
 		public virtual void Run(Stage stage) => Events.Run(stage);
 
+		/// <summary>
+		///		Represents the specific possible stages a <see cref="DeliBehaviour"/> can process
+		/// </summary>
 		protected class StageEvents : IDeliPlugin
 		{
 			/// <summary>

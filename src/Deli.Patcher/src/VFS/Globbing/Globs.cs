@@ -6,6 +6,10 @@ using System.Text.RegularExpressions;
 
 namespace Deli.VFS.Globbing
 {
+	/// <summary>
+	///		A method which enumerates over handles with specific qualities
+	/// </summary>
+	/// <param name="directory">The directory whose children should be enumerated</param>
 	public delegate IEnumerable<IHandle> Globber(IDirectoryHandle directory);
 
 	internal class CompositeGlobber
@@ -46,32 +50,25 @@ namespace Deli.VFS.Globbing
 
 	internal class NameGlobber
 	{
-		private static readonly Dictionary<Regex, string> _globTypes = new()
-		{
-			[new(@"(?<!\\)\[!(.+)-(.+)(?<!\\)\]")] = @"[!{0}-{1}]",
-			[new(@"(?<!\\)\[(.+)-(.+)(?<!\\)\]")] = @"[{0}-{1}]",
-			[new(@"(?<!\\)\[\!(.+)(?<!\\)\]")] = @"[!{0}]",
-			[new(@"(?<!\\)\[(.+)(?<!\\)\]")] = @"[{0}]",
-			[new(@"(?<!\\)\*")] = @".*",
-			[new(@"(?<!\\)\?")] = @".",
-		};
-
-		private static void ApplyGlobs(string value, int start, int length, StringBuilder result)
+		private static void ApplyGlobs(string value, int start, int length, StringBuilder result, List<GlobberFactory.NameReplacementEntry> nameReplacementEntries)
 		{
 			if (length == 0) return;
 
-			foreach (var glob in _globTypes)
+			foreach (var glob in nameReplacementEntries)
 			{
-				var regex = glob.Key;
-				var replacement = glob.Value;
-
-				var match = regex.Match(value, start, length);
+				var match = glob.Filter.Match(value, start, length);
 				if (!match.Success) continue;
+
+				if (!glob.MatchAllowed(out var replacement))
+				{
+					throw new ArgumentException($"Name replacement glob not allowed: '{match.Value}'", nameof(value));
+				}
+
 				var groups = match.Groups;
 				var groupCount = groups.Count - 1;
 
 				// Parse before the match
-				ApplyGlobs(value, start, match.Index - start, result);
+				ApplyGlobs(value, start, match.Index - start, result, nameReplacementEntries);
 
 				// Replace match
 				if (groupCount == 0)
@@ -91,7 +88,7 @@ namespace Deli.VFS.Globbing
 
 				// Parse after the match
 				var end = match.Index + match.Length;
-				ApplyGlobs(value, end, value.Length - end, result);
+				ApplyGlobs(value, end, value.Length - end, result, nameReplacementEntries);
 
 				return;
 			}
@@ -103,10 +100,10 @@ namespace Deli.VFS.Globbing
 
 		private readonly Regex _regex;
 
-		public NameGlobber(string name)
+		public NameGlobber(string name, List<GlobberFactory.NameReplacementEntry> nameReplacements)
 		{
 			var builder = new StringBuilder();
-			ApplyGlobs(name, 0, name.Length, builder);
+			ApplyGlobs(name, 0, name.Length, builder, nameReplacements);
 
 			_regex = new Regex(builder.ToString());
 		}

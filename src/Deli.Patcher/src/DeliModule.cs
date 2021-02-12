@@ -5,12 +5,12 @@ using Deli.VFS;
 namespace Deli.Patcher
 {
 	/// <summary>
-	///		A plugin from a mod that runs during <see cref="PatcherStage"/> and any subsequent stages.
+	///		A plugin from a mod that runs during <see cref="PatcherStage"/> and any subsequent stages
 	/// </summary>
 	public abstract class DeliModule : IDeliPlugin
 	{
 		/// <summary>
-		///		The mod this module originated from.
+		///		The mod this module originated from
 		/// </summary>
 		protected Mod Source { get; }
 
@@ -29,9 +29,9 @@ namespace Deli.Patcher
 		protected StageEvents Events { get; } = new();
 
 		/// <summary>
-		///		Creates an instance of <see cref="DeliModule"/>.
+		///		Creates an instance of <see cref="DeliModule"/>
 		/// </summary>
-		/// <param name="source">The mod this module originated from.</param>
+		/// <param name="source">The mod this module originated from</param>
 		protected DeliModule(Mod source)
 		{
 			Source = source;
@@ -40,6 +40,9 @@ namespace Deli.Patcher
 		/// <inheritdoc cref="IDeliPlugin.Run"/>
 		public virtual void Run(Stage stage) => Events.Run(stage);
 
+		/// <summary>
+		///		Represents the specific possible stages a <see cref="DeliModule"/> can process
+		/// </summary>
 		protected class StageEvents : IDeliPlugin
 		{
 			/// <summary>
@@ -52,6 +55,7 @@ namespace Deli.Patcher
 			/// </summary>
 			public event StageRunner<Stage>? Other;
 
+			/// <inheritdoc cref="IDeliPlugin.Run"/>
 			public void Run(Stage stage)
 			{
 				switch (stage)

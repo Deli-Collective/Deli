@@ -1,4 +1,5 @@
-﻿using System;
+﻿#pragma warning disable CS1591
+using System;
 using System.Collections.Generic;
 using Mono.Cecil;
 using static Deli.Bootstrap.Constants;
@@ -100,3 +101,4 @@ namespace Deli.Bootstrap
 		}
     }
 }
+#pragma warning restore CS1591

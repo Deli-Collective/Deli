@@ -4,15 +4,19 @@ using Deli.VFS;
 
 namespace Deli.Immediate
 {
+	/// <summary>
+	///		An element of the loading sequence which uses immediate loaders. This class is not intended to be inherited outside the framework, so please don't.
+	/// </summary>
+	/// <typeparam name="TStage">A recursive generic to facilitate strongly typed stage parameters</typeparam>
 	public abstract class ImmediateStage<TStage> : Stage<ImmediateAssetLoader<TStage>> where TStage : ImmediateStage<TStage>
 	{
+#pragma warning disable CS1591
+
 		protected abstract TStage GenericThis { get; }
 
-		public ImmediateStage(Blob data) : base(data)
+		protected ImmediateStage(Blob data) : base(data)
 		{
 		}
-
-		protected abstract Dictionary<string, AssetLoaderID>? GetAssets(Mod.AssetTable table);
 
 		private void LoadMod(Mod mod, Dictionary<string, Mod> lookup)
 		{
@@ -42,6 +46,8 @@ namespace Deli.Immediate
 			}
 		}
 
+		protected abstract Dictionary<string, AssetLoaderID>? GetAssets(Mod.AssetTable table);
+
 		protected void AssemblyLoader(Stage stage, Mod mod, IHandle handle)
 		{
 			var assembly = ImmediateReaders.Get<Assembly>()(AssemblyPreloader(handle));
@@ -63,5 +69,7 @@ namespace Deli.Immediate
 				yield return mod;
 			}
 		}
+
+#pragma warning restore CS1591
 	}
 }
