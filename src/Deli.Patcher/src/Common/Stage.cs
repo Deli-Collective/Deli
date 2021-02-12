@@ -148,7 +148,7 @@ namespace Deli
 			}
 		}
 
-		protected virtual void AssemblyLoader(Stage stage, Mod mod, Assembly assembly)
+		protected void AssemblyLoader(Stage stage, Mod mod, Assembly assembly)
 		{
 			foreach (var type in assembly.GetExportedTypes())
 			{

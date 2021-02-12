@@ -1,7 +1,7 @@
 namespace Deli.VFS.Disk
 {
 	/// <summary>
-	///		A handle which exists directly on disk
+	///		A handle which exists on a physical disk
 	/// </summary>
 	public interface IDiskHandle : IHandle
 	{
@@ -17,7 +17,7 @@ namespace Deli.VFS.Disk
 	}
 
 	/// <summary>
-	///		A handle which exists directly on disk and is within a directory
+	///		A handle which exists on a physical disk and is within a directory
 	/// </summary>
 	public interface IDiskChildHandle : IDiskHandle, IChildHandle
 	{
