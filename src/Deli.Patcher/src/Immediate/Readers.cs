@@ -5,7 +5,6 @@ using BepInEx.Logging;
 using Deli.Newtonsoft.Json;
 using Deli.Newtonsoft.Json.Linq;
 using Deli.VFS;
-using Deli.VFS.Disk;
 
 namespace Deli.Immediate
 {
@@ -24,11 +23,6 @@ namespace Deli.Immediate
 
 		private static byte[] BytesOf(IFileHandle file)
 		{
-			if (file is IDiskHandle disk)
-			{
-				return File.ReadAllBytes(disk.PathOnDisk);
-			}
-
 			using var raw = file.OpenRead();
 
 			var buffer = new byte[raw.Length];

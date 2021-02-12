@@ -107,9 +107,15 @@ namespace Deli.Bootstrap
 			public const string ManifestName = "manifest.json";
 		}
 
+		/// <summary>
+		///		Information related to the asset pipeline
+		/// </summary>
 		public static class Assets
 		{
-			public const string AssemblyLoader = "assembly";
+			/// <summary>
+			///		The name of the assembly asset loaders
+			/// </summary>
+			public const string AssemblyLoaderName = "assembly";
 		}
 	}
 }

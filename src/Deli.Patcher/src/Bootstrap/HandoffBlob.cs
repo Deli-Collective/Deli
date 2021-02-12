@@ -1,3 +1,4 @@
+#pragma warning disable CS1591
 using System.Collections.Generic;
 
 namespace Deli.Bootstrap
@@ -14,3 +15,4 @@ namespace Deli.Bootstrap
 		}
 	}
 }
+#pragma warning restore CS1591

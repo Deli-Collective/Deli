@@ -10,6 +10,8 @@ namespace Deli.Setup
 {
 	internal delegate Coroutine CoroutineRunner(IEnumerator method);
 
+#pragma warning disable CS1591
+
 	[BepInPlugin(Constants.Metadata.Guid, Constants.Metadata.Name, Constants.Metadata.Version)]
 	public class PluginEntrypoint : BaseUnityPlugin
 	{
@@ -28,4 +30,6 @@ namespace Deli.Setup
 			StartCoroutine(runtime.Run(mods, StartCoroutine));
 		}
 	}
+
+#pragma warning restore CS1591
 }

@@ -5,23 +5,35 @@ using UnityEngine;
 
 namespace Deli.Setup
 {
+	/// <summary>
+	///		The immediate stage of the loading sequence which allows for patched assemblies to be used
+	/// </summary>
 	public class SetupStage : ImmediateStage<SetupStage>
 	{
 		private readonly GameObject _manager;
 		private readonly Dictionary<Mod, List<DeliBehaviour>> _modBehaviours;
 
+#pragma warning disable CS1591
+
 		protected override string Name { get; } = "setup";
 		protected override SetupStage GenericThis => this;
 
+#pragma warning restore CS1591
+
+		/// <summary>
+		///		Asset loaders specific to this stage
+		/// </summary>
 		public NestedServiceCollection<Mod, string, ImmediateAssetLoader<SetupStage>> SetupAssetLoaders { get; } = new();
 
-		public SetupStage(Blob data, GameObject manager, Dictionary<Mod, List<DeliBehaviour>> modBehaviours) : base(data)
+		internal SetupStage(Blob data, GameObject manager, Dictionary<Mod, List<DeliBehaviour>> modBehaviours) : base(data)
 		{
 			_manager = manager;
 			_modBehaviours = modBehaviours;
 
-			SharedAssetLoaders[Mod, Bootstrap.Constants.Assets.AssemblyLoader] = AssemblyLoader;
+			SharedAssetLoaders[Mod, Bootstrap.Constants.Assets.AssemblyLoaderName] = AssemblyLoader;
 		}
+
+#pragma warning disable CS1591
 
 		protected override void TypeLoader(Stage stage, Mod mod, Type type)
 		{
@@ -80,6 +92,8 @@ namespace Deli.Setup
 		{
 			return table.Setup;
 		}
+
+#pragma warning restore CS1591
 
 		internal IEnumerable<Mod> RunInternal(IEnumerable<Mod> mods) => Run(mods);
 	}

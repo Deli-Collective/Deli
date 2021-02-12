@@ -95,5 +95,28 @@ namespace Deli
 
 			return @this.Major == requirement.Major && @this.Minor > requirement.Minor;
 		}
+
+		public static IEnumerable<T> RecurseEnumerable<T>(this T original, Func<T, T?> mut) where T : class
+		{
+			var buffer = original;
+			do
+			{
+				yield return buffer;
+				buffer = mut(buffer);
+			} while (buffer is not null);
+		}
+
+		public static T RecurseAtomic<T>(this T original, Func<T, T?> mut) where T : class
+		{
+			var buffer = original;
+			var swap = mut(buffer);
+			while (swap is not null)
+			{
+				buffer = swap;
+				swap = mut(buffer);
+			}
+
+			return buffer;
+		}
 	}
 }

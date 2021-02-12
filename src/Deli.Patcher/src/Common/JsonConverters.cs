@@ -52,8 +52,8 @@ namespace Deli
 		private delegate object? Reader(JToken root, JsonSerializer serializer);
 		private delegate void Writer(JsonWriter writer, object value, JsonSerializer serializer);
 
-		private static readonly MethodInfo _readerMethod;
-		private static readonly MethodInfo _writerMethod;
+		private static readonly MethodInfo ReaderMethod;
+		private static readonly MethodInfo WriterMethod;
 
 		static DeepDictionaryJsonConverter()
 		{
@@ -62,15 +62,15 @@ namespace Deli
 				switch (method.Name)
 				{
 					case nameof(ReadJsonTyped):
-						_readerMethod = method;
+						ReaderMethod = method;
 						break;
 					case nameof(WriteJsonTyped):
-						_writerMethod = method;
+						WriterMethod = method;
 						break;
 				}
 			}
 
-			if (_readerMethod is null || _writerMethod is null)
+			if (ReaderMethod is null || WriterMethod is null)
 			{
 				throw new InvalidOperationException("Reader or writer methods were not found.");
 			}
@@ -167,8 +167,8 @@ namespace Deli
 			public TypeCache(Type dictType)
 			{
 				var valueType = dictType.GetGenericArguments()[1];
-				Reader = (Reader) Delegate.CreateDelegate(typeof(Reader), _readerMethod.MakeGenericMethod(valueType));
-				Writer = (Writer) Delegate.CreateDelegate(typeof(Writer), _writerMethod.MakeGenericMethod(valueType));
+				Reader = (Reader) Delegate.CreateDelegate(typeof(Reader), ReaderMethod.MakeGenericMethod(valueType));
+				Writer = (Writer) Delegate.CreateDelegate(typeof(Writer), WriterMethod.MakeGenericMethod(valueType));
 			}
 		}
 	}

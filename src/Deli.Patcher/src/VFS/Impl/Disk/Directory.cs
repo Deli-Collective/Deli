@@ -6,14 +6,29 @@ using System.Linq;
 
 namespace Deli.VFS.Disk
 {
+	/// <summary>
+	///		A directory that exists on a physical disk
+	/// </summary>
 	public abstract class DirectoryHandle : IDirectoryHandle, IEnumerable<IDiskChildHandle>, IDiskHandle
 	{
 		private readonly Dictionary<string, IDiskChildHandle> _handles = new();
 
+		/// <inheritdoc cref="IHandle.IsAlive"/>
+		public bool IsAlive { get; private set; } = true;
+
+		/// <inheritdoc cref="IHandle.Path"/>
 		public string Path { get; }
+
+		/// <inheritdoc cref="IDiskHandle.PathOnDisk"/>
 		public string PathOnDisk { get; }
 
-		protected DirectoryHandle(string path, string pathOnDisk)
+		/// <inheritdoc cref="IHandle.Updated"/>
+		public event Action? Updated;
+
+		/// <inheritdoc cref="IHandle.Deleted"/>
+		public event Action? Deleted;
+
+		internal DirectoryHandle(string path, string pathOnDisk)
 		{
 			Path = path;
 			PathOnDisk = pathOnDisk;
@@ -70,9 +85,18 @@ namespace Deli.VFS.Disk
 			}
 		}
 
+		/// <inheritdoc cref="IDiskHandle.Refresh"/>
 		public void Refresh()
 		{
 			this.ThrowIfDead();
+
+			if (!Directory.Exists(PathOnDisk))
+			{
+				IsAlive = false;
+				_handles.Clear();
+				Deleted?.Invoke();
+				return;
+			}
 
 			var directories = new HashSet<string>(Directory.GetDirectories(PathOnDisk));
 			var files = new HashSet<string>(Directory.GetFiles(PathOnDisk));
@@ -85,19 +109,19 @@ namespace Deli.VFS.Disk
 				existing.Refresh();
 			}
 
-			AddNew(directories, files, buffer);
-		}
-
-		public void RefreshRecursive()
-		{
-			Refresh();
-
-			foreach (var handle in this.GetRecursive().Cast<IDiskHandle>())
+			var hasNew = directories.Count > 0 || files.Count > 0;
+			if (hasNew)
 			{
-				handle.Refresh();
+				AddNew(directories, files, buffer);
+			}
+
+			if (hasNew || buffer.Count != _handles.Count || !buffer.Keys.All(_handles.ContainsKey))
+			{
+				Updated?.Invoke();
 			}
 		}
 
+		/// <inheritdoc cref="IDirectoryHandle.this"/>
 		public IDiskChildHandle? this[string name]
 		{
 			get
@@ -110,6 +134,9 @@ namespace Deli.VFS.Disk
 
 		IChildHandle? IDirectoryHandle.this[string name] => this[name];
 
+		/// <summary>
+		///		Enumerates over the child handles
+		/// </summary>
 		public Dictionary<string, IDiskChildHandle>.ValueCollection.Enumerator GetEnumerator()
 		{
 			this.ThrowIfDead();
@@ -132,23 +159,36 @@ namespace Deli.VFS.Disk
 			return this.ImplicitCast<IDiskChildHandle, IChildHandle>().GetEnumerator();
 		}
 
+		/// <inheritdoc cref="object.ToString"/>
 		public override string ToString()
 		{
 			return PathOnDisk;
 		}
 	}
 
+	/// <summary>
+	///		A root directory that exists on a physical disk
+	/// </summary>
 	public sealed class RootDirectoryHandle : DirectoryHandle
 	{
+		/// <summary>
+		///		Creates an instance of <see cref="RootDirectoryHandle"/>
+		/// </summary>
+		/// <param name="pathOnDisk">The physical path to the root directory</param>
 		public RootDirectoryHandle(string pathOnDisk) : base("/", pathOnDisk)
 		{
 		}
 	}
 
+	/// <summary>
+	///		A child directory that exists on a physical disk
+	/// </summary>
 	public sealed class ChildDirectoryHandle : DirectoryHandle, IChildDirectoryHandle, IDiskChildHandle
 	{
+		/// <inheritdoc cref="INamedHandle.Name"/>
 		public string Name { get; }
 
+		/// <inheritdoc cref="IChildHandle.Directory"/>
 		public DirectoryHandle Directory { get; }
 		IDirectoryHandle IChildHandle.Directory => Directory;
 

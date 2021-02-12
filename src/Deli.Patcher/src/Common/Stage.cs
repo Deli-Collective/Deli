@@ -12,37 +12,47 @@ using Semver;
 
 namespace Deli
 {
+	/// <summary>
+	///		An element of the loading sequence. This class is not intended to be inherited outside the framework, so please don't.
+	/// </summary>
 	public abstract class Stage
 	{
-		public Blob Data { get; }
+		private readonly Blob _data;
 
-		private ImmediateReaderCollection JsonReaders => Data.JsonReaders;
+		private ImmediateReaderCollection JsonReaders => _data.JsonReaders;
 
-		protected JsonSerializer Serializer => Data.Serializer;
+#pragma warning disable CS1591
 
-		protected Mod Mod => Data.Mod;
+		protected JsonSerializer Serializer => _data.Serializer;
+
+		protected Mod Mod => _data.Mod;
 
 		protected ManualLogSource Logger => Mod.Logger;
 
-		protected Dictionary<Mod, List<DeliModule>> ModModules => Data.ModModules;
+		protected Dictionary<Mod, List<DeliModule>> ModModules => _data.ModModules;
 
 		protected abstract string Name { get; }
 
 		protected LocaleFormatter Locale { get; }
 
+#pragma warning restore CS1591
+
 		/// <summary>
 		///		The collection of all the <see cref="ImmediateAssetLoader{TStage}"/>s registered.
 		/// </summary>
-		public NestedServiceCollection<Mod, string, ImmediateAssetLoader<Stage>> SharedAssetLoaders => Data.SharedAssetLoaders;
+		public NestedServiceCollection<Mod, string, ImmediateAssetLoader<Stage>> SharedAssetLoaders => _data.SharedAssetLoaders;
 
 		/// <summary>
 		///		The collection of all the <see cref="ImmediateReader{T}"/>s publicly available.
 		/// </summary>
-		public ImmediateReaderCollection ImmediateReaders => Data.ImmediateReaders;
+		public ImmediateReaderCollection ImmediateReaders => _data.ImmediateReaders;
+
+#pragma warning disable CS1591
 
 		protected Stage(Blob data)
 		{
-			Data = data;
+			_data = data;
+
 			Locale = new(this);
 		}
 
@@ -171,6 +181,8 @@ namespace Deli
 			Logger.LogDebug($"Running the {Name} stage...");
 		}
 
+#pragma warning restore CS1591
+
 		/// <summary>
 		///		Creates and adds a JSON <see cref="ImmediateReader{T}"/> for the type provided.
 		/// </summary>
@@ -189,6 +201,9 @@ namespace Deli
 			return reader;
 		}
 
+		/// <summary>
+		///		Data passed between each stage in the framework
+		/// </summary>
 		public readonly struct Blob
 		{
 			internal Mod Mod { get; }
@@ -211,6 +226,8 @@ namespace Deli
 			}
 		}
 
+#pragma warning disable CS1591
+
 		protected class LocaleFormatter
 		{
 			private readonly Stage _stage;
@@ -226,10 +243,18 @@ namespace Deli
 			public string LoaderException(AssetLoaderID loader, Mod mod, Mod targetMod, IHandle targetHandle) => $"{loader} from {mod} threw an exception while loading a {_stage.Name} asset from {targetMod}: {targetHandle}";
 			public string PluginException(Mod mod, string pluginType) => $"A {pluginType} from {mod} threw an exception during {_stage.Name} stage.";
 		}
+
+#pragma warning restore CS1591
 	}
 
+	/// <summary>
+	///		An element of the loading sequence which uses specific loaders. This class is not intended to be inherited outside the framework, so please don't.
+	/// </summary>
+	/// <typeparam name="TLoader">The type of the loaders to use</typeparam>
 	public abstract class Stage<TLoader> : Stage where TLoader : Delegate
 	{
+#pragma warning disable CS1591
+
 		protected Stage(Blob data) : base(data)
 		{
 		}
@@ -253,5 +278,7 @@ namespace Deli
 
 			return loader;
 		}
+
+#pragma warning restore CS1591
 	}
 }

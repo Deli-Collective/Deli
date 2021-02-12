@@ -4,19 +4,35 @@ using Deli.Immediate;
 
 namespace Deli.Patcher
 {
-	public class PatcherStage : ImmediateStage<PatcherStage>
+	/// <summary>
+	///		The immediate stage of the loading sequence which allows for patching assemblies
+	/// </summary>
+	public sealed class PatcherStage : ImmediateStage<PatcherStage>
 	{
+#pragma warning disable CS1591
+
 		protected override string Name { get; } = "patcher";
 		protected override PatcherStage GenericThis => this;
 
+#pragma warning restore CS1591
+
+		/// <summary>
+		///		Asset loaders specific to this stage
+		/// </summary>
 		public NestedServiceCollection<Mod, string, ImmediateAssetLoader<PatcherStage>> PatcherAssetLoaders { get; } = new();
+
+		/// <summary>
+		///		Assembly patchers, which are executed after this stage, but before the setup stage
+		/// </summary>
 		public NestedServiceCollection<string, Mod, Patcher> Patchers { get; } = new();
 
 		internal PatcherStage(Blob data) : base(data)
 		{
 			ImmediateReaders.Add(ModManifestOf);
-			PatcherAssetLoaders[Mod, Constants.Assets.AssemblyLoader] = AssemblyLoader;
+			PatcherAssetLoaders[Mod, Constants.Assets.AssemblyLoaderName] = AssemblyLoader;
 		}
+
+#pragma warning disable CS1591
 
 		protected override ImmediateAssetLoader<PatcherStage>? GetLoader(Mod mod, string name)
 		{
@@ -37,6 +53,8 @@ namespace Deli.Patcher
 		{
 			return table.Patcher;
 		}
+
+#pragma warning restore CS1591
 
 		internal IEnumerable<Mod> RunInternal(IEnumerable<Mod> mods) => Run(mods);
 	}
