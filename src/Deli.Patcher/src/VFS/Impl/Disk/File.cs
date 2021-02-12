@@ -18,12 +18,12 @@ namespace Deli.VFS.Disk
 		/// <inheritdoc cref="IHandle.Path"/>
 		public string Path { get; }
 
-		/// <inheritdoc cref="INamedHandle.Name"/>
-		public string Name { get; }
-
 		/// <inheritdoc cref="IChildHandle.Directory"/>
 		public DirectoryHandle Directory { get; }
 		IDirectoryHandle IChildHandle.Directory => Directory;
+
+		/// <inheritdoc cref="IChildHandle.Name"/>
+		public string Name { get; }
 
 		/// <inheritdoc cref="IDiskHandle.PathOnDisk"/>
 		public string PathOnDisk { get; }

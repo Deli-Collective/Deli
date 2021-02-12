@@ -25,11 +25,11 @@ namespace Deli.VFS
 		/// <inheritdoc cref="IHandle.Path"/>
 		public string Path => _handle.Path;
 
-		/// <inheritdoc cref="INamedHandle.Name"/>
-		public string Name => _handle.Name;
-
 		/// <inheritdoc cref="IChildHandle.Directory"/>
 		public IDirectoryHandle Directory => _handle.Directory;
+
+		/// <inheritdoc cref="IChildHandle.Name"/>
+		public string Name => _handle.Name;
 
 		/// <inheritdoc cref="IHandle.Updated"/>
 		public event Action? Updated;

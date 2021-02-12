@@ -17,12 +17,12 @@ namespace Deli.VFS.Zip
 		/// <inheritdoc cref="IHandle.Path"/>
 		public string Path { get; }
 
-		/// <inheritdoc cref="INamedHandle.Name"/>
-		public string Name { get; }
-
 		/// <inheritdoc cref="IChildHandle.Directory"/>
 		public DirectoryHandle Directory { get; }
 		IDirectoryHandle IChildHandle.Directory => Directory;
+
+		/// <inheritdoc cref="IChildHandle.Name"/>
+		public string Name { get; }
 
 		/// <inheritdoc cref="IHandle.Updated"/>
 		public event Action? Updated;

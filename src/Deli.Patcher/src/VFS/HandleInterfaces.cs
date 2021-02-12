@@ -31,17 +31,6 @@ namespace Deli.VFS
 	}
 
 	/// <summary>
-	///		A handle which has a name (non-root directories, files)
-	/// </summary>
-	public interface INamedHandle : IHandle
-	{
-		/// <summary>
-		///		The name of the handle
-		/// </summary>
-		string Name { get; }
-	}
-
-	/// <summary>
 	///		A handle which is a file
 	/// </summary>
 	public interface IFileHandle : IChildHandle
@@ -65,14 +54,19 @@ namespace Deli.VFS
 	}
 
 	/// <summary>
-	///		A handle which is within a directory (non-root directories, files)
+	///		A handle which is within a directory (this could be non-root directories, files)
 	/// </summary>
-	public interface IChildHandle : INamedHandle
+	public interface IChildHandle : IHandle
 	{
 		/// <summary>
 		///		The directory (parent) this handle resides in
 		/// </summary>
 		IDirectoryHandle Directory { get; }
+
+		/// <summary>
+		///		The name of the handle
+		/// </summary>
+		string Name { get; }
 	}
 
 	/// <summary>
