@@ -19,17 +19,21 @@ namespace Deli.Patcher
 		/// <summary>
 		///		Asset loaders specific to this stage
 		/// </summary>
-		public NestedServiceCollection<Mod, string, ImmediateAssetLoader<PatcherStage>> PatcherAssetLoaders { get; } = new();
+		public AssetLoaderCollection<ImmediateAssetLoader<PatcherStage>> PatcherAssetLoaders { get; } = new();
 
 		/// <summary>
 		///		Assembly patchers, which are executed after this stage, but before the setup stage
 		/// </summary>
-		public NestedServiceCollection<string, Mod, Patcher> Patchers { get; } = new();
+		public PatcherCollection Patchers { get; } = new();
 
 		internal PatcherStage(Blob data) : base(data)
 		{
 			ImmediateReaders.Add(ModManifestOf);
 			PatcherAssetLoaders[Mod, Constants.Assets.AssemblyLoaderName] = AssemblyLoader;
+			ModModules.Add(Mod, new List<DeliModule>
+			{
+				new Module(Mod)
+			});
 		}
 
 #pragma warning disable CS1591

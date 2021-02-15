@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Deli.VFS.Globbing;
 
 namespace Deli.VFS
 {

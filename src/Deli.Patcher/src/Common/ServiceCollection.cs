@@ -7,7 +7,7 @@ using BepInEx.Logging;
 namespace Deli
 {
 	/// <summary>
-	///		A collection of objects, keyed by type
+	///		A collection of objects, each keyed by a type
 	/// </summary>
 	public abstract class ServiceCollection : IEnumerable
 	{

@@ -32,7 +32,7 @@ namespace Deli.Runtime
 		/// <summary>
 		///		Asset loaders specific to this stage
 		/// </summary>
-		public NestedServiceCollection<Mod, string, DelayedAssetLoader> RuntimeAssetLoaders { get; } = new();
+		public AssetLoaderCollection<DelayedAssetLoader> RuntimeAssetLoaders { get; } = new();
 
 		/// <summary>
 		///		The collection of all the <see cref="DelayedReader{T}"/>s publicly available. This does not include wrappers for <see cref="ImmediateReader{T}"/>.

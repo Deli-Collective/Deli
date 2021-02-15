@@ -60,7 +60,7 @@ namespace Deli
 	    /// </summary>
 		public class Manifest
 		{
-			private static readonly Regex GuidFilter = new Regex(@"^[a-z0-9\._]+$");
+			private static readonly Regex GuidFilter = new(@"^[a-z0-9\._]+$");
 
 			/// <summary>
 			///		The globally unique identifier (GUID, crazy) of the mod. This should never be identical to another mod.

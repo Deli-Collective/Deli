@@ -6,7 +6,7 @@ using System.Linq;
 namespace Deli
 {
 	/// <summary>
-	///		A collection of objects, keyed by a primary and secondary key
+	///		A collection of objects, each keyed by a primary and secondary key
 	/// </summary>
 	public class NestedServiceCollection<TKey1, TKey2, TService> : IEnumerable<KeyValuePair<TKey1, IEnumerable<KeyValuePair<TKey2, TService>>>>
 	{
@@ -35,7 +35,7 @@ namespace Deli
 		/// <param name="key1">The primary key of the service</param>
 		/// <param name="key2">The secondary key of the service</param>
 		/// <exception cref="KeyNotFoundException">The primary/secondary key did not exist when getting a service</exception>
-		public TService this[TKey1 key1, TKey2 key2]
+		public virtual TService this[TKey1 key1, TKey2 key2]
 		{
 			get
 			{
