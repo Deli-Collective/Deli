@@ -41,7 +41,7 @@ namespace Deli
 		/// <summary>
 		///		The collection of all the <see cref="ImmediateAssetLoader{TStage}"/>s registered.
 		/// </summary>
-		public NestedServiceCollection<Mod, string, ImmediateAssetLoader<Stage>> SharedAssetLoaders => _data.SharedAssetLoaders;
+		public AssetLoaderCollection<ImmediateAssetLoader<Stage>> SharedAssetLoaders => _data.SharedAssetLoaders;
 
 		/// <summary>
 		///		The collection of all the <see cref="ImmediateReader{T}"/>s publicly available.
@@ -210,13 +210,12 @@ namespace Deli
 			internal Mod Mod { get; }
 			internal ImmediateReaderCollection JsonReaders { get; }
 			internal JsonSerializer Serializer { get; }
-			internal NestedServiceCollection<Mod, string, ImmediateAssetLoader<Stage>> SharedAssetLoaders { get; }
+			internal AssetLoaderCollection<ImmediateAssetLoader<Stage>> SharedAssetLoaders { get; }
 			internal ImmediateReaderCollection ImmediateReaders { get; }
 			internal Dictionary<Mod, List<DeliModule>> ModModules { get; }
 
-			internal Blob(Mod mod, ImmediateReaderCollection jsonReaders, JsonSerializer serializer,
-				NestedServiceCollection<Mod, string, ImmediateAssetLoader<Stage>> sharedAssetLoaders, ImmediateReaderCollection immediateReaders,
-				Dictionary<Mod, List<DeliModule>> modModules)
+			internal Blob(Mod mod, ImmediateReaderCollection jsonReaders, JsonSerializer serializer, AssetLoaderCollection<ImmediateAssetLoader<Stage>> sharedAssetLoaders,
+				ImmediateReaderCollection immediateReaders, Dictionary<Mod, List<DeliModule>> modModules)
 			{
 				Mod = mod;
 				JsonReaders = jsonReaders;
@@ -268,13 +267,13 @@ namespace Deli
 
 			if (!lookup.TryGetValue(loaderID.Mod, out loaderMod))
 			{
-				throw new InvalidOperationException($"Mod required for {Name} asset \"{asset.Key}\" of {mod} was not present: {loaderID.Mod}");
+				throw new InvalidOperationException($"Mod required for {Name} asset '{asset.Key}' of {mod} was not present: {loaderID.Mod}");
 			}
 
 			var loader = GetLoader(loaderMod, loaderID.Name);
 			if (loader is null)
 			{
-				throw new InvalidOperationException($"Loader required for {Name} asset \"{asset.Key}\" of {mod} was not present.");
+				throw new InvalidOperationException($"Loader required for {Name} asset '{asset.Key}' of {mod} was not present.");
 			}
 
 			return loader;

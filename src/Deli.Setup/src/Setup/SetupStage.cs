@@ -23,7 +23,7 @@ namespace Deli.Setup
 		/// <summary>
 		///		Asset loaders specific to this stage
 		/// </summary>
-		public NestedServiceCollection<Mod, string, ImmediateAssetLoader<SetupStage>> SetupAssetLoaders { get; } = new();
+		public AssetLoaderCollection<ImmediateAssetLoader<SetupStage>> SetupAssetLoaders { get; } = new();
 
 		internal SetupStage(Blob data, GameObject manager, Dictionary<Mod, List<DeliBehaviour>> modBehaviours) : base(data)
 		{

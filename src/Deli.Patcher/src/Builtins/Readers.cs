@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using BepInEx.Logging;
+using Deli.Immediate;
 using Deli.Newtonsoft.Json;
 using Deli.Newtonsoft.Json.Linq;
 using Deli.VFS;
 
-namespace Deli.Immediate
+namespace Deli.Patcher
 {
 	internal static class Readers
 	{

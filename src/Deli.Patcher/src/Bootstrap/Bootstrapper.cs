@@ -39,7 +39,7 @@ namespace Deli.Bootstrap
 							new SemVersionJsonConverter()
 						}
 					});
-					var sharedLoaders = new NestedServiceCollection<Mod, string, ImmediateAssetLoader<Stage>>();
+					var sharedLoaders = new AssetLoaderCollection<ImmediateAssetLoader<Stage>>();
 					var immediateReaders = Readers.DefaultCollection(Logger);
 					var modModules = new Dictionary<Mod, List<DeliModule>>();
 
@@ -62,7 +62,7 @@ namespace Deli.Bootstrap
 					var discovery = new Discovery(Logger, manifestReader);
 					var sorter = new Sorter(Logger);
 
-					var mods = discovery.Run();
+					var mods = new[] { Mod }.Concat(discovery.Run());
 					mods = sorter.Run(mods);
 					mods = Stage.RunInternal(mods);
 
@@ -76,7 +76,7 @@ namespace Deli.Bootstrap
 
 		public Mod Mod { get;  }
 
-		public NestedServiceCollection<string, Mod, Patcher.Patcher> Patchers
+		public PatcherCollection Patchers
 		{
 			get
 			{
