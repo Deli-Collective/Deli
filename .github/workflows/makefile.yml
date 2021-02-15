@@ -33,4 +33,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Deli
-          path: Deli.zip
+          path: src/Deli.zip
