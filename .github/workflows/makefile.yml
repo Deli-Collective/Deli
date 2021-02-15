@@ -27,7 +27,7 @@ jobs:
 
       - name: Execute make
         shell: bash
-        run: make
+        run: make -C src
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
