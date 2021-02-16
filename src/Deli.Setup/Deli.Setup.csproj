@@ -4,6 +4,15 @@
     <TargetFramework>net35</TargetFramework>
     <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
+
+    <PackageId>Deli</PackageId>
+    <Title>Deli.Setup</Title>
+    <Authors>nrgill28</Authors>
+    <Description>Universal modding framework based on BepInEx</Description>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+
+    <PackageProjectUrl>https://github.com/Deli-Collective/Deli</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Deli-Collective/Deli.git</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

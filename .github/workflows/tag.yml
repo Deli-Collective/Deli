@@ -1,0 +1,57 @@
+name: tag
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  src:
+    name: Build and publish source
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+
+      - name: Execute make
+        shell: bash
+        run: make -C src VERSION="${GITHUB_REF/refs\/tags\/v/}"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Deli
+          path: |
+            nuget/*
+            Deli.zip
+
+      - name: Push to nuget.org
+        shell: bash
+        run: dotnet nuget push "nuget/*.nupkg" -k "$KEY" -s https://api.nuget.org/v3/index.json
+        env:
+          KEY: ${{ secrets.NUGET_API_KEY }}
+  docs:
+    name: Build and publish docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - name: Build documentation
+        uses: nikeee/docfx-action@v1.0.0
+        with:
+          args: docs/docfx.json
+
+      - name: Publish Documentation on GitHub Pages
+        uses: maxheld83/ghpages@v0.3.0
+        env:
+          BUILD_DIR: _site # docfx's default output directory is _site
+          GH_PAT: ${{ secrets.GH_PAT }} # See https://github.com/maxheld83/ghpages

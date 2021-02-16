@@ -1,4 +1,4 @@
-name: makefile
+name: master
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
       - master
 
 jobs:
-  makefile:
-    name: Run Makefile
+  src:
+    name: Build source
     runs-on: ubuntu-latest
 
     steps:
@@ -34,3 +34,17 @@ jobs:
         with:
           name: Deli
           path: src/Deli.zip
+  docs:
+    name: Build docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - name: Build documentation
+        uses: nikeee/docfx-action@v1.0.0
+        with:
+          args: docs/docfx.json
