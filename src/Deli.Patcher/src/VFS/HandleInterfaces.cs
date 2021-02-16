@@ -20,7 +20,8 @@ namespace Deli.VFS
 		string Path { get; }
 
 		/// <summary>
-		///		Invoked when this handle is mutated
+		///		Invoked when this handle is mutated.
+		///		In the case of directories, this means a child was created or deleted. For files, it means the contents were changed.
 		/// </summary>
 		event Action? Updated;
 
