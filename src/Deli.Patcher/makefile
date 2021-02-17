@@ -1,5 +1,5 @@
 include ../makefile.var
-CONSTANTS_SOURCE = src/Common/Constants.cs
+CONSTANTS_SOURCE = src/Bootstrap/Constants.cs
 NUPKG            = $(NUGET_DIR)/$(NAME).$(VERSION).nupkg
 
 .PHONY: pack build precompile compile postcompile

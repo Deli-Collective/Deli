@@ -35,6 +35,6 @@ jobs:
 
       - name: Push to nuget.org
         shell: bash
-        run: dotnet nuget push "nuget/*.nupkg" -k "$KEY" -s https://api.nuget.org/v3/index.json
+        run: dotnet nuget push "src/nuget/*.nupkg" -k "$KEY" -s https://api.nuget.org/v3/index.json
         env:
           KEY: ${{ secrets.NUGET_API_KEY }}
