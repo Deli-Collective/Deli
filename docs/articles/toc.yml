@@ -1,2 +1,6 @@
-- name: Introduction
-  href: intro.md
+- name: Preparing a Mod
+  href: preparing/index.md
+- name: System Guides
+  href: guides/toc.yml
+- name: Upgrading Mods
+  href: upgrading/toc.yml

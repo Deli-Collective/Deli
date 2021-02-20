@@ -1,0 +1,209 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "http://deli-collective.github.io/Deli/articles/manifest.schema.json",
+  "type": "object",
+  "title": "The root schema",
+  "description": "The root schema comprises the entire JSON document.",
+  "examples": [
+    {
+      "guid": "example.primary",
+      "version": "1.0.0",
+      "require": "0.3.0",
+      "dependencies": {
+        "example.secondary": "1.0.0"
+      },
+      "name": "Example Mod (Primary)",
+      "description": "A mod to demonstrate the manifest capabilities.",
+      "authors": [
+        "Person 1",
+        "Person 2",
+        "Group"
+      ],
+      "icon_path": "icon.png",
+      "source_url": "https://example.org",
+      "assets": {
+        "patcher": {
+          "MyPatcher.dll": "deli:assembly"
+        },
+        "setup": {
+          "MyRuntime.dll": "deli:assembly"
+        },
+        "runtime": {
+          "MyActualRuntime.dll": "deli:assembly"
+        }
+      }
+    }
+  ],
+  "required": [
+    "guid",
+    "version",
+    "require"
+  ],
+  "properties": {
+    "guid": {
+      "$id": "#/properties/guid",
+      "type": "string",
+      "title": "GUID",
+      "description": "A unique identifier for the mod.",
+      "pattern": "^[a-z0-9\._]+$",
+      "examples": [
+        "example.primary"
+      ]
+    },
+    "version": {
+      "$id": "#/properties/version",
+      "type": "string",
+      "title": "Version",
+      "description": "The version of the mod.",
+      "examples": [
+        "1.0.0"
+      ]
+    },
+    "require": {
+      "$id": "#/properties/require",
+      "type": "string",
+      "title": "Required Deli Version",
+      "description": "The version of Deli the mod needs.",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
+      "examples": [
+        "0.3.0"
+      ]
+    },
+    "dependencies": {
+      "$id": "#/properties/dependencies",
+      "type": "object",
+      "title": "Dependencies",
+      "description": "Other mods that the mod needs.",
+      "examples": [
+        {
+          "example.secondary": "1.0.0"
+        }
+      ],
+      "additionalProperties": true
+    },
+    "name": {
+      "$id": "#/properties/name",
+      "type": "string",
+      "title": "Name",
+      "description": "The human-readable name of the mod.",
+      "examples": [
+        "Example Mod (Primary)"
+      ]
+    },
+    "description": {
+      "$id": "#/properties/description",
+      "type": "string",
+      "title": "Description",
+      "description": "A short explanation of the mod.",
+      "examples": [
+        "A mod to demonstrate the manifest capabilities."
+      ]
+    },
+    "authors": {
+      "$id": "#/properties/authors",
+      "type": "array",
+      "title": "Authors",
+      "description": "An array of major contributors to the mod.",
+      "examples": [
+        [
+          "Person 1",
+          "Person 2"
+        ]
+      ],
+      "additionalItems": true,
+      "items": {
+        "$id": "#/properties/authors/items",
+        "anyOf": [
+          {
+            "$id": "#/properties/authors/items/anyOf/0",
+            "type": "string",
+            "title": "An author",
+            "description": "A single major contributor to the mod.",
+            "examples": [
+              "Person 1",
+              "Person 2"
+            ]
+          }
+        ]
+      }
+    },
+    "icon_path": {
+      "$id": "#/properties/icon_path",
+      "type": "string",
+      "title": "Icon Path",
+      "description": "The path to the mod's icon file.",
+      "examples": [
+        "icon.png"
+      ]
+    },
+    "source_url": {
+      "$id": "#/properties/source_url",
+      "type": "string",
+      "title": "Source URL",
+      "description": "The URL to the mod's source, or where it was downloaded from. Specifying this means Deli will try to check for newer versions.",
+      "pattern": "^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\\.)?([^:\/?\n]+)(?:\/)?(.*?)(?:\/)?$",
+      "examples": [
+        "https://example.org"
+      ]
+    },
+    "assets": {
+      "$id": "#/properties/assets",
+      "type": "object",
+      "title": "Assets",
+      "description": "All the assets to load via Deli.",
+      "examples": [
+        {
+          "patcher": {
+            "MyPatcher.dll": "deli:assembly"
+          },
+          "setup": {
+            "MyRuntime.dll": "deli:assembly"
+          },
+          "runtime": {
+            "MyActualRuntime.dll": "deli:assembly"
+          }
+        }
+      ],
+      "properties": {
+        "patcher": {
+          "$id": "#/properties/assets/properties/patcher",
+          "type": "object",
+          "title": "Patcher Assets",
+          "description": "Assets to be loaded during the patcher stage, where each asset path is a key and the loader is the value.",
+          "examples": [
+            {
+              "MyPatcher.dll": "deli:assembly"
+            }
+          ],
+          "additionalProperties": true
+        },
+        "setup": {
+          "$id": "#/properties/assets/properties/setup",
+          "type": "object",
+          "title": "Setup Assets",
+          "description": "Assets to be loaded during the setup stage, where each asset path is a key and the loader is the value.",
+          "examples": [
+            {
+              "MyRuntime.dll": "deli:assembly"
+            }
+          ],
+          "additionalProperties": true
+        },
+        "runtime": {
+          "$id": "#/properties/assets/properties/runtime",
+          "type": "object",
+          "title": "Runtime Assets",
+          "description": "Assets to be loaded during the runtime stage, where each asset path is a key and the loader is the value.",
+          "examples": [
+            {
+              "MyActualRuntime.dll": "deli:assembly"
+            }
+          ],
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

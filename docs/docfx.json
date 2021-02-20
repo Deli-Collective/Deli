@@ -35,7 +35,8 @@
     "resource": [
       {
         "files": [
-          "articles/**/images/**"
+          "articles/**/images/**",
+          "articles/**/*.schema.json"
         ]
       }
     ],
