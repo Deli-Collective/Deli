@@ -53,12 +53,12 @@ namespace Deli.Setup
 			/// <summary>
 			///		Invoked when the <see cref="SetupStage"/> is in progress.
 			/// </summary>
-			protected event StageRunner<SetupStage>? Setup;
+			public event StageRunner<SetupStage>? Setup;
 
 			/// <summary>
 			///		Invoked when the <see cref="RuntimeStage"/> is in progress.
 			/// </summary>
-			protected event StageRunner<RuntimeStage>? Runtime;
+			public event StageRunner<RuntimeStage>? Runtime;
 
 			/// <inheritdoc cref="IDeliPlugin.Run"/>
 			public void Run(Stage stage)
