@@ -26,7 +26,7 @@ namespace Deli.Patcher
 		/// <summary>
 		///		Invoked when stages are in progress.
 		/// </summary>
-		protected StageEvents Events { get; } = new();
+		protected StageEvents Stages { get; } = new();
 
 		/// <summary>
 		///		Creates an instance of <see cref="DeliModule"/>
@@ -38,7 +38,7 @@ namespace Deli.Patcher
 		}
 
 		/// <inheritdoc cref="IDeliPlugin.Run"/>
-		public virtual void Run(Stage stage) => Events.Run(stage);
+		public virtual void Run(Stage stage) => Stages.Run(stage);
 
 		/// <summary>
 		///		Represents the specific possible stages a <see cref="DeliModule"/> can process

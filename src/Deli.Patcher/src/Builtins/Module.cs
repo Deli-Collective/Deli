@@ -14,8 +14,8 @@ namespace Deli.Patcher
 			_monoMod = new MonoModAssetLoader(Source);
 			_monoModHookGen = new MonoModHookGenAssetLoader(Source);
 
-			Events.Patcher += OnPatcher;
-			Events.Other += OnOther;
+			Stages.Patcher += OnPatcher;
+			Stages.Other += OnOther;
 		}
 
 		private void OnPatcher(PatcherStage stage)
