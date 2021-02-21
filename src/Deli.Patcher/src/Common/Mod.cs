@@ -91,10 +91,6 @@ namespace Deli
 			/// </summary>
 			public string[]? Authors { get; }
 			/// <summary>
-			///		The path to an icon file in the VFS.
-			/// </summary>
-			public string? IconPath { get; }
-			/// <summary>
 			///		The URL that this mod originated from, for use in checking the latest version.
 			/// </summary>
 			public string? SourceUrl { get; }
@@ -113,7 +109,7 @@ namespace Deli
 			///		Creates an instance of <see cref="Mod"/>
 			/// </summary>
 			[JsonConstructor]
-			public Manifest(string guid, SemVersion version, SemVersion require, string? name = null, string? description = null, string[]? authors = null,string? iconPath = null,
+			public Manifest(string guid, SemVersion version, SemVersion require, string? name = null, string? description = null, string[]? authors = null,
 				string? sourceUrl = null, Dictionary<string, SemVersion>? dependencies = null, AssetTable? assets = null)
 			{
 				Guid = guid;
@@ -122,7 +118,6 @@ namespace Deli
 				Name = name;
 				Description = description;
 				Authors = authors;
-				IconPath = iconPath;
 				SourceUrl = sourceUrl;
 				Dependencies = dependencies;
 				Assets = assets;

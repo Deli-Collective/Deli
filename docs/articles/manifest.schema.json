@@ -127,15 +127,6 @@
         ]
       }
     },
-    "icon_path": {
-      "$id": "#/properties/icon_path",
-      "type": "string",
-      "title": "Icon Path",
-      "description": "The path to the mod's icon file.",
-      "examples": [
-        "icon.png"
-      ]
-    },
     "source_url": {
       "$id": "#/properties/source_url",
       "type": "string",
