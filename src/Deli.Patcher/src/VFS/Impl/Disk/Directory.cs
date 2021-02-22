@@ -33,7 +33,7 @@ namespace Deli.VFS.Disk
 			Path = path;
 			PathOnDisk = pathOnDisk;
 
-			AddNew(Directory.GetDirectories(PathOnDisk), Directory.GetFiles(PathOnDisk), _handles);
+			AddNew(Directory.GetDirectories(pathOnDisk), Directory.GetFiles(pathOnDisk), _handles);
 		}
 
 		// Adds handles that still exist on disk.
@@ -115,7 +115,7 @@ namespace Deli.VFS.Disk
 				AddNew(directories, files, buffer);
 			}
 
-			if (hasNew || buffer.Count != _handles.Count || !buffer.Keys.All(_handles.ContainsKey))
+			if (hasNew || buffer.Count < _handles.Count)
 			{
 				Updated?.Invoke();
 			}

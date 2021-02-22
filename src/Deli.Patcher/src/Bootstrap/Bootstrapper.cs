@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using BepInEx.Logging;
 using Deli.Immediate;
@@ -93,6 +94,8 @@ namespace Deli.Bootstrap
 		public Bootstrapper()
 		{
 			var manifest = new Mod.Manifest(Metadata.Guid, Metadata.SemVersion,Metadata.SemVersion, Metadata.Name, Metadata.Description, Metadata.Authors, Metadata.SourceUrl);
+
+			Directory.CreateDirectory(Filesystem.Directory);
 			Mod = new Mod(manifest, new RootDirectoryHandle(Filesystem.Directory));
 		}
 	}
