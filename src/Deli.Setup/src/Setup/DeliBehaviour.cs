@@ -20,6 +20,9 @@ namespace Deli.Setup
 		/// </summary>
 		protected Mod Source { get; }
 
+		/// <inheritdoc cref="Mod.Info"/>
+		protected Mod.Manifest Info => Source.Info;
+
 		/// <inheritdoc cref="Mod.Resources"/>
 		protected IDirectoryHandle Resources => Source.Resources;
 
