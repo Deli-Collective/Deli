@@ -51,6 +51,11 @@ namespace Deli.VFS.Zip
 		{
 			return GetEnumerator();
 		}
+
+		public override string ToString()
+		{
+			return Path;
+		}
 	}
 
 	/// <summary>

@@ -39,19 +39,26 @@ namespace Deli.Setup
 		{
 			base.TypeLoader(stage, mod, type);
 
-			if (!type.IsAbstract || typeof(DeliBehaviour).IsAssignableFrom(type))
+			if (!type.IsAbstract && typeof(DeliBehaviour).IsAssignableFrom(type))
 			{
 				ref var source = ref DeliBehaviour.GlobalSource;
 
-				DeliBehaviour behaviour;
+				DeliBehaviour? behaviour;
 				source = mod;
 				try
 				{
-					behaviour = (DeliBehaviour) _manager.AddComponent(type);
+					behaviour = (DeliBehaviour?) _manager.AddComponent(type);
 				}
 				finally
 				{
 					source = null;
+				}
+
+				// This can happen (shouldn't in most cases), but does if the type isn't a MonoBehaviour
+				// Better to check now than get a NRE in the try-catch (which I did while debugging)
+				if (behaviour is null)
+				{
+					throw new InvalidOperationException($"Attaching the type produced a null component: {type}");
 				}
 
 				if (!_modBehaviours.TryGetValue(mod, out var behaviours))

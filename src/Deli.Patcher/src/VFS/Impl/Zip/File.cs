@@ -44,5 +44,10 @@ namespace Deli.VFS.Zip
 		{
 			return _entry.OpenReader();
 		}
+
+		public override string ToString()
+		{
+			return Path;
+		}
 	}
 }

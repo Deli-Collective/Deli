@@ -33,7 +33,7 @@ namespace Deli.Bootstrap
 		public static void Initialize()
 		{
 			_stateful = new Bootstrapper();
-			_stateful.Logger.LogInfo($"Deli bootstrap has begun! Version {Metadata.Version} ({Git.Branch} @ {Git.Describe})");
+			_stateful.Logger.LogInfo($"Deli bootstrap has begun! Version {Metadata.SemVersion} ({Git.Branch} @ {Git.Describe})");
 		}
 
 		public static void Patch(ref AssemblyDefinition assembly)

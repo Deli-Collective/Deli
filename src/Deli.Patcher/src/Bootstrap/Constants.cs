@@ -25,7 +25,7 @@ namespace Deli.Bootstrap
 			/// <summary>
 			/// 	The system-compliant version that this was built from
 			/// </summary>
-			public const string Version = "SYS_VERSION";
+			public const string Version = "MACRO_SYS_VERSION";
 
 			/// <summary>
 			///		A short except of what Deli is

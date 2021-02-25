@@ -67,7 +67,6 @@ namespace Deli.Bootstrap
 					mods = sorter.Run(mods);
 					mods = Stage.RunInternal(mods);
 
-					yield return Mod;
 					foreach (var mod in mods) yield return mod;
 				}
 

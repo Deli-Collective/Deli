@@ -80,6 +80,7 @@ namespace Deli.Bootstrap
 						yield break;
 					}
 
+					ModDiscovered(mod, dir.FullName);
 					yield return mod;
 					yield break;
 				}
@@ -99,6 +100,7 @@ namespace Deli.Bootstrap
 					continue;
 				}
 
+				ModDiscovered(mod, file.FullName);
 				yield return mod;
 			}
 
@@ -108,13 +110,14 @@ namespace Deli.Bootstrap
 			}
 		}
 
+		private void ModDiscovered(Mod mod, string path)
+		{
+			_logger.LogDebug($"Discovered {mod} at {path}");
+		}
+
 		public IEnumerable<Mod> Run()
 		{
-			foreach (var mod in DiscoverMods(_mods))
-			{
-				_logger.LogDebug($"Discovered {mod} at {mod.Resources}");
-				yield return mod;
-			}
+			return DiscoverMods(_mods);
 		}
 	}
 }

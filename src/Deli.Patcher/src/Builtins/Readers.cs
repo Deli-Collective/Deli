@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using BepInEx.Logging;
 using Deli.Immediate;
 using Deli.Newtonsoft.Json;
 using Deli.Newtonsoft.Json.Linq;
 using Deli.VFS;
+using Deli.VFS.Disk;
 
 namespace Deli.Patcher
 {
@@ -14,6 +16,7 @@ namespace Deli.Patcher
 		public static ImmediateReaderCollection DefaultCollection(ManualLogSource logger) => new(logger)
 		{
 			BytesOf,
+			AssemblyOf,
 			StringOf,
 			StringEnumerableOf,
 			JTokenOf,
@@ -30,6 +33,26 @@ namespace Deli.Patcher
 			raw.Read(buffer, 0, buffer.Length);
 
 			return buffer;
+		}
+
+		private static Assembly AssemblyOf(IFileHandle file)
+		{
+			if (file is IDiskHandle onDisk)
+			{
+				return Assembly.LoadFile(onDisk.PathOnDisk);
+			}
+
+			var rawAssembly = BytesOf(file);
+
+			var symbolsFile = file.WithExtension("mdb") as IFileHandle ?? file.WithExtension("pdb") as IFileHandle;
+			if (symbolsFile is not null)
+			{
+				var rawSymbols = BytesOf(symbolsFile);
+
+				return Assembly.Load(rawAssembly, rawSymbols);
+			}
+
+			return Assembly.Load(rawAssembly);
 		}
 
 		private static string StringOf(IFileHandle file)

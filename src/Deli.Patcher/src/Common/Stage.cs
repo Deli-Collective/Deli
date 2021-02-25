@@ -62,7 +62,7 @@ namespace Deli
 			var glob = asset.Key;
 			var loader = asset.Value;
 
-			Logger.LogDebug($"Enumerating glob: {glob}");
+			Logger.LogDebug($"Enumerating glob: '{glob}'...");
 			using var globbed = mod.Resources.Glob(glob).GetEnumerator();
 
 			if (!globbed.MoveNext())
