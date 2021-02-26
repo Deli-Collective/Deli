@@ -10,6 +10,8 @@ namespace Deli.Setup
 {
 	internal delegate Coroutine CoroutineRunner(IEnumerator method);
 
+	internal delegate void CoroutineStopper(Coroutine coroutine);
+
 #pragma warning disable CS1591
 
 	[BepInPlugin(Constants.Metadata.Guid, Constants.Metadata.Name, Constants.Metadata.Version)]
@@ -27,7 +29,7 @@ namespace Deli.Setup
 			// Eagerly evaluate; do not leave this to runtime to enumerate or it will be too late.
 			var mods = setup.RunInternal(blob.Mods).ToList();
 
-			StartCoroutine(runtime.Run(mods, StartCoroutine));
+			StartCoroutine(runtime.Run(mods, StartCoroutine, StopCoroutine));
 		}
 	}
 

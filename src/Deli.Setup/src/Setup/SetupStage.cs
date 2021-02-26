@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Deli.Immediate;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Deli.Setup
 {
@@ -39,44 +40,52 @@ namespace Deli.Setup
 		{
 			base.TypeLoader(stage, mod, type);
 
-			if (!type.IsAbstract && typeof(DeliBehaviour).IsAssignableFrom(type))
+			if (type.IsAbstract || !typeof(DeliBehaviour).IsAssignableFrom(type)) return;
+
+			const string pluginType = "behaviour";
+			DeliBehaviour? behaviour;
+
+			ref var source = ref DeliBehaviour.GlobalSource;
+			source = mod;
+			try
 			{
-				ref var source = ref DeliBehaviour.GlobalSource;
+				behaviour = (DeliBehaviour?) _manager.AddComponent(type);
+			}
+			catch
+			{
+				Logger.LogFatal(Locale.PluginCtorException(mod, pluginType));
 
-				DeliBehaviour? behaviour;
-				source = mod;
-				try
-				{
-					behaviour = (DeliBehaviour?) _manager.AddComponent(type);
-				}
-				finally
-				{
-					source = null;
-				}
+				throw;
+			}
+			finally
+			{
+				source = null;
+			}
 
-				// This can happen (shouldn't in most cases), but does if the type isn't a MonoBehaviour
-				// Better to check now than get a NRE in the try-catch (which I did while debugging)
-				if (behaviour is null)
-				{
-					throw new InvalidOperationException($"Attaching the type produced a null component: {type}");
-				}
+			// This can happen (shouldn't in most cases), but does if the type isn't a MonoBehaviour
+			// Better to check now than get a NRE in the try-catch (which I did while debugging)
+			if (behaviour is null)
+			{
+				throw new InvalidOperationException($"Attaching the type produced a null component: {type}");
+			}
 
-				if (!_modBehaviours.TryGetValue(mod, out var behaviours))
-				{
-					behaviours = new List<DeliBehaviour>();
-					_modBehaviours.Add(mod, behaviours);
-				}
-				behaviours.Add(behaviour);
+			if (!_modBehaviours.TryGetValue(mod, out var behaviours))
+			{
+				behaviours = new List<DeliBehaviour>();
+				_modBehaviours.Add(mod, behaviours);
+			}
+			behaviours.Add(behaviour);
 
-				try
-				{
-					behaviour.Run(stage);
-				}
-				catch
-				{
-					Logger.LogFatal(Locale.PluginException(mod, "behaviour"));
-					throw;
-				}
+			try
+			{
+				behaviour.Run(stage);
+			}
+			catch
+			{
+				Logger.LogFatal(Locale.PluginStageException(mod, pluginType));
+				Object.Destroy(behaviour);
+
+				throw;
 			}
 		}
 

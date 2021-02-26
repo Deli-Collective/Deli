@@ -53,15 +53,17 @@ namespace Deli.Runtime
 			VersionCheckers = Runtime.VersionCheckers.DefaultCollection();
 		}
 
-		private IEnumerator LoadMod(Mod mod, Dictionary<string, Mod> lookup, CoroutineRunner runner)
+		private IEnumerator LoadMod(Mod mod, Dictionary<string, Mod> lookup, CoroutineRunner runner, CoroutineStopper stopper)
 		{
 			var assets = mod.Info.Assets?.Runtime;
 			if (assets is null) yield break;
 
-			Logger.LogDebug($"Loading assets from {mod}...");
+			Logger.LogDebug(Locale.LoadingAssets(mod));
 			foreach (var asset in assets)
 			{
 				var loader = GetLoader(mod, lookup, asset, out var loaderMod);
+
+				Exception? bufferThrow = null;
 
 				var buffer = new Queue<Coroutine>();
 				foreach (var handle in Glob(mod, asset))
@@ -70,16 +72,25 @@ namespace Deli.Runtime
 					{
 						bool MoveNext()
 						{
+							bool next;
 							try
 							{
-								return loaderDelayed.MoveNext();
+								next = loaderDelayed.MoveNext();
 							}
-							catch
+							catch (Exception e)
 							{
 								// Not fatal; throwing in a coroutine only kills the coroutine. We'll still rethrow for the stacktrace, though.
-								Logger.LogError(Locale.LoaderException(asset.Value, loaderMod, mod, handle));
+								Logger.LogFatal(Locale.LoaderException(asset.Value, loaderMod, mod, handle));
+								bufferThrow = e;
 								throw;
 							}
+
+							if (!next)
+							{
+								Logger.LogDebug($"{handle} >| {asset.Value}");
+							}
+
+							return next;
 						}
 
 						while (MoveNext())
@@ -94,6 +105,16 @@ namespace Deli.Runtime
 
 				while (buffer.Count > 0)
 				{
+					if (bufferThrow is not null)
+					{
+						while (buffer.Count > 0)
+						{
+							stopper(buffer.Dequeue());
+						}
+
+						throw new InvalidOperationException("An exception was thrown by a loading coroutine. All remaining coroutines have been halted.", bufferThrow);
+					}
+
 					yield return buffer.Dequeue();
 				}
 			}
@@ -221,7 +242,7 @@ namespace Deli.Runtime
 			}
 		}
 
-		private IEnumerator RunCore(IEnumerable<Mod> mods, CoroutineRunner runner)
+		private IEnumerator RunCore(IEnumerable<Mod> mods, CoroutineRunner runner, CoroutineStopper stopper)
 		{
 			var lookup = new Dictionary<string, Mod>();
 			foreach (var mod in mods)
@@ -231,7 +252,7 @@ namespace Deli.Runtime
 				RunModules(mod);
 				RunBehaviours(mod);
 
-				yield return LoadMod(mod, lookup, runner);
+				yield return LoadMod(mod, lookup, runner, stopper);
 			}
 		}
 
@@ -249,7 +270,7 @@ namespace Deli.Runtime
 				}
 				catch
 				{
-					Logger.LogFatal(Locale.PluginException(mod, pluginType));
+					Logger.LogFatal(Locale.PluginStageException(mod, pluginType));
 					throw;
 				}
 			}
@@ -305,12 +326,12 @@ namespace Deli.Runtime
 			return wrapper;
 		}
 
-		internal IEnumerator Run(IEnumerable<Mod> mods, CoroutineRunner runner)
+		internal IEnumerator Run(IEnumerable<Mod> mods, CoroutineRunner runner, CoroutineStopper stopper)
 		{
 			PreRun();
 
 			var listed = mods.ToList();
-			yield return RunCore(listed, runner);
+			yield return RunCore(listed, runner, stopper);
 
 			Logger.LogInfo("Finished Deli stage loading.");
 

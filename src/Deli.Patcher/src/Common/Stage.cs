@@ -129,7 +129,18 @@ namespace Deli
 		{
 			if (type.IsAbstract || !typeof(DeliModule).IsAssignableFrom(type)) return;
 
-			var module = (DeliModule) Activator.CreateInstance(type, mod);
+			const string pluginType = "module";
+			DeliModule module;
+			try
+			{
+				module = (DeliModule) Activator.CreateInstance(type, mod);
+			}
+			catch
+			{
+				Logger.LogFatal(Locale.PluginCtorException(mod, pluginType));
+
+				throw;
+			}
 
 			if (!ModModules.TryGetValue(mod, out var modules))
 			{
@@ -144,7 +155,9 @@ namespace Deli
 			}
 			catch
 			{
-				Logger.LogFatal(Locale.PluginException(mod, "module"));
+				Logger.LogFatal(Locale.PluginStageException(mod, pluginType));
+				modules.Remove(module);
+
 				throw;
 			}
 		}
@@ -171,7 +184,7 @@ namespace Deli
 				}
 				catch
 				{
-					Logger.LogFatal(Locale.PluginException(mod, pluginType));
+					Logger.LogFatal(Locale.PluginStageException(mod, pluginType));
 					throw;
 				}
 			}
@@ -241,7 +254,8 @@ namespace Deli
 			public string LoadingAssets(Mod mod) => $"Loading {_stage.Name} assets from {mod}...";
 
 			public string LoaderException(AssetLoaderID loader, Mod mod, Mod targetMod, IHandle targetHandle) => $"{loader} from {mod} threw an exception while loading a {_stage.Name} asset from {targetMod}: {targetHandle}";
-			public string PluginException(Mod mod, string pluginType) => $"A {pluginType} from {mod} threw an exception during {_stage.Name} stage.";
+			public string PluginCtorException(Mod mod, string pluginType) => $"A {pluginType} from {mod} threw an exception during construction.";
+			public string PluginStageException(Mod mod, string pluginType) => $"A {pluginType} from {mod} threw an exception during {_stage.Name} stage.";
 		}
 
 #pragma warning restore CS1591
