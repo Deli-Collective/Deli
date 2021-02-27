@@ -59,11 +59,12 @@ namespace Deli
 				builder.Append(enumerator.Current);
 
 				next = enumerator.MoveNext();
-				if (next)
+				if (!next)
 				{
-					builder.Append(delimiter);
 					break;
 				}
+
+				builder.Append(delimiter);
 			}
 
 			return builder.ToString();
