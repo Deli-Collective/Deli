@@ -25,7 +25,7 @@ namespace Deli.VFS.Globbing
 		{
 			using var enumerator = _globs.GetEnumerator();
 
-			IEnumerable<IDirectoryHandle> lastDirectories = new[] {directory};
+			IEnumerable<IDirectoryHandle> directories = new[] {directory};
 
 			Globber? glob = null;
 			if (enumerator.MoveNext())
@@ -39,12 +39,12 @@ namespace Deli.VFS.Globbing
 						break;
 					}
 
-					// ReSharper disable once AccessToModifiedClosure
-					lastDirectories = lastDirectories.SelectMany(d => glob(d)).WhereCast<IHandle, IDirectoryHandle>();
+					var globC = glob;
+					directories = directories.SelectMany(d => globC(d)).WhereCast<IHandle, IDirectoryHandle>();
 				}
 			}
 
-			return glob is null ? lastDirectories.Cast<IHandle>() : lastDirectories.SelectMany(d => glob(d));
+			return glob is null ? directories.Cast<IHandle>() : directories.SelectMany(d => glob(d));
 		}
 	}
 
