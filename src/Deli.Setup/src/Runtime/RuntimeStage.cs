@@ -58,7 +58,7 @@ namespace Deli.Runtime
 			var assets = mod.Info.Assets?.Runtime;
 			if (assets is null) yield break;
 
-			Logger.LogDebug(Locale.LoadingAssets(mod));
+			Logger.LogInfo(Locale.LoadingAssets(mod));
 			foreach (var asset in assets)
 			{
 				var loader = GetLoader(mod, lookup, asset, out var loaderMod);
@@ -217,13 +217,13 @@ namespace Deli.Runtime
 					switch (localVersion.CompareByPrecedence(remoteVersion))
 					{
 						case -1:
-							Logger.LogWarning($"There is a newer version of {mod} available: ({remoteVersion})");
+							Logger.LogWarning($"There is a newer version of {mod} available: {remoteVersion}");
 							break;
 						case 0:
 							Logger.LogInfo($"{mod} is up to date");
 							break;
 						case 1:
-							Logger.LogWarning($"You are ahead of the latest version of {mod}: ({remoteVersion})");
+							Logger.LogWarning($"You are ahead of the latest version of {mod}: {remoteVersion}");
 							break;
 
 						default: throw new ArgumentOutOfRangeException();
@@ -258,22 +258,7 @@ namespace Deli.Runtime
 
 		private void RunBehaviours(Mod mod)
 		{
-			const string pluginType = "behaviour";
-			if (!_modBehaviours.TryGetValue(mod, out var behaviours)) return;
-
-			Logger.LogDebug(Locale.LoadingPlugin(mod, pluginType));
-			foreach (var behaviour in behaviours)
-			{
-				try
-				{
-					behaviour.Run(this);
-				}
-				catch
-				{
-					Logger.LogFatal(Locale.PluginStageException(mod, pluginType));
-					throw;
-				}
-			}
+			RunPlugin(mod, _modBehaviours, "behaviour");
 		}
 
 #pragma warning disable CS1591
@@ -333,13 +318,11 @@ namespace Deli.Runtime
 			var listed = mods.ToList();
 			yield return RunCore(listed, runner, stopper);
 
-			Logger.LogInfo("Finished Deli stage loading.");
-
 			var caches = ReadCaches();
 			yield return runner(CheckVersions(listed, runner, caches));
 			WriteCaches(caches);
 
-			Logger.LogInfo("Finished checking all mod versions.");
+			PostRun();
 		}
 	}
 }

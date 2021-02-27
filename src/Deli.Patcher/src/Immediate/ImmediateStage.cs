@@ -26,7 +26,7 @@ namespace Deli.Immediate
 			var assets = GetAssets(table);
 			if (assets is null) return;
 
-			Logger.LogDebug(Locale.LoadingAssets(mod));
+			Logger.LogInfo(Locale.LoadingAssets(mod));
 			foreach (var asset in assets)
 			{
 				var loader = GetLoader(mod, lookup, asset, out var loaderMod);
@@ -68,6 +68,8 @@ namespace Deli.Immediate
 
 				yield return mod;
 			}
+
+			PostRun();
 		}
 
 #pragma warning restore CS1591

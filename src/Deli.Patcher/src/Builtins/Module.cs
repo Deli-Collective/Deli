@@ -30,7 +30,7 @@ namespace Deli.Patcher
 
 			foreach (var generated in _monoModHookGen.Outputs)
 			{
-				Logger.LogDebug($"Loading HookGen'd result of '{generated.Key}'...");
+				Logger.LogDebug($"Loading HookGen'd result of '{generated.Key}'");
 
 				var bytes = generated.Value.ToArray();
 				Assembly.Load(bytes);

@@ -78,7 +78,7 @@ namespace Deli.Patcher
             var target = name.Substring(0, name.Length - mmDll.Length) + ".dll";
             if (!_targetMods.TryGetValue(target, out var mods))
             {
-                _mod.Logger.LogDebug($"Prepping MonoMod patcher for '{target}'...");
+                _mod.Logger.LogDebug($"Prepping MonoMod patcher for '{target}'");
 
             	mods = new();
                 var patcher = Patch(mods);
@@ -140,7 +140,7 @@ namespace Deli.Patcher
             {
 	            if (_outputs.ContainsKey(target)) continue;
 
-	            _mod.Logger.LogDebug($"Prepping HookGen for '{target}'...");
+	            _mod.Logger.LogDebug($"Prepping HookGen for '{target}'");
 
 	            var output = new MemoryStream();
 	            var patcher = Patch(output);

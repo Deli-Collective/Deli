@@ -119,5 +119,13 @@ namespace Deli
 
 			return buffer;
 		}
+
+		public static string CapitalizeFirst(this string original)
+		{
+			return new StringBuilder(original.Length)
+				.Append(char.ToUpperInvariant(original[0]))
+				.Append(original, 1, original.Length - 1)
+				.ToString();
+		}
 	}
 }

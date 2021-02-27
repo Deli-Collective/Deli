@@ -62,7 +62,6 @@ namespace Deli
 			var glob = asset.Key;
 			var loader = asset.Value;
 
-			Logger.LogDebug($"Enumerating glob: '{glob}'...");
 			using var globbed = mod.Resources.Glob(glob).GetEnumerator();
 
 			if (!globbed.MoveNext())
@@ -75,7 +74,7 @@ namespace Deli
 			{
 				var handle = globbed.Current!;
 
-				Logger.LogDebug($"{handle} > {loader}");
+				Logger.LogDebug($"{glob} | {handle} > {loader}");
 				yield return handle;
 			} while (globbed.MoveNext());
 		}
@@ -170,17 +169,16 @@ namespace Deli
 			}
 		}
 
-		protected void RunModules(Mod mod)
+		protected void RunPlugin<TPlugin>(Mod mod, Dictionary<Mod, List<TPlugin>> modPlugins, string pluginType) where TPlugin : IDeliPlugin
 		{
-			const string pluginType = "module";
-			if (!ModModules.TryGetValue(mod, out var modules)) return;
+			if (!modPlugins.TryGetValue(mod, out var plugins)) return;
 
-			Logger.LogDebug(Locale.LoadingPlugin(mod, pluginType));
-			foreach (var module in modules)
+			Logger.LogInfo(Locale.LoadingPlugin(mod, pluginType));
+			foreach (var plugin in plugins)
 			{
 				try
 				{
-					module.Run(this);
+					plugin.Run(this);
 				}
 				catch
 				{
@@ -190,9 +188,19 @@ namespace Deli
 			}
 		}
 
+		protected void RunModules(Mod mod)
+		{
+			RunPlugin(mod, ModModules, "module");
+		}
+
 		protected void PreRun()
 		{
-			Logger.LogDebug($"Running the {Name} stage...");
+			Logger.LogMessage($"{Name.CapitalizeFirst()} stage started");
+		}
+
+		protected void PostRun()
+		{
+			Logger.LogMessage($"{Name.CapitalizeFirst()} stage finished");
 		}
 
 #pragma warning restore CS1591
@@ -250,8 +258,8 @@ namespace Deli
 				_stage = stage;
 			}
 
-			public string LoadingPlugin(Mod mod, string pluginType) => $"Loading {mod} {pluginType}s into {_stage.Name}...";
-			public string LoadingAssets(Mod mod) => $"Loading {_stage.Name} assets from {mod}...";
+			public string LoadingPlugin(Mod mod, string pluginType) => $"Loading {mod} {pluginType}s into {_stage.Name}";
+			public string LoadingAssets(Mod mod) => $"Loading {_stage.Name} assets from {mod}";
 
 			public string LoaderException(AssetLoaderID loader, Mod mod, Mod targetMod, IHandle targetHandle) => $"{loader} from {mod} threw an exception while loading a {_stage.Name} asset from {targetMod}: {targetHandle}";
 			public string PluginCtorException(Mod mod, string pluginType) => $"A {pluginType} from {mod} threw an exception during construction.";
