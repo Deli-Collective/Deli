@@ -23,9 +23,9 @@ namespace Deli.Bootstrap
 			public const string Guid = "deli";
 
 			/// <summary>
-			/// 	The system-compliant version that this was built from
+			///		The SemVersion this was built from but already parsed
 			/// </summary>
-			public const string Version = "MACRO_SYS_VERSION";
+			public static readonly SemVersion Version = SemVersion.Parse("MACRO_VERSION");
 
 			/// <summary>
 			///		A short except of what Deli is
@@ -47,9 +47,9 @@ namespace Deli.Bootstrap
 			public const string SourceUrl = "https://github.com/Deli-Collective/Deli";
 
 			/// <summary>
-			///		The SemVersion this was built from but already parsed
+			/// 	The system-compliant version that this was built from
 			/// </summary>
-			public static readonly SemVersion SemVersion = SemVersion.Parse("MACRO_VERSION");
+			public const string SysVersion = "MACRO_SYS_VERSION";
 		}
 
 		/// <summary>

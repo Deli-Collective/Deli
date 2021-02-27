@@ -175,7 +175,7 @@ namespace Deli.VFS.Disk
 		///		Creates an instance of <see cref="RootDirectoryHandle"/>
 		/// </summary>
 		/// <param name="pathOnDisk">The physical path to the root directory</param>
-		public RootDirectoryHandle(string pathOnDisk) : base("/", pathOnDisk)
+		public RootDirectoryHandle(string pathOnDisk) : base("", pathOnDisk)
 		{
 		}
 	}
@@ -192,7 +192,7 @@ namespace Deli.VFS.Disk
 		/// <inheritdoc cref="IChildHandle.Name"/>
 		public string Name { get; }
 
-		internal ChildDirectoryHandle(string name, string pathOnDisk, DirectoryHandle directory) : base(directory.Path + name + "/", pathOnDisk)
+		internal ChildDirectoryHandle(string name, string pathOnDisk, DirectoryHandle directory) : base(HPath.Combine(directory, name), pathOnDisk)
 		{
 			Name = name;
 			Directory = directory;

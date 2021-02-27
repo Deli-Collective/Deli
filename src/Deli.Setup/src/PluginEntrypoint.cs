@@ -14,7 +14,7 @@ namespace Deli.Setup
 
 #pragma warning disable CS1591
 
-	[BepInPlugin(Constants.Metadata.Guid, Constants.Metadata.Name, Constants.Metadata.Version)]
+	[BepInPlugin(Constants.Metadata.Guid, Constants.Metadata.Name, Constants.Metadata.SysVersion)]
 	public class PluginEntrypoint : BaseUnityPlugin
 	{
 		private void Awake()

@@ -54,7 +54,7 @@ namespace Deli.VFS.Zip
 
 		public override string ToString()
 		{
-			return Path;
+			return Path + "/";
 		}
 	}
 
@@ -63,47 +63,87 @@ namespace Deli.VFS.Zip
 	/// </summary>
 	public sealed class RootDirectoryHandle : DirectoryHandle
 	{
-		private readonly struct ZipDirectoryInfo
+		private class RootCreator
 		{
-			public readonly DirectoryHandle Handle;
-			public readonly Dictionary<string, IChildHandle> Children;
-
-			public ZipDirectoryInfo(DirectoryHandle handle, Dictionary<string, IChildHandle> children)
+			private readonly struct Directory
 			{
-				Handle = handle;
-				Children = children;
-			}
-		}
+				public readonly DirectoryHandle Handle;
+				public readonly Dictionary<string, IChildHandle> Children;
 
-		private static ZipDirectoryInfo GetParent(Dictionary<string, ZipDirectoryInfo> directories, string path)
-		{
-			var parentName = System.IO.Path.GetDirectoryName(path);
-			if (!directories.TryGetValue(parentName, out var parent))
-			{
-				parent = AppendDirectory(directories, parentName);
+				public Directory(DirectoryHandle handle, Dictionary<string, IChildHandle> children)
+				{
+					Handle = handle;
+					Children = children;
+				}
 			}
 
-			return parent;
-		}
+			private readonly Dictionary<string, Directory> _directories = new();
 
-		private static ZipDirectoryInfo AppendDirectory(Dictionary<string, ZipDirectoryInfo> directories, string path)
-		{
-			var parent = GetParent(directories, path);
+			public RootDirectoryHandle Root { get; }
 
-			var children = new Dictionary<string, IChildHandle>();
-			var handle = new ChildDirectoryHandle(System.IO.Path.GetFileName(path), children, parent.Handle);
-			var info = new ZipDirectoryInfo(handle, children);
-			parent.Children.Add(handle.Name, handle);
+			public RootCreator()
+			{
+				var rootChildren = new Dictionary<string, IChildHandle>();
+				Root = new RootDirectoryHandle(rootChildren);
 
-			return info;
-		}
+				_directories.Add(Root.Path, new(Root, rootChildren));
+			}
 
-		private static void AppendFile(Dictionary<string, ZipDirectoryInfo> directories, string path, ZipEntry entry)
-		{
-			var parent = GetParent(directories, path);
+			private Directory GetParent(string childPath)
+			{
+				var path = System.IO.Path.GetDirectoryName(childPath);
+				if (!_directories.TryGetValue(path, out var parent))
+				{
+					var name = System.IO.Path.GetFileName(path);
+					parent = AppendDirectory(path, name);
+				}
 
-			var handle = new FileHandle(entry, System.IO.Path.GetFileName(path), parent.Handle);
-			parent.Children.Add(handle.Name, handle);
+				return parent;
+			}
+
+			private Directory AppendDirectory(string path, string name)
+			{
+				var parent = GetParent(path);
+
+				var children = new Dictionary<string, IChildHandle>();
+				var handle = new ChildDirectoryHandle(name, children, parent.Handle);
+				var info = new Directory(handle, children);
+
+				_directories.Add(path, info);
+				parent.Children.Add(handle.Name, handle);
+
+				return info;
+			}
+
+			private void AppendFile(string path, string name, ZipEntry entry)
+			{
+				var parent = GetParent(path);
+
+				var handle = new FileHandle(entry, name, parent.Handle);
+				parent.Children.Add(handle.Name, handle);
+			}
+
+			public void Append(ZipFile zip)
+			{
+				foreach (var entry in zip.Entries)
+				{
+					var path = entry.FileName.TrimEnd('/');
+					if (_directories.ContainsKey(path))
+					{
+						continue;
+					}
+
+					var name = System.IO.Path.GetFileName(path);
+					if (entry.IsDirectory)
+					{
+						AppendDirectory(path, name);
+					}
+					else
+					{
+						AppendFile(path, name, entry);
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -112,36 +152,13 @@ namespace Deli.VFS.Zip
 		/// <param name="zip">The zip containing files and directories</param>
 		public static RootDirectoryHandle Create(ZipFile zip)
 		{
-			var rootChildren = new Dictionary<string, IChildHandle>();
-			var root = new RootDirectoryHandle(rootChildren);
-			var directories = new Dictionary<string, ZipDirectoryInfo>
-			{
-				["/"] = new(root, rootChildren)
-			};
+			var creator = new RootCreator();
+			creator.Append(zip);
 
-			foreach (var entry in zip.Entries)
-			{
-				var path = "/" + entry.FileName.TrimEnd('/');
-
-				if (directories.ContainsKey(path))
-				{
-					continue;
-				}
-
-				if (entry.IsDirectory)
-				{
-					AppendDirectory(directories, path);
-				}
-				else
-				{
-					AppendFile(directories, path, entry);
-				}
-			}
-
-			return root;
+			return creator.Root;
 		}
 
-		private RootDirectoryHandle(Dictionary<string, IChildHandle> children) : base(children, "/")
+		private RootDirectoryHandle(Dictionary<string, IChildHandle> children) : base(children, "")
 		{
 		}
 	}
@@ -158,7 +175,7 @@ namespace Deli.VFS.Zip
 		/// <inheritdoc cref="IChildHandle.Name"/>
 		public string Name { get; }
 
-		internal ChildDirectoryHandle(string name, Dictionary<string, IChildHandle> children, DirectoryHandle directory) : base(children, directory.Path + name + "/")
+		internal ChildDirectoryHandle(string name, Dictionary<string, IChildHandle> children, DirectoryHandle directory) : base(children, HPath.Combine(directory, name))
 		{
 			Name = name;
 			Directory = directory;

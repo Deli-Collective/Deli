@@ -98,7 +98,7 @@ namespace Deli
 				throw new FormatException("The required Deli version must not be null.");
 			}
 
-			var deli = Bootstrap.Constants.Metadata.SemVersion;
+			var deli = Bootstrap.Constants.Metadata.Version;
 			if (!deli.Satisfies(require))
 			{
 				throw new FormatException($"This mod is incompatible with the current version of Deli (required: {require}; current: {deli})");

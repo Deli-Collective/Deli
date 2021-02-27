@@ -190,7 +190,7 @@ namespace Deli.VFS.Globbing
 			var last = split[length - 1] switch
 			{
 				"" => StatelessGlobbers.Current,
-				var other => FromName(other)
+				var name => FromName(name)
 			};
 			if (last is not null)
 			{

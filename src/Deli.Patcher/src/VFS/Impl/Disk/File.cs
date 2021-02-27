@@ -36,7 +36,7 @@ namespace Deli.VFS.Disk
 
 		internal FileHandle(string name, string pathOnDisk, DirectoryHandle directory)
 		{
-			Path = directory.Path + name;
+			Path = HPath.Combine(directory, name);
 			Name = name;
 			Directory = directory;
 			PathOnDisk = pathOnDisk;

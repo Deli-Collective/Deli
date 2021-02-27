@@ -34,7 +34,7 @@ namespace Deli.VFS.Zip
 		{
 			_entry = entry;
 
-			Path = directory.Path + name;
+			Path = HPath.Combine(directory, name);
 			Name = name;
 			Directory = directory;
 		}
