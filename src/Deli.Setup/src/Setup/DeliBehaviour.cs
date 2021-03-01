@@ -53,15 +53,26 @@ namespace Deli.Setup
 		/// </summary>
 		protected class StageEvents : IDeliPlugin
 		{
+			private readonly OneTimeEvent<StageRunner<SetupStage>> _setup = new();
+			private readonly OneTimeEvent<StageRunner<RuntimeStage>> _runtime = new();
+
 			/// <summary>
 			///		Invoked when the <see cref="SetupStage"/> is in progress.
 			/// </summary>
-			public event StageRunner<SetupStage>? Setup;
+			public event StageRunner<SetupStage>? Setup
+			{
+				add => _setup.Add(value);
+				remove => _setup.Remove(value);
+			}
 
 			/// <summary>
 			///		Invoked when the <see cref="RuntimeStage"/> is in progress.
 			/// </summary>
-			public event StageRunner<RuntimeStage>? Runtime;
+			public event StageRunner<RuntimeStage>? Runtime
+			{
+				add => _runtime.Add(value);
+				remove => _runtime.Remove(value);
+			}
 
 			/// <inheritdoc cref="IDeliPlugin.Run"/>
 			public void Run(Stage stage)
@@ -69,10 +80,10 @@ namespace Deli.Setup
 				switch (stage)
 				{
 					case SetupStage setup:
-						Setup?.Invoke(setup);
+						_setup.Consume()?.Invoke(setup);
 						break;
 					case RuntimeStage runtime:
-						Runtime?.Invoke(runtime);
+						_runtime.Consume()?.Invoke(runtime);
 						break;
 				}
 			}

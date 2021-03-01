@@ -111,7 +111,7 @@ namespace Deli
 		{
 			var token = ImmediateReaders.Get<JToken>()(file);
 
-			return token.ToObject<T>(Serializer);
+			return token.ToObject<T>(Serializer) ?? throw new FormatException("JSON object was null.");
 		}
 
 		protected static IFileHandle AssemblyPreloader(IHandle handle)

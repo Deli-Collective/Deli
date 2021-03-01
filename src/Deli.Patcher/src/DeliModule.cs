@@ -48,10 +48,16 @@ namespace Deli.Patcher
 		/// </summary>
 		protected class StageEvents : IDeliPlugin
 		{
+			private readonly OneTimeEvent<StageRunner<PatcherStage>> _patcher = new();
+
 			/// <summary>
 			///		Invoked when the <see cref="PatcherStage"/> is in progress.
 			/// </summary>
-			public event StageRunner<PatcherStage>? Patcher;
+			public event StageRunner<PatcherStage>? Patcher
+			{
+				add => _patcher.Add(value);
+				remove => _patcher.Remove(value);
+			}
 
 			/// <summary>
 			///		Invoked when future stages are in progress.
@@ -64,7 +70,7 @@ namespace Deli.Patcher
 				switch (stage)
 				{
 					case PatcherStage patcher:
-						Patcher?.Invoke(patcher);
+						_patcher.Consume()?.Invoke(patcher);
 						break;
 					default:
 						Other?.Invoke(stage);
