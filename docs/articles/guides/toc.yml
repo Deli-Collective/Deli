@@ -1,10 +1,10 @@
-- name: Behaviour
-  href: behaviour.md
-- name: Patcher
+- name: Setting up a Solution
+  href: solution.md
+- name: Plugins
+  href: plugins/toc.yml
+- name: Asset Pipeline
+  href: asset_pipeline/toc.yml
+- name: Patchers
   href: patcher.md
-- name: Asset Reader
-  href: reader.md
-- name: Asset Loader
-  href: loader.md
-- name: Version Checker
+- name: Version Checkers
   href: version_checker.md
