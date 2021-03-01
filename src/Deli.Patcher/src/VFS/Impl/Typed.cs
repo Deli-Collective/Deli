@@ -6,7 +6,7 @@ namespace Deli.VFS
 	/// <summary>
 	///		A file handle which supports deserialization to a generic type
 	/// </summary>
-	/// <typeparam name="TReader">The reader to deserialize the raw file to <typeparamref cref="TOut"/></typeparam>
+	/// <typeparam name="TReader">The reader to deserialize the raw file to <typeparamref name="TOut"/></typeparam>
 	/// <typeparam name="TOut">The type to deserialize to</typeparam>
 	public abstract class TypedFileHandle<TReader, TOut> : IFileHandle, IDisposable
 	{

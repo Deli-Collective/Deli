@@ -52,6 +52,7 @@ namespace Deli.VFS.Zip
 			return GetEnumerator();
 		}
 
+		/// <inheritdoc cref="object.ToString"/>
 		public override string ToString()
 		{
 			return Path + "/";
