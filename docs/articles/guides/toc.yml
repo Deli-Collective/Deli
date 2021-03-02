@@ -1,10 +1,10 @@
 - name: Setting up a Solution
-  href: solution.md
+  href: solutions.md
 - name: Plugins
   href: plugins/toc.yml
 - name: Asset Pipeline
   href: asset_pipeline/toc.yml
 - name: Patchers
-  href: patcher.md
+  href: patchers.md
 - name: Version Checkers
-  href: version_checker.md
+  href: version_checkers.md
