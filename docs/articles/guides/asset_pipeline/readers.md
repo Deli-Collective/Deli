@@ -67,3 +67,24 @@ public static ResultYieldInstruction<byte[]> BytesOf(IFileHandle file)
 > [!WARNING]
 > Using statements mean that the object is disposed when the function returns. Do not use using statements for delayed readers, or the
 > stream will close before the coroutine starts.
+
+## Inserting a Reader
+Once made, the readers still need to be made available to Deli. To do so, simply add it to one of the stage's reader collections:
+
+```c#
+using Deli.Setup;
+using Deli.VFS;
+
+private static void ByteOf(IFileHandle file) 
+{ 
+    ... 
+}
+
+private void OnSetup(SetupStage stage)
+{
+    stage.ImmediateReaders.Add(ByteOf);
+}
+```
+
+> [!TIP]
+> Readers inserted into one stage are passed to all stages following it. Insert readers as early as possible.
