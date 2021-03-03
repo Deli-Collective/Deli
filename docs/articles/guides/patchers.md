@@ -3,7 +3,7 @@ Patchers allow mods to edit or replace assemblies before they are loaded. This c
 add or remove members from a type (as this is not possible in runtime alternatives).
 
 > [!IMPORTANT]
-> Patchers' plugins must be @Deli.Patcher.DeliModules; they cannot be @Deli.Setup.DeliBehaviour. Ensure you have the appropriate plugin to
+> Patchers' plugins must be <xref:Deli.Patcher.DeliModule>s; they cannot be @Deli.Setup.DeliBehaviour. Ensure you have the appropriate plugin to
 > begin.
 
 ## Creating a Patcher
