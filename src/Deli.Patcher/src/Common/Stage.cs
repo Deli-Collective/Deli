@@ -106,7 +106,6 @@ namespace Deli
 			return obj.ToObject<Mod.Manifest>(Serializer)!;
 		}
 
-		[return: MaybeNull]
 		protected T JsonOf<T>(IFileHandle file)
 		{
 			var token = ImmediateReaders.Get<JToken>()(file);
