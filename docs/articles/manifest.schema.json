@@ -45,7 +45,7 @@
       "type": "string",
       "title": "GUID",
       "description": "A unique identifier for the mod.",
-      "pattern": "^[a-z0-9\._]+$",
+      "pattern": "^[a-z0-9\\._]+$",
       "examples": [
         "example.primary"
       ]
