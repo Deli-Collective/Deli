@@ -14,33 +14,33 @@ namespace Deli
 	/// <summary>
 	///		Represents a Deli mod and contains all the resources available to it.
 	/// </summary>
-    public class Mod
-    {
-	    /// <summary>
-	    ///		The manifest file contained by the mod on disk.
-	    /// </summary>
+	public class Mod
+	{
+		/// <summary>
+		///		The manifest file contained by the mod on disk.
+		/// </summary>
 		public Manifest Info { get; }
 
-	    /// <summary>
-	    ///		The files and directories contained by the mod on disk.
-	    /// </summary>
+		/// <summary>
+		///		The files and directories contained by the mod on disk.
+		/// </summary>
 		public IDirectoryHandle Resources { get; }
 
-	    /// <summary>
-	    ///		The config file available to the mod.
-	    /// </summary>
+		/// <summary>
+		///		The config file available to the mod.
+		/// </summary>
 		public ConfigFile Config { get; }
 
-	    /// <summary>
-	    ///		The logger available to the mod.
-	    /// </summary>
+		/// <summary>
+		///		The logger available to the mod.
+		/// </summary>
 		public ManualLogSource Logger { get; }
 
-	    /// <summary>
-	    ///		Creates an instance of <see cref="Mod"/>
-	    /// </summary>
-	    /// <param name="info"></param>
-	    /// <param name="resources"></param>
+		/// <summary>
+		///		Creates an instance of <see cref="Mod"/>
+		/// </summary>
+		/// <param name="info"></param>
+		/// <param name="resources"></param>
 		public Mod(Manifest info, IDirectoryHandle resources)
 		{
 			Info = info;
@@ -49,15 +49,15 @@ namespace Deli
 			Logger = BepInEx.Logging.Logger.CreateLogSource(info.Name ?? info.Guid);
 		}
 
-	    /// <inheritdoc cref="object.ToString"/>
+		/// <inheritdoc cref="object.ToString"/>
 		public override string ToString()
 		{
 			return Info.ToString();
 		}
 
-	    /// <summary>
-	    ///		Represents the manifest file of a mod
-	    /// </summary>
+		/// <summary>
+		///		Represents the manifest file of a mod
+		/// </summary>
 		public class Manifest
 		{
 			private static readonly Regex GuidFilter = new(@"^[a-z0-9\._]+$");
@@ -140,9 +140,9 @@ namespace Deli
 			}
 		}
 
-	    /// <summary>
-	    ///		Represents the assets contained within a <see cref="Manifest"/>
-	    /// </summary>
+		/// <summary>
+		///		Represents the assets contained within a <see cref="Manifest"/>
+		/// </summary>
 		public class AssetTable
 		{
 			/// <summary>
@@ -169,5 +169,5 @@ namespace Deli
 				Runtime = runtime;
 			}
 		}
-    }
+	}
 }

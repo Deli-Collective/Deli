@@ -11,84 +11,84 @@ namespace Deli.Patcher
 	internal class MonoModAssetLoader
 	{
 		private readonly Mod _mod;
-        private readonly Dictionary<string, List<IFileHandle>> _targetMods = new();
+		private readonly Dictionary<string, List<IFileHandle>> _targetMods = new();
 
-        public MonoModAssetLoader(Mod mod)
-        {
-            _mod = mod;
-        }
+		public MonoModAssetLoader(Mod mod)
+		{
+			_mod = mod;
+		}
 
-        private static Patcher Patch(List<IFileHandle> files)
-        {
-            void Closure(ref AssemblyDefinition assembly)
-            {
-	            var modBuffer = new Stream?[files.Count];
+		private static Patcher Patch(List<IFileHandle> files)
+		{
+			void Closure(ref AssemblyDefinition assembly)
+			{
+				var modBuffer = new Stream?[files.Count];
 
-	            try
-	            {
-		            for (var i = 0; i < modBuffer.Length; ++i)
-		            {
-			            var file = files[i];
+				try
+				{
+					for (var i = 0; i < modBuffer.Length; ++i)
+					{
+						var file = files[i];
 
-			            modBuffer[i] = file.OpenRead();
-		            }
+						modBuffer[i] = file.OpenRead();
+					}
 
-		            using var modder = new MonoModder
-		            {
-			            Module = assembly.MainModule
-		            };
+					using var modder = new MonoModder
+					{
+						Module = assembly.MainModule
+					};
 
-		            foreach (var mod in modBuffer)
-		            {
-			            if (mod is null) continue;
+					foreach (var mod in modBuffer)
+					{
+						if (mod is null) continue;
 
-			            modder.ReadMod(mod);
-		            }
+						modder.ReadMod(mod);
+					}
 
-		            modder.MapDependencies();
-		            modder.PatchRefs();
-		            modder.AutoPatch();
-	            }
-	            finally
-	            {
-		            foreach (var mod in modBuffer)
-		            {
-			            mod?.Dispose();
-		            }
-	            }
-            }
+					modder.MapDependencies();
+					modder.PatchRefs();
+					modder.AutoPatch();
+				}
+				finally
+				{
+					foreach (var mod in modBuffer)
+					{
+						mod?.Dispose();
+					}
+				}
+			}
 
-            return Closure;
-        }
+			return Closure;
+		}
 
-        public void AssetLoader(PatcherStage stage, Mod mod, IHandle handle)
-        {
-            if (handle is not IFileHandle file)
-            {
-            	throw new ArgumentException("The MonoMod loader must be provided a file.", nameof(handle));
-            }
+		public void AssetLoader(PatcherStage stage, Mod mod, IHandle handle)
+		{
+			if (handle is not IFileHandle file)
+			{
+				throw new ArgumentException("The MonoMod loader must be provided a file.", nameof(handle));
+			}
 
-            const string mmDll = ".mm.dll";
-            var name = file.Name;
-            if (!name.EndsWith(mmDll))
-            {
-            	throw new ArgumentException("The file must end with '" + mmDll + "'.", nameof(handle));
-            }
+			const string mmDll = ".mm.dll";
+			var name = file.Name;
+			if (!name.EndsWith(mmDll))
+			{
+				throw new ArgumentException("The file must end with '" + mmDll + "'.", nameof(handle));
+			}
 
-            var target = name.Substring(0, name.Length - mmDll.Length) + ".dll";
-            if (!_targetMods.TryGetValue(target, out var mods))
-            {
-                _mod.Logger.LogDebug($"Prepping MonoMod patcher for '{target}'");
+			var target = name.Substring(0, name.Length - mmDll.Length) + ".dll";
+			if (!_targetMods.TryGetValue(target, out var mods))
+			{
+				_mod.Logger.LogDebug($"Prepping MonoMod patcher for '{target}'");
 
-            	mods = new();
-                var patcher = Patch(mods);
+				mods = new();
+				var patcher = Patch(mods);
 
-            	_targetMods.Add(target, mods);
-                stage.Patchers.SetOrAdd(target, _mod, patcher);
-            }
+				_targetMods.Add(target, mods);
+				stage.Patchers.SetOrAdd(target, _mod, patcher);
+			}
 
-            mods.Add(file);
-        }
+			mods.Add(file);
+		}
 	}
 
 	internal class MonoModHookGenAssetLoader
@@ -128,26 +128,26 @@ namespace Deli.Patcher
 		}
 
 		public void AssetLoader(PatcherStage stage, Mod mod, IHandle handle)
-        {
-            if (handle is not IFileHandle file)
-            {
-	            throw new ArgumentException("The MonoMod.HookGen loader must be provided a file.", nameof(handle));
-            }
+		{
+			if (handle is not IFileHandle file)
+			{
+				throw new ArgumentException("The MonoMod.HookGen loader must be provided a file.", nameof(handle));
+			}
 
-            var reader = stage.ImmediateReaders.Get<IEnumerable<string>>();
+			var reader = stage.ImmediateReaders.Get<IEnumerable<string>>();
 
-            foreach (var target in reader(file))
-            {
-	            if (_outputs.ContainsKey(target)) continue;
+			foreach (var target in reader(file))
+			{
+				if (_outputs.ContainsKey(target)) continue;
 
-	            _mod.Logger.LogDebug($"Prepping HookGen for '{target}'");
+				_mod.Logger.LogDebug($"Prepping HookGen for '{target}'");
 
-	            var output = new MemoryStream();
-	            var patcher = Patch(output);
+				var output = new MemoryStream();
+				var patcher = Patch(output);
 
-	            _outputs.Add(target, output);
-	            stage.Patchers.SetOrAdd(target, _mod, patcher);
-            }
-        }
+				_outputs.Add(target, output);
+				stage.Patchers.SetOrAdd(target, _mod, patcher);
+			}
+		}
 	}
 }

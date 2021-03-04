@@ -6,14 +6,14 @@ using static Deli.Bootstrap.Constants;
 
 namespace Deli.Bootstrap
 {
-    public static class PatcherEntrypoint
-    {
-	    // Store and access everything from this object, so we can scope the access of this static class.
-	    // Avoids memory leaking and enforces the implicit contract.
-	    private static Bootstrapper? _stateful;
-	    private static KeyValuePair<string, IEnumerable<KeyValuePair<Mod, Patcher.Patcher>>>? _activeFile;
+	public static class PatcherEntrypoint
+	{
+		// Store and access everything from this object, so we can scope the access of this static class.
+		// Avoids memory leaking and enforces the implicit contract.
+		private static Bootstrapper? _stateful;
+		private static KeyValuePair<string, IEnumerable<KeyValuePair<Mod, Patcher.Patcher>>>? _activeFile;
 
-	    public static IEnumerable<string> TargetDLLs
+		public static IEnumerable<string> TargetDLLs
 		{
 			get
 			{
@@ -99,6 +99,6 @@ namespace Deli.Bootstrap
 			{
 			}
 		}
-    }
+	}
 }
 #pragma warning restore CS1591
