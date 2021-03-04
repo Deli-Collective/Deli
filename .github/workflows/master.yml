@@ -50,7 +50,8 @@ jobs:
           args: docs/docfx.json
 
       - name: Publish documentation to GitHub Pages
-        uses: maxheld83/ghpages@v0.3.0
+        uses: peaceiris/actions-gh-pages@v3
         env:
-          BUILD_DIR: docs/_site # docfx's default output directory is _site
-          GH_PAT: ${{ secrets.GH_PAT }} # See https://github.com/maxheld83/ghpages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_site
+          force_orphan: true
