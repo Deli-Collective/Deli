@@ -13,8 +13,9 @@ TEMP_PATCHERS        = $(TEMP)/BepInEx/patchers/Deli
 TEMP_PLUGINS         = $(TEMP)/BepInEx/plugins/Deli
 TEMP_DIRS            = $(TEMP_PATCHERS) $(TEMP_PLUGINS)
 
-CONTENTS_PATCHERS    = $(addsuffix .dll,$(PROJ_PATCHER) DotNetZip Deli.Newtonsoft.Json)
-CONTENTS_PLUGINS     = $(addsuffix .dll,$(PROJ_SETUP))
+CONTENTS_PATCHERS_DLLS = $(addsuffix .dll,$(PROJ_PATCHER) DotNetZip Deli.Newtonsoft.Json)
+CONTENTS_PATCHERS_EXES = $(addsuffix .exe, MonoMod MonoMod.RuntimeDetour.HookGen)
+CONTENTS_PLUGINS       = $(addsuffix .dll,$(PROJ_SETUP))
 
 .PHONY: build all clean
 
@@ -38,8 +39,11 @@ $(ZIP): build
 		mkdir -p $$d; \
 	done
 	
-	mv $(addprefix $(PROJ_PATCHER)/bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS_PATCHERS)) $(TEMP_PATCHERS)/
-	mv $(addprefix $(PROJ_SETUP)/bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS_PLUGINS)) $(TEMP_PLUGINS)/
+	mv $(addprefix $(PROJ_PATCHER)/bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS_PATCHERS_DLLS)) "$(TEMP_PATCHERS)/"
+	for f in $(CONTENTS_PATCHERS_EXES); do \
+		mv -- "$(PROJ_PATCHER)/bin/$(CONFIG)/$(FRAMEWORK)/$$f" "$(TEMP_PATCHERS)/$${f%.exe}.dll"; \
+	done
+	mv $(addprefix $(PROJ_SETUP)/bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS_PLUGINS)) "$(TEMP_PLUGINS)/"
 
 	cd $(TEMP); \
 	zip -9r ../$(ZIP) .

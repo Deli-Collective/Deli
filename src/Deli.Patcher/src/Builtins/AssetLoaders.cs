@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using BepInEx;
+using BepInEx.Logging;
 using Deli.VFS;
 using Mono.Cecil;
 using MonoMod;
@@ -8,17 +10,64 @@ using MonoMod.RuntimeDetour.HookGen;
 
 namespace Deli.Patcher
 {
+	internal sealed class DeliMonoModder : MonoModder
+	{
+		private static readonly string[] SearchDirectories =
+		{
+			Paths.BepInExAssemblyDirectory,
+			Paths.PatcherPluginPath,
+			Paths.PluginPath,
+			Paths.ManagedPath
+		};
+
+		private static readonly DefaultAssemblyResolver Resolver;
+
+		static DeliMonoModder()
+		{
+			Resolver = new();
+
+			foreach (var d in SearchDirectories) Resolver.AddSearchDirectory(d);
+		}
+
+		private readonly ManualLogSource _logger;
+
+		public DeliMonoModder(ManualLogSource logger, ModuleDefinition module)
+		{
+			_logger = logger;
+			Module = module;
+			AssemblyResolver = Resolver;
+		}
+
+		public override void Log(string text)
+		{
+			_logger.LogInfo(text);
+		}
+
+		public override void LogVerbose(string text)
+		{
+			_logger.LogDebug(text);
+		}
+
+		public override void Dispose()
+		{
+			Module = null;
+			base.Dispose();
+		}
+	}
+
 	internal class MonoModAssetLoader
 	{
 		private readonly Mod _mod;
 		private readonly Dictionary<string, List<IFileHandle>> _targetMods = new();
+
+		private ManualLogSource Logger => _mod.Logger;
 
 		public MonoModAssetLoader(Mod mod)
 		{
 			_mod = mod;
 		}
 
-		private static Patcher Patch(List<IFileHandle> files)
+		private Patcher Patch(List<IFileHandle> files)
 		{
 			void Closure(ref AssemblyDefinition assembly)
 			{
@@ -26,22 +75,14 @@ namespace Deli.Patcher
 
 				try
 				{
+					using var modder = new DeliMonoModder(Logger, assembly.MainModule);
+
 					for (var i = 0; i < modBuffer.Length; ++i)
 					{
 						var file = files[i];
+						var mod = file.OpenRead();
 
-						modBuffer[i] = file.OpenRead();
-					}
-
-					using var modder = new MonoModder
-					{
-						Module = assembly.MainModule
-					};
-
-					foreach (var mod in modBuffer)
-					{
-						if (mod is null) continue;
-
+						modBuffer[i] = mod;
 						modder.ReadMod(mod);
 					}
 
@@ -103,16 +144,13 @@ namespace Deli.Patcher
 			_mod = mod;
 		}
 
-		private static Patcher Patch(Stream output)
+		private Patcher Patch(Stream output)
 		{
 			void Closure(ref AssemblyDefinition assembly)
 			{
 				var module = assembly.MainModule;
 
-				using var modder = new MonoModder
-				{
-					Module = module
-				};
+				using var modder = new DeliMonoModder(_mod.Logger, module);
 				modder.MapDependencies();
 
 				var generator = new HookGenerator(modder, "MMHOOK_" + module.Name)
