@@ -21,6 +21,7 @@ namespace Deli.Setup
 		{
 			var blob = PatcherEntrypoint.Handoff();
 			var manager = new GameObject(Constants.Metadata.Name);
+			DontDestroyOnLoad(manager);
 
 			var behaviours = new Dictionary<Mod, List<DeliBehaviour>>();
 			var setup = new SetupStage(blob.StageData, manager, behaviours);
