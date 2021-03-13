@@ -8,7 +8,7 @@
     {
       "guid": "example.primary",
       "version": "1.0.0",
-      "require": "0.3.0",
+      "require": "0.3",
       "dependencies": {
         "example.secondary": "1.0.0"
       },
@@ -55,6 +55,7 @@
       "type": "string",
       "title": "Version",
       "description": "The version of the mod.",
+      "pattern": "^(\\d+)(?>\\.(\\d+))?(?>\\.(\\d+))?(?>\\-([0-9A-Za-z\\-\\.]+))?(?>\\+([0-9A-Za-z\\-\\.]+))?$",
       "examples": [
         "1.0.0"
       ]
@@ -64,9 +65,9 @@
       "type": "string",
       "title": "Required Deli Version",
       "description": "The version of Deli the mod needs.",
-      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
+      "pattern": "^(\\d+)(?>\\.(\\d+))?(?>\\.(\\d+))?(?>\\-([0-9A-Za-z\\-\\.]+))?(?>\\+([0-9A-Za-z\\-\\.]+))?$",
       "examples": [
-        "0.3.0"
+        "0.3"
       ]
     },
     "dependencies": {
