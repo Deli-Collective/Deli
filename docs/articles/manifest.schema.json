@@ -133,7 +133,7 @@
       "type": "string",
       "title": "Source URL",
       "description": "The URL to the mod's source, or where it was downloaded from. Specifying this means Deli will try to check for newer versions.",
-      "pattern": "^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\\.)?([^:\/?\n]+)(?:\/)?(.*?)(?:\/)?$",
+      "pattern": "^(?:https?:\\/\\/)?(?:[^@\\/\\n]+@)?(?:www\\.)?([^:\\/?\\n]+(?:\\:\\d+)?)\\/?([^:]*?)\\/?$",
       "examples": [
         "https://example.org"
       ]

@@ -187,7 +187,7 @@ namespace Deli.Runtime
 
 		private IEnumerator CheckVersions(IEnumerable<Mod> mods, CoroutineRunner runner, Dictionary<string, VersionCache> caches)
 		{
-			var domainFilter = new Regex(@"^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)(?:\/)?(.*?)(?:\/)?$", RegexOptions.IgnoreCase);
+			var domainFilter = new Regex(@"^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+(?:\:\d+)?)\/?([^:]*?)\/?$", RegexOptions.IgnoreCase);
 			var buffer = new Queue<Coroutine>();
 			foreach (var mod in mods)
 			{
