@@ -1,5 +1,5 @@
 # Deli
-![Pre-release version](https://img.shields.io/github/v/release/Deli-Collective/Deli?include_prereleases&label=pre-release&style=flat-square)
+![latest version](https://img.shields.io/github/v/release/Deli-Collective/Deli?label=latest&style=flat-square)
 [![Discord](https://img.shields.io/discord/777351065950879744?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2&style=flat-square)](https://discord.gg/g8xeFyt42j)
 
 Deli is a modding framework which provides a uniform way of packaging and loading mods, each containing any type or number of
