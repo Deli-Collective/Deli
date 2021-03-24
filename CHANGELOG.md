@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Assets are now objects in an array instead of properties in a dictionary [#22]
 
 ## [0.3.2]
 ### Fixed

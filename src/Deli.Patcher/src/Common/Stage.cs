@@ -56,16 +56,16 @@ namespace Deli
 			Locale = new(this);
 		}
 
-		protected IEnumerable<IHandle> Glob(Mod mod, KeyValuePair<string, AssetLoaderID> asset)
+		protected IEnumerable<IHandle> Glob(Mod mod, Mod.Asset asset)
 		{
-			var glob = asset.Key;
-			var loader = asset.Value;
+			var path = asset.Path;
+			var loader = asset.Loader;
 
-			using var globbed = mod.Resources.Glob(glob).GetEnumerator();
+			using var globbed = mod.Resources.Glob(path).GetEnumerator();
 
 			if (!globbed.MoveNext())
 			{
-				Logger.LogWarning($"Asset glob from {mod} of type {loader} did not match any handles: {glob}");
+				Logger.LogWarning($"Asset glob from {mod} did not match any handles: {path}");
 				yield break;
 			}
 
@@ -73,7 +73,7 @@ namespace Deli
 			{
 				var handle = globbed.Current!;
 
-				Logger.LogDebug($"{glob} | {handle} > {loader}");
+				Logger.LogDebug($"{path} | {handle} > {loader}");
 				yield return handle;
 			} while (globbed.MoveNext());
 		}
@@ -281,19 +281,18 @@ namespace Deli
 
 		protected abstract TLoader? GetLoader(Mod mod, string name);
 
-		protected TLoader GetLoader(Mod mod, Dictionary<string, Mod> lookup, KeyValuePair<string, AssetLoaderID> asset, out Mod loaderMod)
+		protected TLoader GetLoader(Mod mod, Mod.Asset asset, Dictionary<string, Mod> lookup, out Mod loaderMod)
 		{
-			var loaderID = asset.Value;
-
+			var loaderID = asset.Loader;
 			if (!lookup.TryGetValue(loaderID.Mod, out loaderMod))
 			{
-				throw new InvalidOperationException($"Mod required for {Name} asset '{asset.Key}' of {mod} was not present: {loaderID.Mod}");
+				throw new InvalidOperationException($"Mod required for {Name} asset '{asset.Path}' of {mod} was not present: {loaderID.Mod}");
 			}
 
 			var loader = GetLoader(loaderMod, loaderID.Name);
 			if (loader is null)
 			{
-				throw new InvalidOperationException($"Loader required for {Name} asset '{asset.Key}' of {mod} was not present.");
+				throw new InvalidOperationException($"Loader required for {Name} asset '{asset.Path}' of {mod} was not present.");
 			}
 
 			return loader;

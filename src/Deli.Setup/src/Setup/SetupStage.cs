@@ -104,7 +104,7 @@ namespace Deli.Setup
 			return null;
 		}
 
-		protected override Dictionary<string, AssetLoaderID>? GetAssets(Mod.AssetTable table)
+		protected override Mod.Asset[]? GetAssets(Mod.AssetTable table)
 		{
 			return table.Setup;
 		}

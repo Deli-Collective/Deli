@@ -141,32 +141,60 @@ namespace Deli
 		}
 
 		/// <summary>
-		///		Represents the assets contained within a <see cref="Manifest"/>
+		///		Represents the assets contained within a mod
 		/// </summary>
 		public class AssetTable
 		{
 			/// <summary>
 			///		The assets to load during the patcher stage.
 			/// </summary>
-			public Dictionary<string, AssetLoaderID>? Patcher { get; }
+			public Asset[]? Patcher { get; }
 			/// <summary>
 			///		The assets to load during the setup stage.
 			/// </summary>
-			public Dictionary<string, AssetLoaderID>? Setup { get; }
+			public Asset[]? Setup { get; }
 			/// <summary>
 			///		The assets to load during runtime stage.
 			/// </summary>
-			public Dictionary<string, AssetLoaderID>? Runtime { get; }
+			public Asset[]? Runtime { get; }
 
 			/// <summary>
 			///		Creates an instance of <see cref="AssetTable"/>
 			/// </summary>
 			[JsonConstructor]
-			public AssetTable(Dictionary<string, AssetLoaderID>? patcher, Dictionary<string, AssetLoaderID>? setup, Dictionary<string, AssetLoaderID>? runtime)
+			public AssetTable(Asset[]? patcher, Asset[]? setup, Asset[]? runtime)
 			{
 				Patcher = patcher;
 				Setup = setup;
 				Runtime = runtime;
+			}
+		}
+
+		/// <summary>
+		///		Represents an asset to be loaded from a mod.
+		/// </summary>
+		public class Asset
+		{
+			/// <summary>
+			///		The loader to be used for loading the resources
+			/// </summary>
+			[JsonProperty(Required = Required.Always)]
+			public AssetLoaderID Loader { get; }
+
+			/// <summary>
+			///		The loader to be used for loading the resources
+			/// </summary>
+			[JsonProperty(Required = Required.Always)]
+			public string Path { get; }
+
+			/// <summary>
+			///		Creates an instance of <see cref="Asset"/>
+			/// </summary>
+			[JsonConstructor]
+			public Asset(AssetLoaderID loader, string path)
+			{
+				Loader = loader;
+				Path = path;
 			}
 		}
 	}

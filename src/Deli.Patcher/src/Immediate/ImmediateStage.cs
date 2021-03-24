@@ -29,7 +29,7 @@ namespace Deli.Immediate
 			Logger.LogInfo(Locale.LoadingAssets(mod));
 			foreach (var asset in assets)
 			{
-				var loader = GetLoader(mod, lookup, asset, out var loaderMod);
+				var loader = GetLoader(mod, asset, lookup, out var loaderMod);
 
 				foreach (var handle in Glob(mod, asset))
 				{
@@ -39,14 +39,14 @@ namespace Deli.Immediate
 					}
 					catch
 					{
-						Logger.LogFatal(Locale.LoaderException(asset.Value, loaderMod, mod, handle));
+						Logger.LogFatal(Locale.LoaderException(asset.Loader, loaderMod, mod, handle));
 						throw;
 					}
 				}
 			}
 		}
 
-		protected abstract Dictionary<string, AssetLoaderID>? GetAssets(Mod.AssetTable table);
+		protected abstract Mod.Asset[]? GetAssets(Mod.AssetTable table);
 
 		protected void AssemblyLoader(Stage stage, Mod mod, IHandle handle)
 		{

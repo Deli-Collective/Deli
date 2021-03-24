@@ -21,15 +21,24 @@
       ],
       "source_url": "https://example.org",
       "assets": {
-        "patcher": {
-          "MyPatcher.dll": "deli:assembly"
-        },
-        "setup": {
-          "MyRuntime.dll": "deli:assembly"
-        },
-        "runtime": {
-          "MyActualRuntime.dll": "deli:assembly"
-        }
+        "patcher": [
+          {
+            "path": "MyPatcher.dll",
+            "loader": "deli:assembly"
+          }
+        ],
+        "setup": [
+          {
+            "path": "MySetup.dll",
+            "loader": "deli:assembly"
+          }
+        ],
+        "runtime": [
+          {
+            "path": "MyRuntime.dll",
+            "loader": "deli:assembly"
+          }
+        ]
       }
     }
   ],
@@ -144,53 +153,122 @@
       "description": "All the assets to load via Deli.",
       "examples": [
         {
-          "patcher": {
-            "MyPatcher.dll": "deli:assembly"
-          },
-          "setup": {
-            "MyRuntime.dll": "deli:assembly"
-          },
-          "runtime": {
-            "MyActualRuntime.dll": "deli:assembly"
-          }
+          "patcher": [
+            {
+              "path": "MyPatcher.dll",
+              "loader": "deli:assembly"
+            }
+          ],
+          "setup": [
+            {
+              "path": "MySetup.dll",
+              "loader": "deli:assembly"
+            }
+          ],
+          "runtime": [
+            {
+              "path": "MyRuntime.dll",
+              "loader": "deli:assembly"
+            }
+          ]
         }
       ],
       "properties": {
         "patcher": {
           "$id": "#/properties/assets/properties/patcher",
-          "type": "object",
+          "type": "array",
           "title": "Patcher Assets",
-          "description": "Assets to be loaded during the patcher stage, where each asset path is a key and the loader is the value.",
+          "description": "Assets to be loaded during the patcher stage.",
           "examples": [
-            {
-              "MyPatcher.dll": "deli:assembly"
-            }
+            [
+              {
+                "path": "MyPatcher.dll",
+                "loader": "deli:assembly"
+              }
+            ]
           ],
-          "additionalProperties": true
+          "additionalItems": true,
+          "items": {
+            "$id": "#/properties/assets/properties/patcher/items",
+            "anyOf": [
+              {
+                "$id": "#/properties/assets/properties/patcher/items/anyOf/0",
+                "type": "object",
+                "title": "A patcher asset",
+                "description": "A glob-enabled path to resources and a patcher-stage loader to load the resources with.",
+                "examples": [
+                  {
+                    "path": "MyPatcher.dll",
+                    "loader": "deli:assembly"
+                  }
+                ]
+              }
+            ]
+          }
         },
         "setup": {
           "$id": "#/properties/assets/properties/setup",
-          "type": "object",
+          "type": "array",
           "title": "Setup Assets",
-          "description": "Assets to be loaded during the setup stage, where each asset path is a key and the loader is the value.",
+          "description": "Assets to be loaded during the setup stage.",
           "examples": [
-            {
-              "MyRuntime.dll": "deli:assembly"
-            }
+            [
+              {
+                "path": "MySetup.dll",
+                "loader": "deli:assembly"
+              }
+            ]
           ],
-          "additionalProperties": true
+          "additionalItems": true,
+          "items": {
+            "$id": "#/properties/assets/properties/setup/items",
+            "anyOf": [
+              {
+                "$id": "#/properties/assets/properties/setup/items/anyOf/0",
+                "type": "object",
+                "title": "A setup asset",
+                "description": "A glob-enabled path to resources and setup-stage loader to load the resources with.",
+                "examples": [
+                  {
+                    "path": "MySetup.dll",
+                    "loader": "deli:assembly"
+                  }
+                ]
+              }
+            ]
+          }
         },
         "runtime": {
           "$id": "#/properties/assets/properties/runtime",
-          "type": "object",
+          "type": "array",
           "title": "Runtime Assets",
-          "description": "Assets to be loaded during the runtime stage, where each asset path is a key and the loader is the value.",
+          "description": "Assets to be loaded during the runtime stage.",
           "examples": [
-            {
-              "MyActualRuntime.dll": "deli:assembly"
-            }
+            [
+              {
+                "path": "MyRuntime.dll",
+                "loader": "deli:assembly"
+              }
+            ]
           ],
-          "additionalProperties": true
+          "additionalItems": true,
+          "items": {
+            "$id": "#/properties/assets/properties/runtime/items",
+            "anyOf": [
+              {
+                "$id": "#/properties/assets/properties/runtime/items/anyOf/0",
+                "type": "object",
+                "title": "A runtime asset",
+                "description": "A glob-enabled path to resources and runtime-stage loader to load the resources with. Resources are loaded in parallel.",
+                "examples": [
+                  {
+                    "path": "MyRuntime.dll",
+                    "loader": "deli:assembly"
+                  }
+                ]
+              }
+            ]
+          }
         }
       },
       "additionalProperties": true

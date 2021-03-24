@@ -61,7 +61,7 @@ namespace Deli.Runtime
 			Logger.LogInfo(Locale.LoadingAssets(mod));
 			foreach (var asset in assets)
 			{
-				var loader = GetLoader(mod, lookup, asset, out var loaderMod);
+				var loader = GetLoader(mod, asset, lookup, out var loaderMod);
 
 				Exception? bufferThrow = null;
 
@@ -80,14 +80,14 @@ namespace Deli.Runtime
 							catch (Exception e)
 							{
 								// Not fatal; throwing in a coroutine only kills the coroutine. We'll still rethrow for the stacktrace, though.
-								Logger.LogFatal(Locale.LoaderException(asset.Value, loaderMod, mod, handle));
+								Logger.LogFatal(Locale.LoaderException(asset.Loader, loaderMod, mod, handle));
 								bufferThrow = e;
 								throw;
 							}
 
 							if (!next)
 							{
-								Logger.LogDebug($"{handle} >| {asset.Value}");
+								Logger.LogDebug($"{handle} >| {asset.Loader}");
 							}
 
 							return next;
