@@ -19,7 +19,6 @@
         "Person 2",
         "Group"
       ],
-      "icon_path": "icon.png",
       "source_url": "https://example.org",
       "assets": {
         "patcher": {
