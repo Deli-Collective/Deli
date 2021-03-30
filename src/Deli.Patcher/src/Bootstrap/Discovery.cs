@@ -16,9 +16,9 @@ namespace Deli.Bootstrap
 	{
 		private readonly ManualLogSource _logger;
 		private readonly DirectoryInfo _mods;
-		private readonly ImmediateReader<Mod.Manifest> _manifestReader;
+		private readonly Reader<Mod.Manifest> _manifestReader;
 
-		public Discovery(ManualLogSource logger, ImmediateReader<Mod.Manifest> manifestReader)
+		public Discovery(ManualLogSource logger, Reader<Mod.Manifest> manifestReader)
 		{
 			_logger = logger;
 			_manifestReader = manifestReader;

@@ -13,7 +13,7 @@ namespace Deli.Patcher
 {
 	internal static class Readers
 	{
-		public static ImmediateReaderCollection DefaultCollection(ManualLogSource logger) => new(logger)
+		public static ReaderCollection DefaultCollection(ManualLogSource logger) => new(logger)
 		{
 			BytesOf,
 			AssemblyOf,

@@ -5,11 +5,11 @@ using BepInEx.Logging;
 namespace Deli.Immediate
 {
 	/// <summary>
-	///		A collection of <see cref="ImmediateReader{T}"/>s that can be added to and retrieved
+	///		A collection of <see cref="Reader{TOut}"/>s that can be added to and retrieved
 	/// </summary>
-	public class ImmediateReaderCollection : ServiceCollection
+	public class ReaderCollection : ServiceCollection
 	{
-		internal ImmediateReaderCollection(ManualLogSource logger) : base(logger)
+		internal ReaderCollection(ManualLogSource logger) : base(logger)
 		{
 		}
 
@@ -18,7 +18,7 @@ namespace Deli.Immediate
 		/// </summary>
 		/// <param name="reader">The reader to add</param>
 		/// <typeparam name="T">The type the reader is responsible for</typeparam>
-		public void Add<T>(ImmediateReader<T> reader) where T : notnull
+		public void Add<T>(Reader<T> reader) where T : notnull
 		{
 			Add(typeof(T), reader);
 		}
@@ -28,9 +28,9 @@ namespace Deli.Immediate
 		/// </summary>
 		/// <typeparam name="T">The type to get the reader for</typeparam>
 		/// <exception cref="KeyNotFoundException">Reader was not present</exception>
-		public ImmediateReader<T> Get<T>() where T : notnull
+		public Reader<T> Get<T>() where T : notnull
 		{
-			return (ImmediateReader<T>) Get(typeof(T));
+			return (Reader<T>) Get(typeof(T));
 		}
 
 		/// <summary>
@@ -38,11 +38,11 @@ namespace Deli.Immediate
 		/// </summary>
 		/// <param name="reader">The reader, if it was found</param>
 		/// <typeparam name="T">The type to get the reader for</typeparam>
-		public bool TryGet<T>([MaybeNullWhen(false)] out ImmediateReader<T> reader) where T : notnull
+		public bool TryGet<T>([MaybeNullWhen(false)] out Reader<T> reader) where T : notnull
 		{
 			if (TryGet(typeof(T), out var obj))
 			{
-				reader = (ImmediateReader<T>) obj;
+				reader = (Reader<T>) obj;
 				return true;
 			}
 

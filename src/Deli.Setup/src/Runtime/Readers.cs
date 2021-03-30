@@ -1,5 +1,6 @@
 using System.IO;
 using BepInEx.Logging;
+using Deli.Immediate;
 using Deli.Runtime.Yielding;
 using Deli.VFS;
 using Deli.VFS.Disk;
@@ -9,12 +10,12 @@ namespace Deli.Runtime
 {
 	internal static class Readers
 	{
-		public static DelayedReaderCollection DefaultCollection(ManualLogSource logger) => new(logger)
+		public static void AddBuiltins(ReaderCollection readers)
 		{
-			BytesOf,
-			AssetBundleOf,
-			Texture2DOf
-		};
+			readers.Add(BytesOf);
+			readers.Add(AssetBundleOf);
+			readers.Add(Texture2DOf);
+		}
 
 		private static ResultYieldInstruction<byte[]> BytesOf(IFileHandle file)
 		{

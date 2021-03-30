@@ -8,7 +8,7 @@ namespace Deli.Immediate
 	///		An element of the loading sequence which uses immediate loaders. This class is not intended to be inherited outside the framework, so please don't.
 	/// </summary>
 	/// <typeparam name="TStage">A recursive generic to facilitate strongly typed stage parameters</typeparam>
-	public abstract class ImmediateStage<TStage> : Stage<ImmediateAssetLoader<TStage>> where TStage : ImmediateStage<TStage>
+	public abstract class ImmediateStage<TStage> : Stage<AssetLoader<TStage, Empty>> where TStage : ImmediateStage<TStage>
 	{
 #pragma warning disable CS1591
 
@@ -48,10 +48,12 @@ namespace Deli.Immediate
 
 		protected abstract Mod.Asset[]? GetAssets(Mod.AssetTable table);
 
-		protected void AssemblyLoader(Stage stage, Mod mod, IHandle handle)
+		protected Empty AssemblyLoader(Stage stage, Mod mod, IHandle handle)
 		{
-			var assembly = ImmediateReaders.Get<Assembly>()(AssemblyPreloader(handle));
+			var assembly = Readers.Get<Assembly>()(AssemblyPreloader(handle));
 			AssemblyLoader(stage, mod, assembly);
+
+			return new();
 		}
 
 		protected IEnumerable<Mod> Run(IEnumerable<Mod> mods)

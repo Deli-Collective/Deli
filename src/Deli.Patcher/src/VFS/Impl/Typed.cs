@@ -6,9 +6,8 @@ namespace Deli.VFS
 	/// <summary>
 	///		A file handle which supports deserialization to a generic type
 	/// </summary>
-	/// <typeparam name="TReader">The reader to deserialize the raw file to <typeparamref name="TOut"/></typeparam>
 	/// <typeparam name="TOut">The type to deserialize to</typeparam>
-	public abstract class TypedFileHandle<TReader, TOut> : IFileHandle, IDisposable
+	public class TypedFileHandle<TOut> : IFileHandle, IDisposable where TOut : notnull
 	{
 		private readonly IFileHandle _handle;
 
@@ -17,7 +16,7 @@ namespace Deli.VFS
 		/// <summary>
 		///		The reader responsible for deserializing the underlying file
 		/// </summary>
-		protected TReader Reader { get; }
+		protected Reader<TOut> Reader { get; }
 
 		/// <inheritdoc cref="IHandle.IsAlive"/>
 		public bool IsAlive { get; private set; }
@@ -38,11 +37,11 @@ namespace Deli.VFS
 		public event Action? Deleted;
 
 		/// <summary>
-		///		Creates an instance of <see cref="TypedFileHandle{TReader,TOut}"/>
+		///		Creates an instance of <see cref="TypedFileHandle{TOut}"/>
 		/// </summary>
 		/// <param name="handle">The raw handle to deserialize</param>
 		/// <param name="reader">The reader responsible for deserialization</param>
-		public TypedFileHandle(IFileHandle handle, TReader reader)
+		public TypedFileHandle(IFileHandle handle, Reader<TOut> reader)
 		{
 			_handle = handle;
 
@@ -67,11 +66,6 @@ namespace Deli.VFS
 			Dispose();
 		}
 
-		/// <summary>
-		///		Deserializes this file to <typeparamref name="TOut"/>
-		/// </summary>
-		protected abstract TOut Read();
-
 		/// <inheritdoc cref="IFileHandle.OpenRead"/>
 		public Stream OpenRead()
 		{
@@ -87,7 +81,7 @@ namespace Deli.VFS
 		{
 			this.ThrowIfDead();
 
-			return _cached ??= Read();
+			return _cached ??= Reader(_handle);
 		}
 
 		/// <inheritdoc cref="IDisposable.Dispose"/>

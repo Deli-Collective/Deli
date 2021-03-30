@@ -19,7 +19,7 @@ namespace Deli
 	{
 		private readonly Blob _data;
 
-		private ImmediateReaderCollection JsonReaders => _data.JsonReaders;
+		private ReaderCollection JsonReaders => _data.JsonReaders;
 
 #pragma warning disable CS1591
 
@@ -38,14 +38,14 @@ namespace Deli
 #pragma warning restore CS1591
 
 		/// <summary>
-		///		The collection of all the <see cref="ImmediateAssetLoader{TStage}"/>s registered.
+		///		The collection of all the <see cref="AssetLoader{TStage, TOut}"/>s registered.
 		/// </summary>
-		public AssetLoaderCollection<ImmediateAssetLoader<Stage>> SharedAssetLoaders => _data.SharedAssetLoaders;
+		public AssetLoaderCollection<AssetLoader<Stage, Empty>> SharedAssetLoaders => _data.SharedAssetLoaders;
 
 		/// <summary>
-		///		The collection of all the <see cref="ImmediateReader{T}"/>s publicly available.
+		///		The collection of all the <see cref="Reader{TOut}"/>s publicly available.
 		/// </summary>
-		public ImmediateReaderCollection ImmediateReaders => _data.ImmediateReaders;
+		public ReaderCollection Readers => _data.Readers;
 
 #pragma warning disable CS1591
 
@@ -80,7 +80,7 @@ namespace Deli
 
 		protected Mod.Manifest ModManifestOf(IFileHandle file)
 		{
-			var obj = ImmediateReaders.Get<JObject>()(file);
+			var obj = Readers.Get<JObject>()(file);
 
 			// Do early version checking before deserializing the whole object.
 			const string propertyName = "require";
@@ -107,7 +107,7 @@ namespace Deli
 
 		protected T JsonOf<T>(IFileHandle file)
 		{
-			var token = ImmediateReaders.Get<JToken>()(file);
+			var token = Readers.Get<JToken>()(file);
 
 			return token.ToObject<T>(Serializer) ?? throw new FormatException("JSON object was null.");
 		}
@@ -204,10 +204,10 @@ namespace Deli
 #pragma warning restore CS1591
 
 		/// <summary>
-		///		Creates and adds a JSON <see cref="ImmediateReader{T}"/> for the type provided.
+		///		Creates and adds a JSON <see cref="Reader{TOut}"/> for the type provided.
 		/// </summary>
 		/// <typeparam name="T">The JSON model.</typeparam>
-		public ImmediateReader<T> RegisterJson<T>() where T : notnull
+		public Reader<T> RegisterJson<T>() where T : notnull
 		{
 			if (JsonReaders.TryGet<T>(out var reader))
 			{
@@ -216,7 +216,7 @@ namespace Deli
 
 			reader = JsonOf<T>;
 			JsonReaders.Add(reader);
-			ImmediateReaders.Add(reader);
+			Readers.Add(reader);
 
 			return reader;
 		}
@@ -227,20 +227,20 @@ namespace Deli
 		public readonly struct Blob
 		{
 			internal Mod Mod { get; }
-			internal ImmediateReaderCollection JsonReaders { get; }
+			internal ReaderCollection JsonReaders { get; }
 			internal JsonSerializer Serializer { get; }
-			internal AssetLoaderCollection<ImmediateAssetLoader<Stage>> SharedAssetLoaders { get; }
-			internal ImmediateReaderCollection ImmediateReaders { get; }
+			internal AssetLoaderCollection<AssetLoader<Stage, Empty>> SharedAssetLoaders { get; }
+			internal ReaderCollection Readers { get; }
 			internal Dictionary<Mod, List<DeliModule>> ModModules { get; }
 
-			internal Blob(Mod mod, ImmediateReaderCollection jsonReaders, JsonSerializer serializer, AssetLoaderCollection<ImmediateAssetLoader<Stage>> sharedAssetLoaders,
-				ImmediateReaderCollection immediateReaders, Dictionary<Mod, List<DeliModule>> modModules)
+			internal Blob(Mod mod, ReaderCollection jsonReaders, JsonSerializer serializer, AssetLoaderCollection<AssetLoader<Stage, Empty>> sharedAssetLoaders,
+				ReaderCollection readers, Dictionary<Mod, List<DeliModule>> modModules)
 			{
 				Mod = mod;
 				JsonReaders = jsonReaders;
 				Serializer = serializer;
 				SharedAssetLoaders = sharedAssetLoaders;
-				ImmediateReaders = immediateReaders;
+				Readers = readers;
 				ModModules = modModules;
 			}
 		}

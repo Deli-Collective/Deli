@@ -121,7 +121,7 @@ namespace Deli.Patcher
 			}
 		}
 
-		public void MonoModAssetLoader(PatcherStage stage, Mod mod, IHandle handle)
+		public Empty MonoModAssetLoader(PatcherStage stage, Mod mod, IHandle handle)
 		{
 			if (handle is not IFileHandle file)
 			{
@@ -138,20 +138,24 @@ namespace Deli.Patcher
 
 			var target = name.Substring(0, name.Length - mmDll.Length) + ".dll";
 			this[stage, target].Mods.Add(file);
+
+			return new();
 		}
 
-		public void MonoModHookGenAssetLoader(PatcherStage stage, Mod mod, IHandle handle)
+		public Empty MonoModHookGenAssetLoader(PatcherStage stage, Mod mod, IHandle handle)
 		{
 			if (handle is not IFileHandle file)
 			{
 				throw new ArgumentException("The MonoMod.HookGen loader must be provided a file.", nameof(handle));
 			}
 
-			var reader = stage.ImmediateReaders.Get<IEnumerable<string>>();
+			var reader = stage.Readers.Get<IEnumerable<string>>();
 			foreach (var target in reader(file))
 			{
 				this[stage, target].HookDestination ??= new MemoryStream();
 			}
+
+			return new();
 		}
 
 		private class Patcher

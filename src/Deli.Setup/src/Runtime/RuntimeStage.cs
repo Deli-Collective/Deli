@@ -18,27 +18,20 @@ namespace Deli.Runtime
 	/// <summary>
 	///		The stage of the loading sequence which runs over several frames
 	/// </summary>
-	public class RuntimeStage : Stage<DelayedAssetLoader>
+	public class RuntimeStage : Stage<AssetLoader<RuntimeStage, IEnumerator>>
 	{
 		private readonly Dictionary<Mod, List<DeliBehaviour>> _modBehaviours;
-		private readonly Dictionary<Type, object> _wrapperReaders = new();
 
 #pragma warning disable CS1591
 
 		protected override string Name { get; } = "runtime";
 
-#pragma warning restoreCS1591
+#pragma warning restore CS1591
 
 		/// <summary>
 		///		Asset loaders specific to this stage
 		/// </summary>
-		public AssetLoaderCollection<DelayedAssetLoader> RuntimeAssetLoaders { get; } = new();
-
-		/// <summary>
-		///		The collection of all the <see cref="DelayedReader{T}"/>s publicly available. This does not include wrappers for <see cref="ImmediateReader{T}"/>.
-		///		For getting readers including <see cref="ImmediateReader{T}"/> wrappers, use <seealso cref="GetReader{T}"/>.
-		/// </summary>
-		public DelayedReaderCollection DelayedReaders { get; }
+		public AssetLoaderCollection<AssetLoader<RuntimeStage, IEnumerator>> RuntimeAssetLoaders { get; } = new();
 
 		/// <summary>
 		///		The collection of all version checkers for all supported domains
@@ -49,7 +42,7 @@ namespace Deli.Runtime
 		{
 			_modBehaviours = modBehaviours;
 
-			DelayedReaders = Readers.DefaultCollection(Logger);
+			Runtime.Readers.AddBuiltins(Readers);
 			VersionCheckers = Runtime.VersionCheckers.DefaultCollection();
 		}
 
@@ -263,7 +256,7 @@ namespace Deli.Runtime
 
 #pragma warning disable CS1591
 
-		protected override DelayedAssetLoader? GetLoader(Mod mod, string name)
+		protected override AssetLoader<RuntimeStage, IEnumerator>? GetLoader(Mod mod, string name)
 		{
 			if (RuntimeAssetLoaders.TryGet(mod, name, out var delayed))
 			{
@@ -285,31 +278,6 @@ namespace Deli.Runtime
 		}
 
 #pragma warning restore CS1591
-
-		/// <summary>
-		///		Gets a reader from <seealso cref="DelayedReaders"/>, otherwise gets a reader from <see cref="Stage.ImmediateReaders"/> and wraps it.
-		/// </summary>
-		/// <typeparam name="T">The type to deserialize.</typeparam>
-		public DelayedReader<T> GetReader<T>() where T : notnull
-		{
-			var type = typeof(T);
-			if (DelayedReaders.TryGet<T>(out var reader))
-			{
-				_wrapperReaders.Remove(type);
-				return reader;
-			}
-
-			if (_wrapperReaders.TryGetValue(type, out var obj))
-			{
-				return (DelayedReader<T>) obj;
-			}
-
-			var immediate = ImmediateReaders.Get<T>();
-			DelayedReader<T> wrapper = handle => new DummyYieldInstruction<T>(immediate(handle));
-			_wrapperReaders.Add(typeof(T), wrapper);
-
-			return wrapper;
-		}
 
 		internal IEnumerator Run(IEnumerable<Mod> mods, CoroutineRunner runner, CoroutineStopper stopper)
 		{

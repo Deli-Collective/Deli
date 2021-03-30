@@ -24,7 +24,7 @@ namespace Deli.Setup
 		/// <summary>
 		///		Asset loaders specific to this stage
 		/// </summary>
-		public AssetLoaderCollection<ImmediateAssetLoader<SetupStage>> SetupAssetLoaders { get; } = new();
+		public AssetLoaderCollection<AssetLoader<SetupStage, Empty>> SetupAssetLoaders { get; } = new();
 
 		internal SetupStage(Blob data, GameObject manager, Dictionary<Mod, List<DeliBehaviour>> modBehaviours) : base(data)
 		{
@@ -89,7 +89,7 @@ namespace Deli.Setup
 			}
 		}
 
-		protected override ImmediateAssetLoader<SetupStage>? GetLoader(Mod mod, string name)
+		protected override AssetLoader<SetupStage, Empty>? GetLoader(Mod mod, string name)
 		{
 			if (SetupAssetLoaders.TryGet(mod, name, out var setup))
 			{

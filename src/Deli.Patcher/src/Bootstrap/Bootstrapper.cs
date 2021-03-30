@@ -25,7 +25,7 @@ namespace Deli.Bootstrap
 			{
 				Stage.Blob Init()
 				{
-					var jsonReaders = new ImmediateReaderCollection(Logger);
+					var jsonReaders = new ReaderCollection(Logger);
 					var serializer = JsonSerializer.Create(new JsonSerializerSettings
 					{
 						Formatting = Formatting.Indented,
@@ -40,7 +40,7 @@ namespace Deli.Bootstrap
 							new SemVersionJsonConverter()
 						}
 					});
-					var sharedLoaders = new AssetLoaderCollection<ImmediateAssetLoader<Stage>>();
+					var sharedLoaders = new AssetLoaderCollection<AssetLoader<Stage, Empty>>();
 					var immediateReaders = Readers.DefaultCollection(Logger);
 					var modModules = new Dictionary<Mod, List<DeliModule>>();
 
@@ -59,7 +59,7 @@ namespace Deli.Bootstrap
 			{
 				IEnumerable<Mod> Init()
 				{
-					var manifestReader = Stage.ImmediateReaders.Get<Mod.Manifest>();
+					var manifestReader = Stage.Readers.Get<Mod.Manifest>();
 					var discovery = new Discovery(Logger, manifestReader);
 					var sorter = new Sorter(Logger);
 

@@ -19,7 +19,7 @@ namespace Deli.Patcher
 		/// <summary>
 		///		Asset loaders specific to this stage
 		/// </summary>
-		public AssetLoaderCollection<ImmediateAssetLoader<PatcherStage>> PatcherAssetLoaders { get; } = new();
+		public AssetLoaderCollection<AssetLoader<PatcherStage, Empty>> PatcherAssetLoaders { get; } = new();
 
 		/// <summary>
 		///		Assembly patchers, which are executed after this stage, but before the setup stage
@@ -28,7 +28,7 @@ namespace Deli.Patcher
 
 		internal PatcherStage(Blob data) : base(data)
 		{
-			ImmediateReaders.Add(ModManifestOf);
+			Readers.Add(ModManifestOf);
 			PatcherAssetLoaders[Mod, Constants.Assets.AssemblyLoaderName] = AssemblyLoader;
 			ModModules.Add(Mod, new List<DeliModule>
 			{
@@ -38,7 +38,7 @@ namespace Deli.Patcher
 
 #pragma warning disable CS1591
 
-		protected override ImmediateAssetLoader<PatcherStage>? GetLoader(Mod mod, string name)
+		protected override AssetLoader<PatcherStage, Empty>? GetLoader(Mod mod, string name)
 		{
 			if (PatcherAssetLoaders.TryGet(mod, name, out var patcher))
 			{
