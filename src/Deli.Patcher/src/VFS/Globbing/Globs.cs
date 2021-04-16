@@ -103,7 +103,10 @@ namespace Deli.VFS.Globbing
 		public NameGlobber(string name, List<GlobberFactory.NameReplacementEntry> nameReplacements)
 		{
 			var builder = new StringBuilder();
+
+			builder.Append('^');
 			ApplyGlobs(name, 0, name.Length, builder, nameReplacements);
+			builder.Append('$');
 
 			_regex = new Regex(builder.ToString());
 		}
