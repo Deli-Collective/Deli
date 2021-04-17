@@ -7,3 +7,4 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 - Fix name globs matching handles with names that contain, but do not match, the glob [#28]
+- Fix `deli:monomod.hookgen` when non-Deli patches are present [#27]

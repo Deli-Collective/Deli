@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using Deli.VFS;
 using Mono.Cecil;
@@ -10,30 +12,57 @@ using MonoMod.RuntimeDetour.HookGen;
 
 namespace Deli.Patcher
 {
+	internal sealed class DeliAssemblyResolver : DefaultAssemblyResolver
+	{
+		private static IEnumerable<string> DepthFirstSearch(IEnumerable<string> directories)
+		{
+			foreach (var directory in directories)
+			{
+				yield return directory;
+
+				var subdirectories = Directory.GetDirectories(directory);
+				foreach (var subdirectory in DepthFirstSearch(subdirectories))
+				{
+					yield return subdirectory;
+				}
+			}
+		}
+
+		protected override AssemblyDefinition SearchDirectory(AssemblyNameReference name, IEnumerable<string> directories, ReaderParameters parameters)
+		{
+			return base.SearchDirectory(name, DepthFirstSearch(directories), parameters);
+		}
+	}
+
 	internal sealed class DeliMonoModder : MonoModder
 	{
-		private static readonly string[] SearchDirectories =
-		{
-			Paths.BepInExAssemblyDirectory,
-			Paths.PatcherPluginPath,
-			Paths.PluginPath,
-			Paths.ManagedPath
-		};
-
-		private static readonly DefaultAssemblyResolver Resolver;
+		private static readonly DeliAssemblyResolver Resolver;
 
 		static DeliMonoModder()
 		{
 			Resolver = new();
 
-			foreach (var d in SearchDirectories) Resolver.AddSearchDirectory(d);
+			static IEnumerable<string> SearchDirectories()
+			{
+				yield return Paths.BepInExAssemblyDirectory;
+				yield return Paths.PatcherPluginPath;
+				yield return Paths.PluginPath;
+				yield return Paths.ManagedPath;
+			}
+
+			foreach (var directory in SearchDirectories())
+			{
+				Resolver.AddSearchDirectory(directory);
+			}
 		}
 
 		private readonly ManualLogSource _logger;
+		private readonly bool _hookGenDebug;
 
-		public DeliMonoModder(ManualLogSource logger, ModuleDefinition module)
+		public DeliMonoModder(ManualLogSource logger, ModuleDefinition module, bool hookGenDebug)
 		{
 			_logger = logger;
+			_hookGenDebug = hookGenDebug;
 			Module = module;
 			AssemblyResolver = Resolver;
 		}
@@ -45,64 +74,54 @@ namespace Deli.Patcher
 
 		public override void LogVerbose(string text)
 		{
-			_logger.LogDebug(text);
+			if (_hookGenDebug)
+			{
+				_logger.LogDebug(text);
+			}
 		}
 
 		public override void Dispose()
 		{
 			Module = null;
+			AssemblyResolver = null;
+
 			base.Dispose();
 		}
 	}
 
-	internal class MonoModAssetLoader
+	internal class AssetLoaders
 	{
 		private readonly Mod _mod;
-		private readonly Dictionary<string, List<IFileHandle>> _targetMods = new();
+		private readonly ConfigEntry<bool> _hookGenDebug;
+		private readonly Dictionary<string, Patcher> _patchers = new();
 
-		private ManualLogSource Logger => _mod.Logger;
+		public IEnumerable<KeyValuePair<string, MemoryStream>> Hooks => _patchers
+			.Select(x => new KeyValuePair<string, MemoryStream?>(x.Key, x.Value.HookDestination))
+			.Where(x => x.Value is not null)!;
 
-		public MonoModAssetLoader(Mod mod)
+		public AssetLoaders(Mod mod, ConfigEntry<bool> hookGenDebug)
 		{
 			_mod = mod;
+			_hookGenDebug = hookGenDebug;
 		}
 
-		private Patcher Patch(List<IFileHandle> files)
+		private Patcher this[PatcherStage stage, string assembly]
 		{
-			void Closure(ref AssemblyDefinition assembly)
+			get
 			{
-				var modBuffer = new Stream?[files.Count];
-
-				try
+				if (!_patchers.TryGetValue(assembly, out var patcher))
 				{
-					using var modder = new DeliMonoModder(Logger, assembly.MainModule);
+					patcher = new Patcher(_mod.Logger, _hookGenDebug);
+					_patchers.Add(assembly, patcher);
 
-					for (var i = 0; i < modBuffer.Length; ++i)
-					{
-						var file = files[i];
-						var mod = file.OpenRead();
-
-						modBuffer[i] = mod;
-						modder.ReadMod(mod);
-					}
-
-					modder.MapDependencies();
-					modder.PatchRefs();
-					modder.AutoPatch();
+					stage.Patchers[assembly, _mod] = patcher.Patch;
 				}
-				finally
-				{
-					foreach (var mod in modBuffer)
-					{
-						mod?.Dispose();
-					}
-				}
+
+				return patcher;
 			}
-
-			return Closure;
 		}
 
-		public void AssetLoader(PatcherStage stage, Mod mod, IHandle handle)
+		public void MonoModAssetLoader(PatcherStage stage, Mod mod, IHandle handle)
 		{
 			if (handle is not IFileHandle file)
 			{
@@ -113,59 +132,15 @@ namespace Deli.Patcher
 			var name = file.Name;
 			if (!name.EndsWith(mmDll))
 			{
-				throw new ArgumentException("The file must end with '" + mmDll + "'.", nameof(handle));
+				throw new ArgumentException("The file did not match the MonoMod format. It must start with the name of the " +
+				                            "assembly to patch, and must end with '" + mmDll + "'.", nameof(handle));
 			}
 
 			var target = name.Substring(0, name.Length - mmDll.Length) + ".dll";
-			if (!_targetMods.TryGetValue(target, out var mods))
-			{
-				_mod.Logger.LogDebug($"Prepping MonoMod patcher for '{target}'");
-
-				mods = new();
-				var patcher = Patch(mods);
-
-				_targetMods.Add(target, mods);
-				stage.Patchers.SetOrAdd(target, _mod, patcher);
-			}
-
-			mods.Add(file);
-		}
-	}
-
-	internal class MonoModHookGenAssetLoader
-	{
-		private readonly Mod _mod;
-		private readonly Dictionary<string, MemoryStream> _outputs = new();
-
-		public IEnumerable<KeyValuePair<string, MemoryStream>> Outputs => _outputs;
-
-		public MonoModHookGenAssetLoader(Mod mod)
-		{
-			_mod = mod;
+			this[stage, target].Mods.Add(file);
 		}
 
-		private Patcher Patch(Stream output)
-		{
-			void Closure(ref AssemblyDefinition assembly)
-			{
-				var module = assembly.MainModule;
-
-				using var modder = new DeliMonoModder(_mod.Logger, module);
-				modder.MapDependencies();
-
-				var generator = new HookGenerator(modder, "MMHOOK_" + module.Name)
-				{
-					HookPrivate = true
-				};
-				generator.Generate();
-
-				generator.OutputModule.Write(output);
-			}
-
-			return Closure;
-		}
-
-		public void AssetLoader(PatcherStage stage, Mod mod, IHandle handle)
+		public void MonoModHookGenAssetLoader(PatcherStage stage, Mod mod, IHandle handle)
 		{
 			if (handle is not IFileHandle file)
 			{
@@ -173,18 +148,70 @@ namespace Deli.Patcher
 			}
 
 			var reader = stage.ImmediateReaders.Get<IEnumerable<string>>();
-
 			foreach (var target in reader(file))
 			{
-				if (_outputs.ContainsKey(target)) continue;
+				this[stage, target].HookDestination ??= new MemoryStream();
+			}
+		}
 
-				_mod.Logger.LogDebug($"Prepping HookGen for '{target}'");
+		private class Patcher
+		{
+			private readonly ManualLogSource _logger;
+			private readonly ConfigEntry<bool> _hookGenDebug;
 
-				var output = new MemoryStream();
-				var patcher = Patch(output);
+			public List<IFileHandle> Mods { get; } = new();
+			public MemoryStream? HookDestination { get; set; }
 
-				_outputs.Add(target, output);
-				stage.Patchers.SetOrAdd(target, _mod, patcher);
+			public Patcher(ManualLogSource logger, ConfigEntry<bool> hookGenDebug)
+			{
+				_logger = logger;
+				_hookGenDebug = hookGenDebug;
+			}
+
+			public void Patch(ref AssemblyDefinition assembly)
+			{
+				var modBuffer = new Stream?[Mods.Count];
+
+				try
+				{
+					var module = assembly.MainModule;
+					using var modder = new DeliMonoModder(_logger, module, _hookGenDebug.Value);
+
+					for (var i = 0; i < modBuffer.Length; ++i)
+					{
+						var file = Mods[i];
+						var mod = file.OpenRead();
+
+						modBuffer[i] = mod;
+						modder.ReadMod(mod);
+					}
+
+					modder.MapDependencies();
+					if (modBuffer.Length > 0)
+					{
+						modder.PatchRefs();
+						modder.AutoPatch();
+					}
+
+					var hookDestination = HookDestination;
+					if (hookDestination is not null)
+					{
+						var generator = new HookGenerator(modder, "MMHOOK_" + module.Name)
+						{
+							HookPrivate = true
+						};
+
+						generator.Generate();
+						generator.OutputModule.Write(hookDestination);
+					}
+				}
+				finally
+				{
+					foreach (var mod in modBuffer)
+					{
+						mod?.Dispose();
+					}
+				}
 			}
 		}
 	}

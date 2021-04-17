@@ -6,13 +6,13 @@ namespace Deli.Patcher
 	{
 		private bool _setupRan;
 
-		private readonly MonoModAssetLoader _monoMod;
-		private readonly MonoModHookGenAssetLoader _monoModHookGen;
+		private readonly AssetLoaders _assetLoaders;
 
 		public Module(Mod source) : base(source)
 		{
-			_monoMod = new MonoModAssetLoader(Source);
-			_monoModHookGen = new MonoModHookGenAssetLoader(Source);
+			var hookGenDebug = Config.Bind("Patchers", "MonoModDebug", false, "Whether or not to enable debug logging for MonoMod.");
+
+			_assetLoaders = new AssetLoaders(Source, hookGenDebug);
 
 			Stages.Patcher += OnPatcher;
 			Stages.Other += OnOther;
@@ -20,15 +20,15 @@ namespace Deli.Patcher
 
 		private void OnPatcher(PatcherStage stage)
 		{
-			stage.PatcherAssetLoaders[Source, "monomod"] = _monoMod.AssetLoader;
-			stage.PatcherAssetLoaders[Source, "monomod.hookgen"] = _monoModHookGen.AssetLoader;
+			stage.PatcherAssetLoaders[Source, "monomod"] = _assetLoaders.MonoModAssetLoader;
+			stage.PatcherAssetLoaders[Source, "monomod.hookgen"] = _assetLoaders.MonoModHookGenAssetLoader;
 		}
 
 		private void OnOther(Stage stage)
 		{
 			if (_setupRan) return;
 
-			foreach (var generated in _monoModHookGen.Outputs)
+			foreach (var generated in _assetLoaders.Hooks)
 			{
 				Logger.LogDebug($"Loading HookGen'd result of '{generated.Key}'");
 
