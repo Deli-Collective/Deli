@@ -37,6 +37,11 @@ namespace Deli
 		public ManualLogSource Logger { get; }
 
 		/// <summary>
+		///		The state of this mod.
+		/// </summary>
+		public ModState State { get; }
+
+		/// <summary>
 		///		Creates an instance of <see cref="Mod"/>
 		/// </summary>
 		/// <param name="info"></param>
@@ -47,12 +52,32 @@ namespace Deli
 			Resources = resources;
 			Config = new ConfigFile(Constants.Filesystem.ConfigsDirectory + "/" + info.Guid + ".cfg", false);
 			Logger = BepInEx.Logging.Logger.CreateLogSource(info.Name ?? info.Guid);
+			State = new ModState();
 		}
 
 		/// <inheritdoc cref="object.ToString"/>
 		public override string ToString()
 		{
 			return Info.ToString();
+		}
+
+		/// <summary>
+		///	Defines a mod's state in the framework
+		/// </summary>
+		public class ModState
+		{
+			/// <summary>
+			///		True if this mod has been disabled before the loading phase
+			/// </summary>
+			public bool IsDisabled { get; internal set; }
+
+			/// <summary>
+			///		The errors this mod experienced, if any.
+			/// </summary>
+			public IEnumerable<Exception> Exceptions => ExceptionsInternal;
+
+			// Backing field for the above property
+			internal readonly List<Exception> ExceptionsInternal = new();
 		}
 
 		/// <summary>

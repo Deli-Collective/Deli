@@ -61,7 +61,7 @@ namespace Deli.Bootstrap
 				{
 					var manifestReader = Stage.ImmediateReaders.Get<Mod.Manifest>();
 					var discovery = new Discovery(Logger, manifestReader);
-					var sorter = new Sorter(Logger);
+					var sorter = new Sorter(this, Logger);
 
 					var mods = new[] { Mod }.Concat(discovery.Run());
 					mods = sorter.Run(mods);
