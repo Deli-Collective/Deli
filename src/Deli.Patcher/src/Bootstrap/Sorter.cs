@@ -40,6 +40,7 @@ namespace Deli.Bootstrap
 							_logger.LogError($"Mod {mod} depends on {dep.Key} @ {dep.Value}, but it is not installed");
 							mod.State.ExceptionsInternal.Add(new DeliUnsatisfiedDependencyException(mod, dep.Key, dep.Value));
 							mod.State.IsDisabled = true;
+							continue;
 						}
 
 						// Check if the installed version satisfies the dependency request
@@ -48,6 +49,7 @@ namespace Deli.Bootstrap
 							_logger.LogError($"Mod {mod} depends on {resolved.Info.Name ?? resolved.Info.Guid} @ {dep.Value}, but version {resolved.Info.Version} is installed");
 							mod.State.ExceptionsInternal.Add(new DeliUnsatisfiedDependencyException(mod, resolved.Info, dep.Value));
 							mod.State.IsDisabled = true;
+							continue;
 						}
 
 						// Check if the dependency is already disabled
@@ -55,6 +57,7 @@ namespace Deli.Bootstrap
 						{
 							_logger.LogWarning($"Mod {mod} will not be loaded because it's dependency {resolved.Info.Name ?? resolved.Info.Guid} was not loaded.");
 							mod.State.IsDisabled = true;
+							continue;
 						}
 					}
 				}
@@ -100,7 +103,9 @@ namespace Deli.Bootstrap
 		{
 			var lookup = CreateLookup(mods);
 			_logger.LogInfo($"Found {lookup.Count} mods to load");
-			return CheckDependencies(lookup, lookup.Values.TSort(m => m.Info.Dependencies?.Keys.Select(dep => lookup[dep]) ?? Enumerable.Empty<Mod>()));
+			return CheckDependencies(lookup, lookup.Values.TSort(m => m.Info.Dependencies?.Keys
+				.Where(dep => lookup.ContainsKey(dep))
+				.Select(dep => lookup[dep]) ?? Enumerable.Empty<Mod>()));
 		}
 	}
 }
