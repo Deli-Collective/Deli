@@ -24,11 +24,13 @@ namespace Deli.VFS.Zip
 		/// <inheritdoc cref="IChildHandle.Name"/>
 		public string Name { get; }
 
+		#pragma warning disable CS0067
 		/// <inheritdoc cref="IHandle.Updated"/>
 		public event Action? Updated;
 
 		/// <inheritdoc cref="IHandle.Deleted"/>
 		public event Action? Deleted;
+		#pragma warning restore CS0067
 
 		internal FileHandle(ZipEntry entry, string name, DirectoryHandle directory)
 		{

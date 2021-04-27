@@ -27,7 +27,7 @@ namespace Deli.Runtime
 
 		protected override string Name { get; } = "runtime";
 
-#pragma warning restoreCS1591
+#pragma warning restore CS1591
 
 		/// <summary>
 		///		Asset loaders specific to this stage

@@ -18,11 +18,13 @@ namespace Deli.VFS.Zip
 		/// <inheritdoc cref="IHandle.Path"/>
 		public string Path { get; }
 
+		#pragma warning disable CS0067
 		/// <inheritdoc cref="IHandle.Updated"/>
 		public event Action? Updated;
 
 		/// <inheritdoc cref="IHandle.Deleted"/>
 		public event Action? Deleted;
+		#pragma warning restore CS0067
 
 		internal DirectoryHandle(Dictionary<string, IChildHandle> children, string path)
 		{

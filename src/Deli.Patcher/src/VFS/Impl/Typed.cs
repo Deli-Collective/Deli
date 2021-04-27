@@ -31,11 +31,13 @@ namespace Deli.VFS
 		/// <inheritdoc cref="IChildHandle.Name"/>
 		public string Name => _handle.Name;
 
+		#pragma warning disable CS0067
 		/// <inheritdoc cref="IHandle.Updated"/>
 		public event Action? Updated;
 
 		/// <inheritdoc cref="IHandle.Deleted"/>
 		public event Action? Deleted;
+		#pragma warning restore CS0067
 
 		/// <summary>
 		///		Creates an instance of <see cref="TypedFileHandle{TReader,TOut}"/>
