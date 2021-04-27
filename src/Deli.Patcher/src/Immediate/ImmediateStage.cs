@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using Deli.Patcher.Exceptions;
 using Deli.VFS;
 
 namespace Deli.Immediate
@@ -58,15 +61,33 @@ namespace Deli.Immediate
 		{
 			PreRun();
 
-			var lookup = new Dictionary<string, Mod>();
-			foreach (var mod in mods)
+			var lookup = mods.ToDictionary(mod => mod.Info.Guid);
+			foreach (var mod in lookup.Values)
 			{
-				lookup.Add(mod.Info.Guid, mod);
+				if (AreDependenciesAlive(mod, lookup))
+				{
+					try
+					{
+						RunModules(mod);
+						LoadMod(mod, lookup);
+					}
+					catch (Exception e)
+					{
+						// If a module failed here, log the error and disable the mod.
+						Logger.LogError(e);
+						mod.State.IsDisabled = true;
+						mod.State.ExceptionsInternal.Add(e);
+					}
 
-				RunModules(mod);
-				LoadMod(mod, lookup);
-
-				yield return mod;
+					// Apparently .NET doesn't let you put yield returns inside a try/catch block. Boo.
+					if (!mod.State.IsDisabled) yield return mod;
+				}
+				else
+				{
+					// If the mod's dependencies are not all alive, disable it and give a warning
+					mod.State.IsDisabled = true;
+					Logger.LogWarning($"Mod {mod} has been disabled because one of it's dependencies is no longer alive.");
+				}
 			}
 
 			PostRun();

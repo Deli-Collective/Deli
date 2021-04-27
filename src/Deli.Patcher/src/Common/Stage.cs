@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using BepInEx.Logging;
 using Deli.Immediate;
@@ -299,6 +300,13 @@ namespace Deli
 			return loader;
 		}
 
+		protected bool AreDependenciesAlive(Mod mod, Dictionary<string, Mod> lookup)
+		{
+			// Check if any of this mod's dependencies are dead, or just return true if it doesn't have any.
+			return !mod.Info.Dependencies?.Keys
+				.Select(x => lookup[x])
+				.Any(x => x.State.IsDisabled) ?? true;
+		}
 #pragma warning restore CS1591
 	}
 }
