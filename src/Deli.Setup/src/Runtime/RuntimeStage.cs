@@ -80,7 +80,7 @@ namespace Deli.Runtime
 							catch (Exception e)
 							{
 								// Not fatal; throwing in a coroutine only kills the coroutine. We'll still rethrow for the stacktrace, though.
-								Logger.LogFatal(Locale.LoaderException(asset.Value, loaderMod, mod, handle));
+								Logger.LogError(Locale.LoaderException(asset.Value, loaderMod, mod, handle));
 								bufferThrow = e;
 								throw;
 							}

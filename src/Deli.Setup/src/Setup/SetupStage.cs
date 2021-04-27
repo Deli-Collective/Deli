@@ -53,7 +53,7 @@ namespace Deli.Setup
 			}
 			catch
 			{
-				Logger.LogFatal(Locale.PluginCtorException(mod, pluginType));
+				Logger.LogError(Locale.PluginCtorException(mod, pluginType));
 
 				throw;
 			}
@@ -82,7 +82,7 @@ namespace Deli.Setup
 			}
 			catch
 			{
-				Logger.LogFatal(Locale.PluginStageException(mod, pluginType));
+				Logger.LogError(Locale.PluginStageException(mod, pluginType));
 				Object.Destroy(behaviour);
 
 				throw;

@@ -135,7 +135,7 @@ namespace Deli
 			}
 			catch
 			{
-				Logger.LogFatal(Locale.PluginCtorException(mod, pluginType));
+				Logger.LogError(Locale.PluginCtorException(mod, pluginType));
 
 				throw;
 			}
@@ -153,7 +153,7 @@ namespace Deli
 			}
 			catch
 			{
-				Logger.LogFatal(Locale.PluginStageException(mod, pluginType));
+				Logger.LogError(Locale.PluginStageException(mod, pluginType));
 				modules.Remove(module);
 
 				throw;
@@ -181,7 +181,7 @@ namespace Deli
 				}
 				catch
 				{
-					Logger.LogFatal(Locale.PluginStageException(mod, pluginType));
+					Logger.LogError(Locale.PluginStageException(mod, pluginType));
 					throw;
 				}
 			}

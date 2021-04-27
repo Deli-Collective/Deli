@@ -42,7 +42,7 @@ namespace Deli.Immediate
 					}
 					catch
 					{
-						Logger.LogFatal(Locale.LoaderException(asset.Value, loaderMod, mod, handle));
+						Logger.LogError(Locale.LoaderException(asset.Value, loaderMod, mod, handle));
 						throw;
 					}
 				}
