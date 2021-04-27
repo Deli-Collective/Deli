@@ -31,5 +31,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Deli.Newtonsoft.Json\Src\Newtonsoft.Json\Newtonsoft.Json.csproj" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Deli.Setup</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>

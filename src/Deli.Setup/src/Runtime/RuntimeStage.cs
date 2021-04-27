@@ -244,15 +244,32 @@ namespace Deli.Runtime
 
 		private IEnumerator RunCore(IEnumerable<Mod> mods, CoroutineRunner runner, CoroutineStopper stopper)
 		{
-			var lookup = new Dictionary<string, Mod>();
-			foreach (var mod in mods)
+			var lookup = mods.ToDictionary(x => x.Info.Guid);
+			foreach (var mod in lookup.Values)
 			{
-				lookup.Add(mod.Info.Guid, mod);
+				if (AreDependenciesAlive(mod, lookup))
+				{
+					try
+					{
+						RunModules(mod);
+						RunBehaviours(mod);
+					}
+					catch (Exception e)
+					{
+						// If a module failed here, log the error and disable the mod.
+						Logger.LogError(e);
+						mod.State.IsDisabled = true;
+						mod.State.ExceptionsInternal.Add(e);
+					}
 
-				RunModules(mod);
-				RunBehaviours(mod);
-
-				yield return LoadMod(mod, lookup, runner, stopper);
+					if (!mod.State.IsDisabled) yield return LoadMod(mod, lookup, runner, stopper);
+				}
+				else
+				{
+					// If the mod's dependencies are not all alive, disable it and give a warning
+					mod.State.IsDisabled = true;
+					Logger.LogWarning($"Mod {mod} has been disabled because one of it's dependencies is no longer alive.");
+				}
 			}
 		}
 
