@@ -20,9 +20,7 @@ namespace Deli.Bootstrap
 		{
 			foreach (var mod in sorted)
 			{
-				var deps = mod.Info.Dependencies;
-				if (deps is null) continue;
-
+				// Check the required Deli version
 				if (mod.Info.Require > Constants.Metadata.Version)
 				{
 					_logger.LogError($"Mod {mod} requires Deli {mod.Info.Require} or greater, please update Deli to use this mod!");
@@ -30,29 +28,34 @@ namespace Deli.Bootstrap
 					mod.State.IsDisabled = true;
 				}
 
-				foreach (var dep in deps)
+				// Check dependencies
+				var deps = mod.Info.Dependencies;
+				if (deps is not null)
 				{
-					// Try finding the installed dependency
-					if (!lookup.TryGetValue(dep.Key, out var resolved))
+					foreach (var dep in deps)
 					{
-						_logger.LogError($"Mod {mod} depends on {dep.Key} @ {dep.Value}, but it is not installed");
-						mod.State.ExceptionsInternal.Add(new DeliUnsatisfiedDependencyException(mod, dep.Key, dep.Value));
-						mod.State.IsDisabled = true;
-					}
+						// Try finding the installed dependency
+						if (!lookup.TryGetValue(dep.Key, out var resolved))
+						{
+							_logger.LogError($"Mod {mod} depends on {dep.Key} @ {dep.Value}, but it is not installed");
+							mod.State.ExceptionsInternal.Add(new DeliUnsatisfiedDependencyException(mod, dep.Key, dep.Value));
+							mod.State.IsDisabled = true;
+						}
 
-					// Check if the installed version satisfies the dependency request
-					if (resolved.Info.Version.CompareByPrecedence(dep.Value) == -1)
-					{
-						_logger.LogError($"Mod {mod} depends on {resolved.Info.Name ?? resolved.Info.Guid} @ {dep.Value}, but version {resolved.Info.Version} is installed");
-						mod.State.ExceptionsInternal.Add(new DeliUnsatisfiedDependencyException(mod, resolved.Info, dep.Value));
-						mod.State.IsDisabled = true;
-					}
+						// Check if the installed version satisfies the dependency request
+						if (resolved.Info.Version.CompareByPrecedence(dep.Value) == -1)
+						{
+							_logger.LogError($"Mod {mod} depends on {resolved.Info.Name ?? resolved.Info.Guid} @ {dep.Value}, but version {resolved.Info.Version} is installed");
+							mod.State.ExceptionsInternal.Add(new DeliUnsatisfiedDependencyException(mod, resolved.Info, dep.Value));
+							mod.State.IsDisabled = true;
+						}
 
-					// Check if the dependency is already disabled
-					if (resolved.State.IsDisabled)
-					{
-						_logger.LogWarning($"Mod {mod} will not be loaded because it's dependency {resolved.Info.Name ?? resolved.Info.Guid} was not loaded.");
-						mod.State.IsDisabled = true;
+						// Check if the dependency is already disabled
+						if (resolved.State.IsDisabled)
+						{
+							_logger.LogWarning($"Mod {mod} will not be loaded because it's dependency {resolved.Info.Name ?? resolved.Info.Guid} was not loaded.");
+							mod.State.IsDisabled = true;
+						}
 					}
 				}
 
