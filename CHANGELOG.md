@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changes
+- Paths
+  - Configs are now saved to `BepInEx/configs/Deli/`
+  - The cache is now saved to `BepInEx/patchers/DeliTeam-Deli/cache/`
+  - Zip mods are now loaded from `BepInEx/plugins/*/**/`, e.g. `BepInEx/plugins/MyName-MyMod/MyMod.deli`
+  - Directory mods are now loaded from `BepInEx/plugins/*/*/**/`, e.g. `BepInEx/plugins/MyName-MyMod/DeliMod/manifest.json`
 
 ## [0.3.2]
 ### Fixed

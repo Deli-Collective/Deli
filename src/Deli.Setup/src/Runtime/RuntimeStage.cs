@@ -151,7 +151,7 @@ namespace Deli.Runtime
 		{
 			foreach (var cache in caches)
 			{
-				using var raw = new FileStream(Filesystem.CacheDirectory + "/" + cache.Key + ".json", FileMode.Create, FileAccess.Write, FileShare.None);
+				using var raw = new FileStream(Path.Combine(Filesystem.CacheDirectory, cache.Key + ".json"), FileMode.Create, FileAccess.Write, FileShare.None);
 				using var text = new StreamWriter(raw);
 				using var json = new JsonTextWriter(text);
 

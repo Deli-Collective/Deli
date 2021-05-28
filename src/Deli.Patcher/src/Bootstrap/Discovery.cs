@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using BepInEx;
 using BepInEx.Logging;
 using Deli.Immediate;
 using Deli.VFS;
@@ -15,14 +16,12 @@ namespace Deli.Bootstrap
 	internal class Discovery
 	{
 		private readonly ManualLogSource _logger;
-		private readonly DirectoryInfo _mods;
 		private readonly ImmediateReader<Mod.Manifest> _manifestReader;
 
 		public Discovery(ManualLogSource logger, ImmediateReader<Mod.Manifest> manifestReader)
 		{
 			_logger = logger;
 			_manifestReader = manifestReader;
-			_mods = Directory.CreateDirectory(Filesystem.ModsDirectory);
 		}
 
 		private Mod.Manifest CreateManifest(IDirectoryHandle resources)
@@ -57,35 +56,6 @@ namespace Deli.Bootstrap
 
 		private IEnumerable<Mod> DiscoverMods(DirectoryInfo dir)
 		{
-			var manifest = new FileInfo(Path.Combine(dir.FullName, Filesystem.ManifestName));
-			if (manifest.Exists)
-			{
-				if (dir.FullName == Path.GetFullPath(Filesystem.ModsDirectory))
-				{
-					_logger.LogWarning("Ignoring misplaced manifest in the root of the mods directory. This manifest was probably not placed here intentionally and should be removed.");
-				}
-				else
-				{
-					Mod mod;
-					try
-					{
-						var resources = new VDisk.RootDirectoryHandle(dir.FullName);
-						mod = CreateMod(resources);
-					}
-					catch (Exception e)
-					{
-						_logger.LogError($"Failed to create mod from directory mod at {dir}{Environment.NewLine}{e}");
-
-						// Don't continue, as this directory was intended to be a mod.
-						yield break;
-					}
-
-					ModDiscovered(mod, dir.FullName);
-					yield return mod;
-					yield break;
-				}
-			}
-
 			foreach (var file in dir.GetFiles("*.deli"))
 			{
 				Mod mod;
@@ -104,9 +74,34 @@ namespace Deli.Bootstrap
 				yield return mod;
 			}
 
-			foreach (var submod in dir.GetDirectories().SelectMany(DiscoverMods))
+			foreach (var subdir in dir.GetDirectories())
 			{
-				yield return submod;
+				var manifest = new FileInfo(Path.Combine(subdir.FullName, Filesystem.ManifestName));
+				if (!manifest.Exists)
+				{
+					foreach (var submod in DiscoverMods(subdir))
+					{
+						yield return submod;
+					}
+
+					continue;
+				}
+
+				Mod mod;
+				try
+				{
+					var resources = new VDisk.RootDirectoryHandle(subdir.FullName);
+					mod = CreateMod(resources);
+				}
+				catch (Exception e)
+				{
+					_logger.LogError($"Failed to create mod from directory mod at {subdir}{Environment.NewLine}{e}");
+
+					continue;
+				}
+
+				ModDiscovered(mod, subdir.FullName);
+				yield return mod;
 			}
 		}
 
@@ -117,7 +112,7 @@ namespace Deli.Bootstrap
 
 		public IEnumerable<Mod> Run()
 		{
-			return DiscoverMods(_mods);
+			return new DirectoryInfo(Paths.PluginPath).GetDirectories().SelectMany(DiscoverMods);
 		}
 	}
 }

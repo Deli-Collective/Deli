@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using Deli.VFS;
 using System.Runtime.Serialization;
+using BepInEx;
 using Deli.Bootstrap;
 using Deli.Newtonsoft.Json;
 using Semver;
@@ -43,9 +45,12 @@ namespace Deli
 		/// <param name="resources"></param>
 		public Mod(Manifest info, IDirectoryHandle resources)
 		{
+			var deliCfgPath = Path.Combine(Paths.ConfigPath, Constants.Metadata.Name);
+			Directory.CreateDirectory(deliCfgPath);
+
 			Info = info;
 			Resources = resources;
-			Config = new ConfigFile(Constants.Filesystem.ConfigsDirectory + "/" + info.Guid + ".cfg", false);
+			Config = new ConfigFile(Path.Combine(deliCfgPath, info.Guid + ".cfg"), false);
 			Logger = BepInEx.Logging.Logger.CreateLogSource(info.Name ?? info.Guid);
 		}
 

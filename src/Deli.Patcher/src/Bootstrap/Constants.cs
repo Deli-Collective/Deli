@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Reflection;
 using Semver;
 
 namespace Deli.Bootstrap
@@ -84,22 +87,13 @@ namespace Deli.Bootstrap
 			/// <summary>
 			///		The directory containing all Deli related content.
 			/// </summary>
-			public const string Directory = Metadata.Name;
+			public static string Directory { get; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
+			                                          ?? throw new IOException("Deli is installed in the root directory. Don't do that.");
 
 			/// <summary>
 			///		The directory containing cachable files of Deli. These can be deleted with insignificant repercussions.
 			/// </summary>
-			public const string CacheDirectory = Directory + "/cache";
-
-			/// <summary>
-			///		The directory containing config files of Deli mods.
-			/// </summary>
-			public const string ConfigsDirectory = Directory + "/configs";
-
-			/// <summary>
-			///		The directory containing Deli mods.
-			/// </summary>
-			public const string ModsDirectory = Directory + "/mods";
+			public static string CacheDirectory { get; } = Path.Combine(Directory, "cache");
 
 			/// <summary>
 			/// The name of the manifest file expected in mods.
