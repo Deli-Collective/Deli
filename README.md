@@ -1,3 +1,8 @@
+## LTS Notice
+No more features will be added to Deli. All future updates will be bugfixes for the current version of Deli. For continued feature updates,
+see the evolution of Deli: [Stratum](https://github.com/H3VR-Modding/Stratum).
+
+---
 # Deli
 ![latest version](https://img.shields.io/github/v/release/Deli-Collective/Deli?label=latest&style=flat-square)
 [![Discord](https://img.shields.io/discord/777351065950879744?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2&style=flat-square)](https://discord.gg/g8xeFyt42j)
