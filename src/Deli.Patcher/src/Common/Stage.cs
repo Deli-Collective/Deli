@@ -97,7 +97,9 @@ namespace Deli
 			}
 
 			var deli = Bootstrap.Constants.Metadata.Version;
-			if (!deli.Satisfies(require))
+			if (!deli.Satisfies(require) &&
+			    !(deli.Major == 0 && deli.Minor == 4 && require.Major == 0 && require.Minor == 3) // Allow 0.3.x mods to be use on 0.4.x
+			)
 			{
 				throw new FormatException($"This mod is incompatible with the current version of Deli (required: {require}; current: {deli})");
 			}

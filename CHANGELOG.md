@@ -8,6 +8,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 ### Added
 - LTS notice to `README.md`
+- Backwards compatibility with mods that require `0.3.x`
 ### Changes
 - Paths
   - Configs are now saved to `BepInEx/configs/Deli/`
