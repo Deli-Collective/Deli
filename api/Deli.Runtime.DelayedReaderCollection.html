@@ -1,0 +1,408 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class DelayedReaderCollection
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class DelayedReaderCollection
+   ">
+    <meta name="generator" content="docfx 2.56.7.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Deli.Runtime.DelayedReaderCollection">
+  
+  
+  <h1 id="Deli_Runtime_DelayedReaderCollection" data-uid="Deli.Runtime.DelayedReaderCollection" class="text-break">Class DelayedReaderCollection
+  </h1>
+  <div class="markdown level0 summary"><p>A collection of <a class="xref" href="Deli.Runtime.DelayedReader-1.html">DelayedReader&lt;T&gt;</a>s that can be added to and retrieved</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
+    <div class="level1"><a class="xref" href="Deli.ServiceCollection.html">ServiceCollection</a></div>
+    <div class="level2"><span class="xref">DelayedReaderCollection</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.ienumerable">IEnumerable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Deli.ServiceCollection.html#Deli_ServiceCollection_Add_System_Type_System_Object_">ServiceCollection.Add(Type, Object)</a>
+    </div>
+    <div>
+      <a class="xref" href="Deli.ServiceCollection.html#Deli_ServiceCollection_Get_System_Type_">ServiceCollection.Get(Type)</a>
+    </div>
+    <div>
+      <a class="xref" href="Deli.ServiceCollection.html#Deli_ServiceCollection_TryGet_System_Type_System_Object__">ServiceCollection.TryGet(Type, Object)</a>
+    </div>
+    <div>
+      <a class="xref" href="Deli.ServiceCollection.html#Deli_ServiceCollection_GetEnumerator">ServiceCollection.GetEnumerator()</a>
+    </div>
+    <div>
+      <a class="xref" href="Deli.ServiceCollection.html#Deli_ServiceCollection_System_Collections_IEnumerable_GetEnumerator">ServiceCollection.IEnumerable.GetEnumerator()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#System_Object_Equals_System_Object_">Object.Equals(Object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#System_Object_Equals_System_Object_System_Object_">Object.Equals(Object, Object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.gethashcode#System_Object_GetHashCode">Object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.gettype#System_Object_GetType">Object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.memberwiseclone#System_Object_MemberwiseClone">Object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.referenceequals#System_Object_ReferenceEquals_System_Object_System_Object_">Object.ReferenceEquals(Object, Object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.tostring#System_Object_ToString">Object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Deli.Runtime.html">Deli.Runtime</a></h6>
+  <h6><strong>Assembly</strong>: Deli.Setup.dll</h6>
+  <h5 id="Deli_Runtime_DelayedReaderCollection_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class DelayedReaderCollection : ServiceCollection, IEnumerable</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+  </h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/Deli-Collective/Deli/new/main/apiSpec/new?filename=Deli_Runtime_DelayedReaderCollection__ctor_ManualLogSource_.md&amp;value=---%0Auid%3A%20Deli.Runtime.DelayedReaderCollection.%23ctor(ManualLogSource)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/Deli-Collective/Deli/blob/main/src/Deli.Setup/src/Runtime/DelayedReaderCollection.cs/#L16">View Source</a>
+  </span>
+  <a id="Deli_Runtime_DelayedReaderCollection__ctor_" data-uid="Deli.Runtime.DelayedReaderCollection.#ctor*"></a>
+  <h4 id="Deli_Runtime_DelayedReaderCollection__ctor_ManualLogSource_" data-uid="Deli.Runtime.DelayedReaderCollection.#ctor(ManualLogSource)">DelayedReaderCollection(ManualLogSource)</h4>
+  <div class="markdown level1 summary"><p>Creates an instance of <a class="xref" href="Deli.Runtime.DelayedReaderCollection.html">DelayedReaderCollection</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DelayedReaderCollection(ManualLogSource logger)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">ManualLogSource</span></td>
+        <td><span class="parametername">logger</span></td>
+        <td><p>The logger to use, in case a warning needs to be displayed</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/Deli-Collective/Deli/new/main/apiSpec/new?filename=Deli_Runtime_DelayedReaderCollection_Add__1_Deli_Runtime_DelayedReader___0__.md&amp;value=---%0Auid%3A%20Deli.Runtime.DelayedReaderCollection.Add%60%601(Deli.Runtime.DelayedReader%7B%60%600%7D)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/Deli-Collective/Deli/blob/main/src/Deli.Setup/src/Runtime/DelayedReaderCollection.cs/#L25">View Source</a>
+  </span>
+  <a id="Deli_Runtime_DelayedReaderCollection_Add_" data-uid="Deli.Runtime.DelayedReaderCollection.Add*"></a>
+  <h4 id="Deli_Runtime_DelayedReaderCollection_Add__1_Deli_Runtime_DelayedReader___0__" data-uid="Deli.Runtime.DelayedReaderCollection.Add``1(Deli.Runtime.DelayedReader{``0})">Add&lt;T&gt;(DelayedReader&lt;T&gt;)</h4>
+  <div class="markdown level1 summary"><p>Adds a reader to the collection</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Add&lt;T&gt;(DelayedReader&lt;T&gt; reader)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Deli.Runtime.DelayedReader-1.html">DelayedReader</a>&lt;T&gt;</td>
+        <td><span class="parametername">reader</span></td>
+        <td><p>The reader to add</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td><p>The type the reader is responsible for</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/Deli-Collective/Deli/new/main/apiSpec/new?filename=Deli_Runtime_DelayedReaderCollection_Get__1.md&amp;value=---%0Auid%3A%20Deli.Runtime.DelayedReaderCollection.Get%60%601%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/Deli-Collective/Deli/blob/main/src/Deli.Setup/src/Runtime/DelayedReaderCollection.cs/#L35">View Source</a>
+  </span>
+  <a id="Deli_Runtime_DelayedReaderCollection_Get_" data-uid="Deli.Runtime.DelayedReaderCollection.Get*"></a>
+  <h4 id="Deli_Runtime_DelayedReaderCollection_Get__1" data-uid="Deli.Runtime.DelayedReaderCollection.Get``1">Get&lt;T&gt;()</h4>
+  <div class="markdown level1 summary"><p>Gets a reader, throwing if it does not exist</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public DelayedReader&lt;T&gt; Get&lt;T&gt;()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Deli.Runtime.DelayedReader-1.html">DelayedReader</a>&lt;T&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td><p>The type to get the reader for</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.keynotfoundexception">KeyNotFoundException</a></td>
+        <td><p>Reader was not present</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/Deli-Collective/Deli/new/main/apiSpec/new?filename=Deli_Runtime_DelayedReaderCollection_TryGet__1_Deli_Runtime_DelayedReader___0___.md&amp;value=---%0Auid%3A%20Deli.Runtime.DelayedReaderCollection.TryGet%60%601(Deli.Runtime.DelayedReader%7B%60%600%7D%40)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/Deli-Collective/Deli/blob/main/src/Deli.Setup/src/Runtime/DelayedReaderCollection.cs/#L45">View Source</a>
+  </span>
+  <a id="Deli_Runtime_DelayedReaderCollection_TryGet_" data-uid="Deli.Runtime.DelayedReaderCollection.TryGet*"></a>
+  <h4 id="Deli_Runtime_DelayedReaderCollection_TryGet__1_Deli_Runtime_DelayedReader___0___" data-uid="Deli.Runtime.DelayedReaderCollection.TryGet``1(Deli.Runtime.DelayedReader{``0}@)">TryGet&lt;T&gt;(out DelayedReader&lt;T&gt;)</h4>
+  <div class="markdown level1 summary"><p>Tries to get a reader, returning a success <span class="xref">langword_csharp_bool</span> instead of throwing</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool TryGet&lt;T&gt;(out DelayedReader&lt;T&gt; reader)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Deli.Runtime.DelayedReader-1.html">DelayedReader</a>&lt;T&gt;</td>
+        <td><span class="parametername">reader</span></td>
+        <td><p>The reader, if it was found</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td><p>The type to get the reader for</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.ienumerable">System.Collections.IEnumerable</a>
+  </div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/Deli-Collective/Deli/new/main/apiSpec/new?filename=Deli_Runtime_DelayedReaderCollection.md&amp;value=---%0Auid%3A%20Deli.Runtime.DelayedReaderCollection%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/Deli-Collective/Deli/blob/main/src/Deli.Setup/src/Runtime/DelayedReaderCollection.cs/#L10" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <div class="toggle-mode">
+                <div class="icon">
+                  <i aria-hidden="true">☀</i>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="switch-style">
+                  <span class="slider round"></span>
+                </label>
+                <div class="icon">
+                  <i aria-hidden="true">☾</i>
+                </div>
+                <script type="text/javascript" src="../styles/toggle-theme.js"></script>
+              </div>
+          
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

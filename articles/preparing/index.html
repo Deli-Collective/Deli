@@ -1,0 +1,216 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Preparing a Mod </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Preparing a Mod ">
+    <meta name="generator" content="docfx 2.56.7.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="preparing-a-mod">Preparing a Mod</h1>
+
+<p>To actually load the content in the following guides, you need to prepare a mod so Deli knows about it.</p>
+<h2 id="creating-the-manifest">Creating the Manifest</h2>
+<p>The <code>manifest.json</code> file is within all Deli mods and contains information about the mod it is contained in. This information varies in
+importance from mission-critical to almost never used.</p>
+<p>The bare minimum manifest is:</p>
+<pre><code class="lang-json">{
+  &quot;guid&quot;: &quot;example&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;require&quot;: &quot;0.3.0&quot;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>guid</code></td>
+<td>string; lowercase alphanumeric with <code>.</code> and <code>_</code> permitted</td>
+<td>The unique identifier for the mod. <strong>This should not conflict with any other mod</strong>.</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td>a SemVer-compatible version</td>
+<td>The version of the mod.</td>
+</tr>
+<tr>
+<td><code>require</code></td>
+<td>a SemVer-compatible version</td>
+<td>The version of Deli that the mod needs.</td>
+</tr>
+</tbody>
+</table>
+<div class="NOTE">
+<h5>Note</h5>
+<p>There are many more optional properties! Other guides will demonstrate more, and all properties can be found in
+<a href="../manifest.schema.json">the schema file</a>.</p>
+</div>
+<h2 id="creating-the-mod">Creating the Mod</h2>
+<p>A Deli mod is some form of a directory that contains a manifest file. Currently, directories and zip files are supported.</p>
+<p>For the purposes of development, you will want a directory mod. Simply create a directory in <code>Deli/mods/</code> (title it anything; the title is not
+used).<br>
+<img src="images/create_directory.png" alt="Example of creating a subdirectory in Deli/mods/"></p>
+<p>Then, place the manifest file into the directory.<br>
+<img src="images/insert_manifest.png" alt="Example of placing the manifest in the subdirectory"></p>
+<p>Huzzah! Your directory has turned into a mod!</p>
+<div class="WARNING">
+<h5>Warning</h5>
+<p>Do not place the manifest file directly in the mods directory, as doing so will give you a warning and nothing else. You must place the
+manifest within a subdirectory for Deli to care about it.</p>
+</div>
+<h2 id="packaging-the-mod">Packaging the Mod</h2>
+<div class="TIP">
+<h5>Tip</h5>
+<p>If you have not already, you may want to follow some other guides before continuing with this guide. Packaging a mod will have no effect
+on its behaviour, so there is not point unless you wish to distribute it.</p>
+</div>
+<p>When you are ready to release, you should package your mod. Doing so means that users simply drag and drop a file into their mods
+directory, and removes the complexity of multiple files and directories. Packaging is a two part process:</p>
+<h3 id="zipping">Zipping</h3>
+<p>Simply zip the contents of the directory, like so:<br>
+<img src="images/proper_zip.png" alt="Example of properly zipping a mod"></p>
+<p><strong>Do not zip the directory itself</strong>, or Deli will fail to find the manifest and thus fail to load the mod.<br>
+<img src="images/improper_zip.png" alt="Example of improperly zipping a mod"></p>
+<div class="WARNING">
+<h5>Warning</h5>
+<p>Not all zip tools are created equal! Some (like PowerShell 5.1) violate <a href="https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT">the zip file
+specification</a>, primarily 4.4.17.1. We recommend 7-Zip for both users and
+creators, but the default Windows tool should be fine.</p>
+</div>
+<ol start="2">
+<li>Change the extension of the zip file from <code>zip</code> to <code>deli</code>.</li>
+</ol>
+<div class="NOTE">
+<h5>Note</h5>
+<p>If you cannot see file name extensions, you may need to enable &quot;File name extensions&quot; in File Explorer:
+<img src="images/file_extensions.png" alt="Highlighted options showing how to enable &quot;File name extensions&quot;"></p>
+</div>
+<p>Your mod is now ready for release!</p>
+<h2 id="release-tips">Release Tips</h2>
+<p>Here's a few niche tips for when you release your mod, but make for a smoother user experience nonetheless:</p>
+<ol>
+<li>If your release website only supports archive files (e.g. BoneTome), place the mod file within an archive and upload that archive. <strong>Do
+not rename the mod file back to a zip</strong>, or users will extract it directly to their mods directory. This has been documented several
+times within support channels.<br>
+<img src="images/mod_in_zip.png" alt="Example of a mod file in a zip file"></li>
+<li>Keep a consistent file name. Many users perform a drag and drop installation and nothing more. If the file name of one version is different from
+another, a user might forget to delete the old version. This will cause both versions to fail to load, and is intended behaviour.</li>
+</ol>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/Deli-Collective/Deli/blob/main/docs/articles/preparing/index.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <div class="toggle-mode">
+                <div class="icon">
+                  <i aria-hidden="true">☀</i>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="switch-style">
+                  <span class="slider round"></span>
+                </label>
+                <div class="icon">
+                  <i aria-hidden="true">☾</i>
+                </div>
+                <script type="text/javascript" src="../../styles/toggle-theme.js"></script>
+              </div>
+          
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

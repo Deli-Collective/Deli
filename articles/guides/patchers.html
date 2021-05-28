@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Patchers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Patchers ">
+    <meta name="generator" content="docfx 2.56.7.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="patchers">Patchers</h1>
+
+<p>Patchers allow mods to edit or replace assemblies before they are loaded. This can be for a multitude of reasons, but a common one is to
+add or remove members from a type (as this is not possible in runtime alternatives).</p>
+<div class="IMPORTANT">
+<h5>Important</h5>
+<p>Patchers' plugins must be <a class="xref" href="../../api/Deli.Patcher.DeliModule.html">DeliModule</a>s; they cannot be <a class="xref" href="../../api/Deli.Setup.DeliBehaviour.html">DeliBehaviour</a>. Ensure you have the appropriate plugin to
+begin.</p>
+</div>
+<h2 id="creating-a-patcher">Creating a Patcher</h2>
+<p>Patchers are simple. They only take a single, <code>ref</code> assembly parameter:</p>
+<pre><code class="lang-c#">using Mono.Cecil;
+
+public static void MyPatcher(ref AssemblyDefinition assembly)
+{
+    // Modify the assembly here using Mono.Cecil
+}
+</code></pre>
+<p>Their implications are fairly complex though. If a patcher assembly references other assemblies, those assemblies become immune to
+patchers. This is the reason why you cannot use <a class="xref" href="../../api/Deli.Setup.DeliBehaviour.html">DeliBehaviour</a> for patchers: they will prematurely load the core Unity assembly,
+which BepInEx must patch.</p>
+<div class="TIP">
+<h5>Tip</h5>
+<p>Do as little as possible in a patcher. That way, the most amount of assemblies can be patched.</p>
+</div>
+<h2 id="inserting-a-patcher">Inserting a Patcher</h2>
+<p>When inserting a patcher, you need to supply the mod that the patch originates from, and the name of the DLL file you wish to patch.</p>
+<p>A demonstration of this would be:</p>
+<pre><code class="lang-c#">using Mono.Cecil;
+
+private void PatchTheGame(ref AssemblyDefinition assembly)
+{
+    ...
+}
+
+private void OnPatcher(PatcherStage stage)
+{
+    stage.Patchers[Source, &quot;Assembly-CSharp.dll&quot;] = PatchTheGame;
+}
+</code></pre>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/Deli-Collective/Deli/blob/main/docs/articles/guides/patchers.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <div class="toggle-mode">
+                <div class="icon">
+                  <i aria-hidden="true">☀</i>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="switch-style">
+                  <span class="slider round"></span>
+                </label>
+                <div class="icon">
+                  <i aria-hidden="true">☾</i>
+                </div>
+                <script type="text/javascript" src="../../styles/toggle-theme.js"></script>
+              </div>
+          
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>
