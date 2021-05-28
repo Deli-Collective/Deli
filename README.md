@@ -5,7 +5,6 @@ see the evolution of Deli: [Stratum](https://github.com/H3VR-Modding/Stratum).
 ---
 # Deli
 ![latest version](https://img.shields.io/github/v/release/Deli-Collective/Deli?label=latest&style=flat-square)
-[![Discord](https://img.shields.io/discord/777351065950879744?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2&style=flat-square)](https://discord.gg/g8xeFyt42j)
 
 Deli is a modding framework which provides a uniform way of packaging and loading mods, each containing any type or number of
 assets. While it was originally made for the popular VR firearms sandbox game _Hotdogs, Horseshoes & Hand Grenades_, its dependency on
@@ -14,7 +13,6 @@ BepInEx means it theoretically works for any Unity game.
 ## Quick Links
 - [Installing](https://github.com/Deli-Collective/Deli/wiki/Installation)
 - [Milestones](https://github.com/Deli-Collective/Deli/milestones) (i.e. plans for future updates)
-- [Join us on Discord for discussions, updates and support](https://discord.gg/g8xeFyt42j)
 
 ## Features
 - **Standardized mod installation**: Have a mod you want to install? Drop it in the mods folder and you're good to go.

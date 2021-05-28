@@ -14,6 +14,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   - The cache is now saved to `BepInEx/patchers/DeliTeam-Deli/cache/`
   - Zip mods are now loaded from `BepInEx/plugins/*/**/`, e.g. `BepInEx/plugins/MyName-MyMod/MyMod.deli`
   - Directory mods are now loaded from `BepInEx/plugins/*/*/**/`, e.g. `BepInEx/plugins/MyName-MyMod/DeliMod/manifest.json`
+### Removed
+- Discord invite from `README.md`
 
 ## [0.3.2]
 ### Fixed
