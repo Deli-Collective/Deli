@@ -36,24 +36,57 @@ namespace Deli.Patcher
 
 	internal sealed class DeliMonoModder : MonoModder
 	{
-		private static readonly DeliAssemblyResolver Resolver;
+		private static readonly DefaultAssemblyResolver Resolver;
 
 		static DeliMonoModder()
 		{
 			Resolver = new();
 
-			static IEnumerable<string> SearchDirectories()
-			{
-				yield return Paths.BepInExAssemblyDirectory;
-				yield return Paths.PatcherPluginPath;
-				yield return Paths.PluginPath;
-				yield return Paths.ManagedPath;
-			}
-
 			foreach (var directory in SearchDirectories())
 			{
 				Resolver.AddSearchDirectory(directory);
 			}
+
+			Resolver.ResolveFailure += ResolverOnResolveFailure;
+		}
+
+		private static IEnumerable<string> SearchDirectories()
+		{
+			yield return Paths.BepInExAssemblyDirectory;
+			yield return Paths.PatcherPluginPath;
+			yield return Paths.PluginPath;
+			yield return Paths.ManagedPath;
+			yield return Path.Combine(Paths.BepInExRootPath, "monomod");
+		}
+
+		// Copied from BepInEx.MonoMod.Loader
+		private static AssemblyDefinition? ResolverOnResolveFailure(object sender, AssemblyNameReference reference)
+		{
+			foreach (var directory in SearchDirectories())
+			{
+				var potentialDirectories = new List<string> { directory };
+
+				potentialDirectories.AddRange(Directory.GetDirectories(directory, "*", SearchOption.AllDirectories));
+
+				var potentialFiles = potentialDirectories.Select(x => Path.Combine(x, $"{reference.Name}.dll"))
+					.Concat(potentialDirectories.Select(
+						x => Path.Combine(x, $"{reference.Name}.exe")));
+
+				foreach (string path in potentialFiles)
+				{
+					if (!File.Exists(path))
+						continue;
+
+					var assembly = AssemblyDefinition.ReadAssembly(path, new ReaderParameters(ReadingMode.Deferred));
+
+					if (assembly.Name.Name == reference.Name)
+						return assembly;
+
+					assembly.Dispose();
+				}
+			}
+
+			return null;
 		}
 
 		private readonly ManualLogSource _logger;
@@ -180,10 +213,13 @@ namespace Deli.Patcher
 					for (var i = 0; i < modBuffer.Length; ++i)
 					{
 						var file = Mods[i];
-						var mod = file.OpenRead();
+						using var mod = file.OpenRead();
 
-						modBuffer[i] = mod;
-						modder.ReadMod(mod);
+						var buffer = new MemoryStream();
+						mod.CopyTo(buffer);
+
+						modBuffer[i] = buffer;
+						modder.ReadMod(buffer);
 					}
 
 					modder.MapDependencies();

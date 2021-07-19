@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Semver;
 
@@ -126,6 +127,15 @@ namespace Deli
 				.Append(char.ToUpperInvariant(original[0]))
 				.Append(original, 1, original.Length - 1)
 				.ToString();
+		}
+
+		public static void CopyTo(this Stream @this, Stream other)
+		{
+			var buffer = new byte[20 * 4096];
+			int read;
+
+			while ((read = @this.Read(buffer, 0, buffer.Length)) != 0)
+				other.Write(buffer, 0, read);
 		}
 	}
 }

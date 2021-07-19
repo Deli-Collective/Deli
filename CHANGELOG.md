@@ -7,6 +7,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.2]
+### Fixed
+- MonoMod patchers will no longer throw exceptions when BepInEx.MonoModLoader is used
+
 ## [0.4.0]
 ### Added
 - LTS notice to `README.md`
@@ -26,6 +30,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - `deli:monomod.hookgen` no longer throws exceptions when non-Deli MonoMod patches are present [#27]
 
 [unreleased]: https://github.com/Deli-Collective/Deli/compare/v0.3.2...HEAD
+[0.4.2]: https://github.com/Deli-Collective/Deli/compare/v0.4.0...v0.4.2
 [0.4.0]: https://github.com/Deli-Collective/Deli/compare/v0.3.2...v0.4.0
 [0.3.2]: https://github.com/Deli-Collective/Deli/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/Deli-Collective/Deli/tree/v0.3.1
