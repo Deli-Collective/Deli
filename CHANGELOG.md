@@ -10,6 +10,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ## [0.4.2]
 ### Fixed
 - MonoMod patchers will no longer throw exceptions when BepInEx.MonoModLoader is used
+- A ReflectionTypeLoadException will no longer cause a crash
 
 ## [0.4.0]
 ### Added

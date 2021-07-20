@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using BepInEx.Logging;
 using Deli.Immediate;
@@ -163,7 +164,18 @@ namespace Deli
 
 		protected void AssemblyLoader(Stage stage, Mod mod, Assembly assembly)
 		{
-			foreach (var type in assembly.GetExportedTypes())
+			IEnumerable<Type> types;
+			try
+			{
+				types = assembly.GetExportedTypes();
+			}
+			catch (ReflectionTypeLoadException e)
+			{
+				Logger.LogWarning($"Could not load all types from {assembly} within {mod}.");
+				types = e.Types.Where(x => x != null);
+			}
+
+			foreach (var type in types)
 			{
 				TypeLoader(stage, mod, type);
 			}
