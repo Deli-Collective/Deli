@@ -1,0 +1,152 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Deli Developer Documentation </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Deli Developer Documentation ">
+    <meta name="generator" content="docfx 2.56.7.0">
+    
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="styles/docfx.vendor.css">
+    <link rel="stylesheet" href="styles/docfx.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <meta property="docfx:navrel" content="toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="index.html">
+                <img id="logo" class="svg" src="logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="deli-developer-documentation">Deli Developer Documentation</h1>
+
+<p>Welcome! If you are looking for documentation on Deli, made to be read by developers, you are in the right place! If you are instead looking
+for user documentation, such as installation instructions, see the <a href="https://github.com/Deli-Collective/Deli/wiki">GitHub wiki</a>.</p>
+<p>Aside from this homepage, this website is split into 2 parts: articles and API documentation.<br>
+Articles are hand-written documents. They should be especially helpful in getting the big picture.<br>
+API documentation is a collection of auto-generated pages, each detailing a type. If you need XML docs, you can find them there.</p>
+<h2 id="why-use-deli">Why Use Deli</h2>
+<p>The fundamental purpose of Deli is to centralize the loading of arbitrary data, so that all mods are in a single format. The secondary goal
+is to abstract and simplify IO to the point where most mods are no longer code, but data that other mods operate on.</p>
+<p>What does that mean in practice? Consider <em>Hotdogs, Horseshoes &amp; Hand Grenades</em> (H3VR), a VR sandbox shooter.</p>
+<h3 id="the-necessity">The Necessity</h3>
+<p>Before Deli, H3VR had 5 different mod formats:</p>
+<ul>
+<li>BepInEx plugins: arbitrary code</li>
+<li>LSIIC virtual objects: new guns, magazines, and attachments</li>
+<li>Sideloader mods: asset replacement via XUnity.ResourceRedirector</li>
+<li>TNHTweaker characters: new ways to play Take and Hold, a rogue-like gamemode within the game</li>
+<li>WurstMod maps: new maps to play Take and Hold on, and even new maps which contain new gamemodes entirely</li>
+</ul>
+<p>That is quite the variety, and new users knew that. Without Deli, each format had different installation instructions, no baseline metadata,
+and each mod had to do all of the IO that was needed. Consequently, there were redundancies in all of the frameworks and it was difficult to
+create and maintain them due to the added complexity.</p>
+<h3 id="the-effect">The Effect</h3>
+<p>After Deli was introduced, the following formats shifted or began to embed themselves in Deli mods:</p>
+<ul>
+<li>BepInEx plugins</li>
+<li>TNHTweaker characters</li>
+<li>WurstMod maps</li>
+</ul>
+<p>The other formats have not been embedded in Deli yet, because of constraints in Deli's v0.2 design. Though, these are still planned to be
+converted.</p>
+<p>For users this was amazing: you download a <code>.deli</code> file, drop it in the <code>mods</code> folder, and the mod is installed. If it requires other mods,
+Deli errors out and tells you. No special instructions.<br>
+For developers it was amazing: less code to write and maintain, and less problems with installation.</p>
+<h2 id="what-deli-is-not">What Deli is Not</h2>
+<p>Deli is not, and will not, replace BepInEx. Deli mods can contain arbitrary code akin to BepInEx patchers/plugins, but Deli still utilizes
+many features of BepInEx. It would be a waste of effort to reimplement and maintain all that BepInEx provides.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/Deli-Collective/Deli/blob/main/docs/index.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <div class="toggle-mode">
+                <div class="icon">
+                  <i aria-hidden="true">☀</i>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="switch-style">
+                  <span class="slider round"></span>
+                </label>
+                <div class="icon">
+                  <i aria-hidden="true">☾</i>
+                </div>
+                <script type="text/javascript" src="styles/toggle-theme.js"></script>
+              </div>
+          
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="styles/docfx.js"></script>
+    <script type="text/javascript" src="styles/main.js"></script>
+  </body>
+</html>

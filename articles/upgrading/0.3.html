@@ -1,0 +1,375 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Upgrading from 0.2 to 0.3 </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Upgrading from 0.2 to 0.3 ">
+    <meta name="generator" content="docfx 2.56.7.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="upgrading-from-02-to-03">Upgrading from 0.2 to 0.3</h1>
+
+<div class="WARNING">
+<h5>Warning</h5>
+<p>Upgrade articles do not cover every change, only the largest and most common to encounter. If you encounter a change that was
+undocumented, feel free to edit the article.<br>
+Additionally, the conversion examples in this article will only cover converting to immediate stages. See individual guides for use
+during runtime.</p>
+</div>
+<h2 id="adjusting-stages">Adjusting Stages</h2>
+<p>The first (and easiest) requirement to upgrading is understanding when your mod should load. This can be simply mapped as:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Old stage</th>
+<th style="text-align: left;">New stage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">patcher</td>
+<td style="text-align: left;">patcher</td>
+</tr>
+<tr>
+<td style="text-align: left;">runtime</td>
+<td style="text-align: left;">setup</td>
+</tr>
+<tr>
+<td style="text-align: left;"><em>no equivalent</em></td>
+<td style="text-align: left;">runtime</td>
+</tr>
+</tbody>
+</table>
+<div class="NOTE">
+<h5>Note</h5>
+<p>Readers or loaders designed for assets that take a long time to load should be moved to runtime.<br>
+Almost anything that isn't a normal-sized text file (or serialized as such) should make use of this to reduce startup delay.<br>
+Convert your method to the corresponding stage first, then convert it to a runtime method.</p>
+</div>
+<h2 id="adjusting-the-manifest">Adjusting the Manifest</h2>
+<p>There have been numerous adjustments to the manifest, easily demonstrated in a config change.<br>
+Old:</p>
+<pre><code class="lang-json">{
+  &quot;guid&quot;: &quot;example.primary&quot;, // REQUIRED
+  &quot;version&quot;: &quot;1.0.0&quot;, // REQUIRED
+  &quot;dependencies&quot;: {
+    &quot;example.secondary&quot;: &quot;1.0.0&quot;
+  },
+  &quot;name&quot;: &quot;Example Mod (Primary)&quot;,
+  &quot;authors&quot;: [ &quot;Person 1&quot;, &quot;Person 2&quot;, &quot;Group&quot; ],
+  &quot;sourceUrl&quot;: &quot;https://example.org&quot;,
+  &quot;patcher&quot;: {
+    &quot;MyPatcher.dll&quot;: &quot;assembly&quot;
+  },
+  &quot;runtime&quot;: {
+    &quot;MyRuntime.dll&quot;: &quot;assembly&quot;
+  }
+}
+</code></pre>
+<p>New:</p>
+<pre><code class="lang-json">{
+  &quot;guid&quot;: &quot;example.primary&quot;, // REQUIRED
+  &quot;version&quot;: &quot;1.0.0&quot;, // REQUIRED, value is now SemVer
+  &quot;require&quot;: &quot;0.3.0&quot;, // REQUIRED, new: SemVer of minimum version of Deli
+  &quot;dependencies&quot;: {
+    &quot;example.secondary&quot;: &quot;1.0.0&quot; // value is now SemVer
+  },
+  &quot;name&quot;: &quot;Example Mod (Primary)&quot;,
+  &quot;description&quot;: &quot;A mod to demonstrate the manifest capabilities.&quot;, // new
+  &quot;authors&quot;: [ &quot;Person 1&quot;, &quot;Person 2&quot;, &quot;Group&quot; ],
+  &quot;source_url&quot;: &quot;https://example.org&quot;, // renamed from &quot;sourceUrl&quot;
+  &quot;assets&quot;: { // new: contains all the stages and their assets
+    &quot;patcher&quot;: {
+      &quot;MyPatcher.dll&quot;: &quot;deli:assembly&quot; // value is now an asset loader ID
+    },
+    &quot;setup&quot;: { // renamed from &quot;runtime&quot;
+      &quot;MyRuntime.dll&quot;: &quot;deli:assembly&quot; // value is now an asset loader ID
+    },
+    &quot;runtime&quot;: { // new
+      &quot;MyActualRuntime.dll&quot;: &quot;deli:assembly&quot; // value is now an asset loader ID
+    }
+  }
+}
+</code></pre>
+<div class="IMPORTANT">
+<h5>Important</h5>
+<p>Asset loaders are now identified by &quot;mod guid:name&quot;, e.g. &quot;example:cool_loader&quot;. Loaders provided by Deli are under the guid: &quot;deli&quot;,
+e.g. &quot;deli:assembly&quot;.</p>
+</div>
+<h2 id="creating-an-entrypoint">Creating an Entrypoint</h2>
+<p>Every type of mutation of the framework now requires an entrypoint; there are no <code>Quick...Bind</code>s to automatically register things for you.
+See <a href="../guides/patcher.md">the patcher</a> or <a href="../guides/behaviour.md">the behaviour</a> guide for information about entrypoints, though not much
+as changed from 0.2 in this regard.</p>
+<h2 id="adjusting-file-reads">Adjusting File Reads</h2>
+<p>The new process of accessing/reading files is much more complex, but grants many more powers.</p>
+<p>Consider the following example from 0.2:</p>
+<pre><code class="lang-c#">// Reads the string within &quot;name.txt&quot;, if it exists
+Option&lt;string&gt; nameOpt = mod.Resources.Get&lt;string&gt;(&quot;name.txt&quot;);
+
+// Unwraps the option, throwing an exception if the file was not found
+string name = nameOpt.Unwrap();
+</code></pre>
+<p>An example of reading during an immediate stage in 0.3 would be:</p>
+<pre><code class="lang-c#">// Represents the file called &quot;name.txt&quot; in the root directory.
+// A null file means that the file was not present.
+// Be sure to validate that this is not null, or you WILL get NullReferenceExceptions!
+IFileHandle? file = mod.Resources.GetFile(&quot;name.txt&quot;);
+
+// The reader that can deserialize files to strings
+ImmediateReader&lt;string&gt; reader = stage.ImmediateReaders.Get&lt;string&gt;();
+
+// Reads the string within &quot;name.txt&quot;
+string name = reader(file);
+</code></pre>
+<div class="IMPORTANT">
+<h5>Important</h5>
+<p>The new process requires a <a class="xref" href="../../api/Deli.Stage.html">Stage</a> instance in order to get the readers, or you must provide the readers yourself. The VFS itself
+cannot deserialize a file, like <code>IResourceIO</code>s used to.</p>
+</div>
+<p>The benefits are not apparent until you use typed handles, which automatically update and cache the deserialized result.<br>
+An example of such, done during an immediate stage:</p>
+<pre><code class="lang-c#">IFileHandle? file = mod.Resources.GetFile(&quot;name.txt&quot;);
+
+ImmediateReader&lt;string&gt; reader = stage.ImmediateReaders.Get&lt;string&gt;();
+
+// Creates a typed handle, which extends the functionality of the original handle
+// Pass and store this in your code instead of the direct name
+var typed = new ImmediateTypedFileHandle&lt;string&gt;(file, reader)
+</code></pre>
+<p>Then when you need the exact file contents:</p>
+<pre><code class="lang-c#">// The string within &quot;name.txt&quot;
+// It will invoke the reader if there is no cache or the file was updated since last caching
+string name = typed.GetOrRead();
+</code></pre>
+<h3 id="json">JSON</h3>
+<p>JSON has been slightly adjusted as well.<br>
+Old:</p>
+<pre><code class="lang-c#">// Adds the JSON reader to the kernel
+kernel.RegisterJson&lt;MyJsonType&gt;();
+
+// Option&lt;MyJsonType&gt; is now supported in IResourceIOs
+</code></pre>
+<p>New (any stage):</p>
+<pre><code class="lang-c#">// Returns the JSON reader for that type
+// Multiple invocations are safe
+ImmediateReader&lt;MyJsonType&gt; reader = stage.RegisterJson&lt;MyJsonType&gt;();
+
+// Use the immediate reader like any other
+</code></pre>
+<h2 id="adjusting-asset-readers">Adjusting Asset Readers</h2>
+<p>Readers have the same purpose, but they have changed by a large percent:</p>
+<ul>
+<li>Now a delegate (was single method interface)</li>
+<li>Now takes a <a class="xref" href="../../api/Deli.VFS.IFileHandle.html">IFileHandle</a> (was <code>byte[]</code>)</li>
+</ul>
+<p>Consider an old <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a> reader:</p>
+<pre><code class="lang-c#">[QuickUnnamedBind]
+class StringReader : IAssetReader&lt;string&gt;
+{
+    public string ReadAsset(byte[] raw)
+    {
+        // Convert the raw file contents to a string
+        return Encoding.UTF8.GetString(raw);
+    }
+}
+</code></pre>
+<p>Converted to an immediate reader:</p>
+<pre><code class="lang-c#">// Name does not matter
+// Static, because the method does not require any state
+public static string ReadString(IFileHandle file)
+{
+    // Open a stream to the raw file contents, similar to how we were provided a byte array before 
+    using var raw = file.OpenRead();
+    // Wrap the raw content in a text reader
+    using var text = new StreamReader(raw);
+    
+    // Read the contents to a string
+    return text.ReadToEnd();
+}
+</code></pre>
+<div class="TIP">
+<h5>Tip</h5>
+<p>If your reader method needs state from its old type, then keep the type! Your non-static reader method can still be assigned to a
+reader collection.</p>
+</div>
+<p>Then, add the reader to an immediate reader collection:</p>
+<pre><code class="lang-c#">// Allows anyone to use the reader
+// If a reader already exists for the type, a warning is logged and the new reader is ignored
+stage.ImmediateReaders.Add(ReadString);
+</code></pre>
+<h2 id="adjusting-asset-loaders">Adjusting Asset Loaders</h2>
+<p>Like its sibling, the reader, the loader has changed in form but not purpose:</p>
+<ul>
+<li>Now a delegate (was a single method interface)</li>
+<li>Now takes a <a class="xref" href="../../api/Deli.Stage.html">Stage</a> (or more specific; was <code>IServiceKernel</code>)</li>
+<li>Now takes an <a class="xref" href="../../api/Deli.VFS.IHandle.html">IHandle</a> (was @System.String)</li>
+</ul>
+<p>For example, an old loader:</p>
+<pre><code class="lang-c#">[QuickNamedBind(&quot;cool_number&quot;)]
+class CoolNumberAssetLoader : IAssetLoader
+{
+    public void LoadAsset(IServiceKernel kernel, Mod mod, string path)
+    {
+        // Read an integer from the path given (file), and throw if it does not exist
+        int n = mod.Resources.Get&lt;int&gt;(path).Unwrap();
+        
+        DoSomethingReallyCool(n);
+    }
+    
+    private void DoSomethingReallyCool(int n)
+    {
+        ...
+    }
+}
+</code></pre>
+<p>Versus a new setup loader:</p>
+<pre><code class="lang-c#">class CoolNumberAssetLoader
+{
+    // Name does not matter
+    public void LoadAsset(SetupStage stage, Mod mod, IHandle handle)
+    {
+        // Ensure the handle is a file (not a directory)
+        if (handle is not IFileHandle file)
+        {
+            throw new ArgumentException(&quot;Cool number loading requires a file handle.&quot;, nameof(handle));
+        }
+        
+        // This was already covered in the file access section
+        ImmediateReader&lt;int&gt; reader = stage.ImmediateReaders.Get&lt;int&gt;();
+        int n = reader(file)
+        
+        DoSomethingReallyCool(n);
+    }
+    
+    private void DoSomethingReallyCool(int n)
+    {
+        ...
+    }
+}
+</code></pre>
+<div class="TIP">
+<h5>Tip</h5>
+<p>If you require multiple files for one loader, you can pattern match to <a class="xref" href="../../api/Deli.VFS.IDirectoryHandle.html">IDirectoryHandle</a> instead of <a class="xref" href="../../api/Deli.VFS.IFileHandle.html">IFileHandle</a>. Then,
+simply access the files within the directory.</p>
+</div>
+<p>Then, add it to the loader collection:</p>
+<pre><code class="lang-c#">// Allows anyone to use the reader
+// If a reader already exists for the type, a warning is logged and the new reader is ignored
+stage.SetupAssetLoaders[Source, &quot;cool_number&quot;] = new CoolNumberAssetLoader().LoadAsset;
+</code></pre>
+<div class="NOTE">
+<h5>Note</h5>
+<p>The above example assumes you are in a <a class="xref" href="../../api/Deli.Patcher.DeliModule.html">DeliModule</a> or <a class="xref" href="../../api/Deli.Setup.DeliBehaviour.html">DeliBehaviour</a>, in which case <code>Source</code> means the <a class="xref" href="../../api/Deli.Mod.html">Mod</a> that the plugin originated from.</p>
+</div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/Deli-Collective/Deli/blob/main/docs/articles/upgrading/0.3.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <div class="toggle-mode">
+                <div class="icon">
+                  <i aria-hidden="true">☀</i>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="switch-style">
+                  <span class="slider round"></span>
+                </label>
+                <div class="icon">
+                  <i aria-hidden="true">☾</i>
+                </div>
+                <script type="text/javascript" src="../../styles/toggle-theme.js"></script>
+              </div>
+          
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

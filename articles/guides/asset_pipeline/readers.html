@@ -1,0 +1,203 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Asset Readers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Asset Readers ">
+    <meta name="generator" content="docfx 2.56.7.0">
+    
+    <link rel="shortcut icon" href="../../../favicon.ico">
+    <link rel="stylesheet" href="../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../toc.html">
+    <meta property="docfx:tocrel" content="../../toc.html">
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../index.html">
+                <img id="logo" class="svg" src="../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="asset-readers">Asset Readers</h1>
+
+<p>Asset readers (or just &quot;readers&quot;) are delegates which deserialize for file formats. They are a part of the asset pipeline, and may also be
+used by mods to directly access files.</p>
+<div class="TIP">
+<h5>Tip</h5>
+<p>A completed asset reader can be found in <a href="https://github.com/Deli-Collective/Deli.ExampleMod/blob/master/Deli.ExampleMod/src/AssetReaders.cs">the example
+mod</a>.</p>
+</div>
+<h2 id="creating-a-immediate-reader">Creating a (Immediate) Reader</h2>
+<p>Readers come in many forms. Consider a simple static method for reading purely the data that is given:</p>
+<pre><code class="lang-c#">using Deli.VFS;
+
+public static byte ByteOf(IFileHandle file)
+{
+    using var raw = file.OpenRead();
+    
+    return raw.ReadByte();
+} 
+</code></pre>
+<p>Some readers may need access to other readers to complete their duties (higher order functions). In this case, a closure class can be made:</p>
+<pre><code class="lang-c#">using Deli;
+using Deli.VFS;
+
+public class ByteReaderClosure
+{
+    private readonly ImmediateReader&lt;int&gt; _intOf;
+    
+    public ByteReaderClosure(ImmediateReader&lt;int&gt; intOf)
+    {
+        _intOf = intOf;
+    }
+    
+    public byte ByteOf(IFileHandle file)
+    {
+        return (byte) _intOf(file);
+    }
+}
+</code></pre>
+<h2 id="creating-a-delayed-reader">Creating a Delayed Reader</h2>
+<p>Delayed readers are more complex within the method body, but easy to setup. Just wrap the return value of the previous reader in a
+<a class="xref" href="../../../api/Deli.Runtime.Yielding.ResultYieldInstruction-1.html">ResultYieldInstruction&lt;TResult&gt;</a>:</p>
+<pre><code class="lang-c#">using Deli.Runtime.Yielding;
+using Deli.VFS;
+
+public static ResultYieldInstruction&lt;byte[]&gt; BytesOf(IFileHandle file)
+{
+    var raw = file.OpenRead();
+    var buffer = new byte[stream.Length];
+
+    return new AsyncYieldInstruction&lt;Stream&gt;(raw, (self, callback, state) =&gt; self.BeginRead(buffer, 0, buffer.Length, callback, state),
+        (self, result) =&gt; self.EndRead(result)).CallbackWith(() =&gt;
+    {
+        raw.Dispose();
+        return buffer;
+    });
+}
+</code></pre>
+<div class="WARNING">
+<h5>Warning</h5>
+<p>Using statements mean that the object is disposed when the function returns. Do not use using statements for delayed readers, or the
+stream will close before the coroutine starts.</p>
+</div>
+<h2 id="inserting-a-reader">Inserting a Reader</h2>
+<p>Once made, the readers still need to be made available to Deli. To do so, simply add it to one of the stage's reader collections:</p>
+<pre><code class="lang-c#">using Deli.Setup;
+using Deli.VFS;
+
+private static void ByteOf(IFileHandle file) 
+{ 
+    ... 
+}
+
+private void OnSetup(SetupStage stage)
+{
+    stage.ImmediateReaders.Add(ByteOf);
+}
+</code></pre>
+<div class="TIP">
+<h5>Tip</h5>
+<p>Readers inserted into one stage are passed to all stages following it. Insert readers as early as possible.</p>
+</div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/Deli-Collective/Deli/blob/main/docs/articles/guides/asset_pipeline/readers.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <div class="toggle-mode">
+                <div class="icon">
+                  <i aria-hidden="true">☀</i>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="switch-style">
+                  <span class="slider round"></span>
+                </label>
+                <div class="icon">
+                  <i aria-hidden="true">☾</i>
+                </div>
+                <script type="text/javascript" src="../../../styles/toggle-theme.js"></script>
+              </div>
+          
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../styles/main.js"></script>
+  </body>
+</html>
